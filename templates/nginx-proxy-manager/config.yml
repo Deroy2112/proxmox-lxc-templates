@@ -1,0 +1,14 @@
+name: nginx-proxy-manager
+description: Nginx Proxy Manager - Web-based reverse proxy management on Debian 13 (Trixie)
+version: 2.13.5
+build_version: 1
+base_os: debian-13
+architecture: amd64
+maintainer: Deroy2112 <81692934+Deroy2112@users.noreply.github.com>
+
+resources:
+  memory_min: 512
+  memory_recommended: 1024
+  disk_min: 4G
+  disk_recommended: 8G
+  cores: 2
