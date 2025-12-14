@@ -19,7 +19,7 @@ apt-get install -y --no-install-recommends \
     mediainfo \
     librhash-dev
 
-# === Add Microsoft .NET repository ===
+# === Add Microsoft .NET repository (using bookworm - compatible with trixie) ===
 mkdir -p /etc/apt/keyrings
 curl -fsSL https://packages.microsoft.com/keys/microsoft.asc \
     | gpg --dearmor -o /etc/apt/keyrings/microsoft.gpg
@@ -27,8 +27,8 @@ chmod 644 /etc/apt/keyrings/microsoft.gpg
 
 cat > /etc/apt/sources.list.d/microsoft.sources <<'EOF'
 Types: deb
-URIs: https://packages.microsoft.com/debian/13/prod
-Suites: trixie
+URIs: https://packages.microsoft.com/debian/12/prod
+Suites: bookworm
 Components: main
 Architectures: amd64
 Signed-By: /etc/apt/keyrings/microsoft.gpg
@@ -84,7 +84,7 @@ INSTALL_DATE="__DATE__"
 EOF
 
 # === Install template-update tool ===
-repo_raw_url=$(echo "${TEMPLATE_REPO}" | sed 's|github.com|raw.githubusercontent.com|')/main
+repo_raw_url="${TEMPLATE_REPO/github.com/raw.githubusercontent.com}/main"
 curl -fsSL "${repo_raw_url}/scripts/template-update.sh" \
     -o /usr/local/bin/template-update
 chmod +x /usr/local/bin/template-update
