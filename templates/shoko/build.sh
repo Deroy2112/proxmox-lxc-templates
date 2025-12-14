@@ -44,7 +44,7 @@ useradd -r -s /usr/sbin/nologin -d "$SHOKO_DIR" "$SHOKO_USER"
 
 # === Download and install Shoko Server ===
 mkdir -p "$SHOKO_DIR"
-curl -fsSL "https://github.com/ShokoAnime/ShokoServer/releases/download/v${SHOKO_VERSION}/Shoko.CLI-linux-x64-v${SHOKO_VERSION}.zip" \
+curl -fsSL "https://github.com/ShokoAnime/ShokoServer/releases/download/v${SHOKO_VERSION}/Shoko.CLI_Framework_any-x64.zip" \
     -o /tmp/shoko.zip
 unzip -q /tmp/shoko.zip -d "$SHOKO_DIR"
 chmod +x "$SHOKO_DIR/Shoko.CLI"
