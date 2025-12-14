@@ -7,6 +7,7 @@ set -euo pipefail
 export DEBIAN_FRONTEND=noninteractive
 
 readonly NPM_VERSION="2.13.5"
+readonly NPM_DIR="/opt/nginxproxymanager"
 readonly APP_DIR="/app"
 readonly DATA_DIR="/data"
 
@@ -29,9 +30,9 @@ apt-get install -y --no-install-recommends \
 
 # === Setup Certbot in virtualenv ===
 python3 -m venv /opt/certbot
-/opt/certbot/bin/pip install --upgrade pip
+/opt/certbot/bin/pip install --upgrade pip setuptools wheel
 /opt/certbot/bin/pip install certbot certbot-dns-cloudflare
-ln -sf /opt/certbot/bin/certbot /usr/bin/certbot
+ln -sf /opt/certbot/bin/certbot /usr/local/bin/certbot
 
 # === Add Node.js repository (Node.js 22 LTS) ===
 mkdir -p /etc/apt/keyrings
@@ -68,43 +69,74 @@ apt-get install -y --no-install-recommends \
     nodejs \
     openresty
 
-# === Create directory structure ===
-mkdir -p "$APP_DIR"/{frontend,backend}
-mkdir -p "$DATA_DIR"/{nginx,logs,letsencrypt,access,custom_ssl}
-mkdir -p "$DATA_DIR/nginx"/{proxy_host,redirection_host,dead_host,stream,temp}
-mkdir -p /var/cache/nginx/proxy_temp
-mkdir -p /run/nginx
+# === Download NPM source ===
+mkdir -p "$NPM_DIR"
+curl -fsSL "https://github.com/NginxProxyManager/nginx-proxy-manager/archive/refs/tags/v${NPM_VERSION}.tar.gz" \
+    -o /tmp/npm.tar.gz
+tar -xzf /tmp/npm.tar.gz -C "$NPM_DIR" --strip-components=1
 
 # === Create symbolic links for binaries ===
 ln -sf /usr/bin/python3 /usr/bin/python
 ln -sf /usr/local/openresty/nginx/sbin/nginx /usr/sbin/nginx
+ln -sf /usr/local/openresty/nginx /etc/nginx
 
-# === Download NPM source ===
-curl -fsSL "https://github.com/NginxProxyManager/nginx-proxy-manager/archive/refs/tags/v${NPM_VERSION}.tar.gz" \
-    -o /tmp/npm.tar.gz
-tar -xzf /tmp/npm.tar.gz -C /tmp
-cd "/tmp/nginx-proxy-manager-${NPM_VERSION}"
+# === Update version in package.json ===
+sed -i "s|\"version\": \"2.0.0\"|\"version\": \"${NPM_VERSION}\"|" "$NPM_DIR/backend/package.json"
+sed -i "s|\"version\": \"2.0.0\"|\"version\": \"${NPM_VERSION}\"|" "$NPM_DIR/frontend/package.json"
 
-# === Copy nginx configuration to OpenResty directory ===
-cp -r docker/rootfs/etc/nginx/* /usr/local/openresty/nginx/conf/
-ln -sf /usr/local/openresty/nginx/conf /etc/nginx
+# === Patch nginx config for non-Docker environment ===
+# Disable daemon mode (systemd manages the process)
+sed -i 's+^daemon+#daemon+g' "$NPM_DIR/docker/rootfs/etc/nginx/nginx.conf"
+
+# Fix include paths to absolute
+NGINX_CONFS=$(find "$NPM_DIR" -type f -name "*.conf")
+for NGINX_CONF in $NGINX_CONFS; do
+    sed -i 's+include conf.d+include /etc/nginx/conf.d+g' "$NGINX_CONF"
+done
+
+# === Create directory structure ===
+mkdir -p /var/www/html /etc/nginx/logs
+mkdir -p /tmp/nginx/body
+mkdir -p /run/nginx
+mkdir -p "$APP_DIR"/frontend/images
+mkdir -p "$DATA_DIR"/{nginx,logs,letsencrypt,access,custom_ssl,letsencrypt-acme-challenge}
+mkdir -p "$DATA_DIR/nginx"/{default_host,default_www,proxy_host,redirection_host,dead_host,stream,temp}
+mkdir -p /var/lib/nginx/cache/{public,private}
+mkdir -p /var/cache/nginx/proxy_temp
+
+chmod -R 777 /var/cache/nginx
+chown root /tmp/nginx
+
+# === Copy files from docker rootfs ===
+cp -r "$NPM_DIR/docker/rootfs/var/www/html/"* /var/www/html/
+cp -r "$NPM_DIR/docker/rootfs/etc/nginx/"* /etc/nginx/
+cp "$NPM_DIR/docker/rootfs/etc/letsencrypt.ini" /etc/letsencrypt.ini
+cp "$NPM_DIR/docker/rootfs/etc/logrotate.d/nginx-proxy-manager" /etc/logrotate.d/nginx-proxy-manager
+
+# === Create additional symlinks ===
+ln -sf /etc/nginx/nginx.conf /etc/nginx/conf/nginx.conf
+
+# === Remove dev config ===
+rm -f /etc/nginx/conf.d/dev.conf
 
 # === Copy backend ===
-cp -r backend/* "$APP_DIR/backend/"
+cp -r "$NPM_DIR/backend/"* "$APP_DIR/"
 
 # === Build Frontend ===
-cd "/tmp/nginx-proxy-manager-${NPM_VERSION}/frontend"
+cd "$NPM_DIR/frontend"
 
+export NODE_OPTIONS="--max_old_space_size=2048"
 npm install
 npm run locale-compile
 npm run build
-cp -r dist/* "$APP_DIR/frontend/"
 
-# === Build Backend ===
-cd "$APP_DIR/backend"
-npm install
+cp -r "$NPM_DIR/frontend/dist/"* "$APP_DIR/frontend/"
+cp -r "$NPM_DIR/frontend/public/images/"* "$APP_DIR/frontend/images/"
 
-# === Create backend config ===
+# === Initialize Backend ===
+cd "$APP_DIR"
+rm -rf "$APP_DIR/config/default.json"
+
 mkdir -p "$APP_DIR/config"
 cat > "$APP_DIR/config/production.json" <<'EOF'
 {
@@ -114,34 +146,46 @@ cat > "$APP_DIR/config/production.json" <<'EOF'
       "client": "sqlite3",
       "connection": {
         "filename": "/data/database.sqlite"
-      },
-      "useNullAsDefault": true
+      }
     }
   }
 }
 EOF
 
+npm install
+
 # === Generate dummy SSL certificates ===
-if [[ ! -f /data/nginx/dummycert.pem ]] || [[ ! -f /data/nginx/dummykey.pem ]]; then
-    openssl req -new -newkey rsa:2048 -days 3650 -nodes -x509 \
-        -subj "/O=Nginx Proxy Manager/OU=Dummy Certificate/CN=localhost" \
-        -keyout /data/nginx/dummykey.pem \
-        -out /data/nginx/dummycert.pem
-fi
+openssl req -new -newkey rsa:2048 -days 3650 -nodes -x509 \
+    -subj "/O=Nginx Proxy Manager/OU=Dummy Certificate/CN=localhost" \
+    -keyout "$DATA_DIR/nginx/dummykey.pem" \
+    -out "$DATA_DIR/nginx/dummycert.pem"
+
+# === Patch nginx.conf for root user (no npm user in LXC) ===
+sed -i 's/user npm/user root/g; s/^pid/#pid/g' /etc/nginx/nginx.conf
+sed -r -i 's/^([[:space:]]*)su npm npm/\1#su npm npm/g;' /etc/logrotate.d/nginx-proxy-manager
+
+# === Create resolver config generator (runs at first boot) ===
+cat > /usr/local/bin/npm-resolvers-update <<'EOF'
+#!/bin/bash
+# Generate resolver config from current DNS settings
+echo resolver "$(awk 'BEGIN{ORS=" "} $1=="nameserver" {print ($2 ~ ":")? "["$2"]": $2}' /etc/resolv.conf);" > /etc/nginx/conf.d/include/resolvers.conf
+EOF
+chmod +x /usr/local/bin/npm-resolvers-update
 
 # === Create systemd service ===
 cat > /lib/systemd/system/npm.service <<'EOF'
 [Unit]
 Description=Nginx Proxy Manager
-After=network.target openresty.service
+After=network.target
 Wants=openresty.service
 
 [Service]
 Type=simple
 Environment=NODE_ENV=production
-Environment=NODE_OPTIONS="--max_old_space_size=250"
-WorkingDirectory=/app/backend
-ExecStart=/usr/bin/node index.js
+ExecStartPre=-/bin/mkdir -p /tmp/nginx/body /data/letsencrypt-acme-challenge
+ExecStartPre=/usr/local/bin/npm-resolvers-update
+ExecStart=/usr/bin/node index.js --abort_on_uncaught_exception --max_old_space_size=250
+WorkingDirectory=/app
 Restart=on-failure
 RestartSec=5
 
@@ -184,7 +228,7 @@ systemctl enable openresty
 systemctl enable npm
 
 # === Cleanup ===
-rm -rf /tmp/npm.tar.gz "/tmp/nginx-proxy-manager-${NPM_VERSION}"
+rm -rf /tmp/npm.tar.gz "$NPM_DIR"
 npm cache clean --force
 apt-get clean
 rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
