@@ -1,0 +1,14 @@
+name: shoko
+description: Shoko Anime Server on Debian 13 (Trixie)
+version: 5.1.0
+build_version: 1
+base_os: debian-13
+architecture: amd64
+maintainer: Deroy2112 <81692934+Deroy2112@users.noreply.github.com>
+
+resources:
+  memory_min: 1024
+  memory_recommended: 2048
+  disk_min: 5G
+  disk_recommended: 10G
+  cores: 2
