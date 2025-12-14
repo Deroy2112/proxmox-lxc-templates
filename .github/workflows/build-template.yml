@@ -150,10 +150,6 @@ jobs:
             echo "ff02::2     ip6-allrouters"
           } > /etc/hosts
 
-          # DNS resolver (Proxmox configures this)
-          rm -f /etc/resolv.conf
-          touch /etc/resolv.conf
-
           # Minimal fstab (Proxmox manages mounts)
           echo "# Empty fstab - Proxmox manages container mounts" > /etc/fstab
 
@@ -167,6 +163,9 @@ jobs:
 
       - name: Run template build script
         run: |
+          # Copy host DNS for package installation
+          sudo cp /etc/resolv.conf "$ROOTFS/etc/resolv.conf"
+
           sudo cp "templates/${{ matrix.template }}/build.sh" "$ROOTFS/tmp/build.sh"
           sudo chmod +x "$ROOTFS/tmp/build.sh"
 
@@ -209,6 +208,9 @@ jobs:
           rm -rf /tmp/* /var/tmp/*
 
           rm -f /root/.bash_history
+
+          # Clear resolv.conf (Proxmox will configure DNS)
+          truncate -s 0 /etc/resolv.conf
           CLEANUP
 
       - name: Create tar.zst archive
