@@ -27,8 +27,8 @@ chmod 644 /etc/apt/keyrings/microsoft.gpg
 
 cat > /etc/apt/sources.list.d/microsoft.sources <<'EOF'
 Types: deb
-URIs: https://packages.microsoft.com/debian/12/prod
-Suites: bookworm
+URIs: https://packages.microsoft.com/debian/13/prod
+Suites: trixie
 Components: main
 Architectures: amd64
 Signed-By: /etc/apt/keyrings/microsoft.gpg
