@@ -120,13 +120,17 @@ jobs:
           # Timezone
           ln -sf /usr/share/zoneinfo/UTC /etc/localtime
 
+          # Install ALL standard system packages (like official Proxmox templates)
+          apt-get update
+          apt-get install -y tasksel
+          tasksel install standard
+
           # Proxmox compatibility: disable networkd wait (prevents boot delays)
           mkdir -p /etc/systemd/system-preset
           echo "disable systemd-networkd-wait-online.service" > /etc/systemd/system-preset/00-pve-template.preset
 
           # Proxmox compatibility: install network tools
-          apt-get update
-          apt-get install -y --no-install-recommends ifupdown2 isc-dhcp-client
+          apt-get install -y ifupdown2 isc-dhcp-client
 
           # Network interfaces (Proxmox adds eth0 config on container creation)
           mkdir -p /etc/network/interfaces.d
