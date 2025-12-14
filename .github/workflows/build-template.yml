@@ -266,21 +266,21 @@ jobs:
 
             [ -z "$MD5" ] && continue
 
-            cat >> docs/aplinfo.dat <<EOF
-Package: ${BASE_OS}-${NAME}
-Version: ${FULL_VERSION}
-Type: lxc
-OS: ${BASE_OS}
-Section: system
-Maintainer: ${MAINTAINER}
-Architecture: ${ARCH}
-Infopage: https://github.com/${{ github.repository }}
-Description: ${DESCRIPTION}
-Location: https://github.com/${{ github.repository }}/releases/download/${TAG}/${TEMPLATE_FILE}
-md5sum: ${MD5}
-sha512sum: ${SHA512}
-
-EOF
+            {
+              echo "Package: ${BASE_OS}-${NAME}"
+              echo "Version: ${FULL_VERSION}"
+              echo "Type: lxc"
+              echo "OS: ${BASE_OS}"
+              echo "Section: system"
+              echo "Maintainer: ${MAINTAINER}"
+              echo "Architecture: ${ARCH}"
+              echo "Infopage: https://github.com/${{ github.repository }}"
+              echo "Description: ${DESCRIPTION}"
+              echo "Location: https://github.com/${{ github.repository }}/releases/download/${TAG}/${TEMPLATE_FILE}"
+              echo "md5sum: ${MD5}"
+              echo "sha512sum: ${SHA512}"
+              echo ""
+            } >> docs/aplinfo.dat
           done
 
           gzip -9 -k docs/aplinfo.dat
