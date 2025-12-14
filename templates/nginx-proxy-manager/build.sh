@@ -68,9 +68,6 @@ apt-get install -y --no-install-recommends \
     nodejs \
     openresty
 
-# === Install Yarn ===
-npm install -g yarn
-
 # === Create directory structure ===
 mkdir -p "$APP_DIR"/{frontend,backend}
 mkdir -p "$DATA_DIR"/{nginx,logs,letsencrypt,access,custom_ssl}
@@ -101,13 +98,13 @@ cd "/tmp/nginx-proxy-manager-${NPM_VERSION}/frontend"
 
 # Replace node-sass with sass (compatibility fix)
 sed -i 's/"node-sass"/"sass"/g' package.json
-yarn install --network-timeout=60000 --no-progress
-yarn build --no-progress
+npm install
+npm run build
 cp -r dist/* "$APP_DIR/frontend/"
 
 # === Build Backend ===
 cd "$APP_DIR/backend"
-yarn install --network-timeout=60000 --no-progress
+npm install
 
 # === Create backend config ===
 mkdir -p "$APP_DIR/config"
@@ -194,7 +191,6 @@ systemctl enable npm
 
 # === Cleanup ===
 rm -rf /tmp/npm.tar.gz "/tmp/nginx-proxy-manager-${NPM_VERSION}"
-yarn cache clean --no-progress 2>/dev/null || true
 npm cache clean --force
 apt-get clean
 rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
