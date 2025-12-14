@@ -114,7 +114,7 @@
             padding: 10px 14px;
             border: 1px solid var(--border-color);
             border-radius: 8px;
-            font-size: 0.9rem;
+            font-size: 16px; /* Prevents iOS zoom on focus */
             background: var(--bg-input);
             color: var(--text-primary);
             transition: border-color 0.2s;
@@ -597,8 +597,8 @@
                 </div>
 
                 <div class="nav-section">
-                    <div class="nav-section-title">By OS</div>
-                    <div id="os-filters"></div>
+                    <div class="nav-section-title">Templates</div>
+                    <div id="template-list"></div>
                 </div>
             </nav>
 
@@ -691,33 +691,28 @@
             closeMobileSidebar();
         }
 
-        function filterByOS(os, element) {
-            currentFilter = os;
+        function showTemplate(name, element) {
+            currentFilter = name;
             setActiveNav(element);
-            const filtered = allTemplates.filter(t => t.os === os);
-            updateHeader(os, `${filtered.length} templates`);
-            renderTemplates(filterBySearch(filtered));
+            const template = allTemplates.find(t => t.name === name);
+            if (template) {
+                updateHeader(template.name, template.os);
+                renderTemplates([template]);
+            }
             closeMobileSidebar();
         }
 
         function filterTemplates(query) {
             searchQuery = query.toLowerCase();
-            if (currentFilter === null && !searchQuery) {
-                renderLanding();
+            if (!searchQuery) {
+                showLanding();
                 return;
             }
 
-            let filtered = currentFilter
-                ? allTemplates.filter(t => t.os === currentFilter)
-                : allTemplates;
-
-            filtered = filterBySearch(filtered);
-
-            if (currentFilter === null) {
-                setActiveNav(document.querySelectorAll('.nav-item')[1]);
-                updateHeader('Search Results', `${filtered.length} found`);
-            }
-
+            currentFilter = null;
+            setActiveNav(null);
+            const filtered = filterBySearch(allTemplates);
+            updateHeader('Search Results', `${filtered.length} found`);
             renderTemplates(filtered);
         }
 
@@ -859,19 +854,14 @@
             });
         }
 
-        function buildOSFilters() {
-            const osMap = {};
-            allTemplates.forEach(t => {
-                osMap[t.os] = (osMap[t.os] || 0) + 1;
-            });
-
-            const container = document.getElementById('os-filters');
-            container.innerHTML = Object.entries(osMap)
-                .sort((a, b) => a[0].localeCompare(b[0]))
-                .map(([os, count]) => `
-                    <div class="nav-item" onclick="filterByOS('${os}', this)">
-                        <span>${os}</span>
-                        <span class="nav-item-count">${count}</span>
+        function buildTemplateList() {
+            const container = document.getElementById('template-list');
+            container.innerHTML = allTemplates
+                .sort((a, b) => a.name.localeCompare(b.name))
+                .map(t => `
+                    <div class="nav-item" onclick="showTemplate('${escapeHtml(t.name)}', this)">
+                        <span>${escapeHtml(t.name)}</span>
+                        <span class="nav-item-count">${escapeHtml(t.version)}</span>
                     </div>
                 `).join('');
         }
@@ -886,7 +876,7 @@
                 allTemplates = await response.json();
 
                 document.getElementById('total-count').textContent = allTemplates.length;
-                buildOSFilters();
+                buildTemplateList();
                 renderLanding();
             } catch (e) {
                 document.getElementById('content').innerHTML = `
