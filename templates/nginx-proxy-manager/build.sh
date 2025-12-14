@@ -96,9 +96,8 @@ cp -r backend/* "$APP_DIR/backend/"
 # === Build Frontend ===
 cd "/tmp/nginx-proxy-manager-${NPM_VERSION}/frontend"
 
-# Replace node-sass with sass (compatibility fix)
-sed -i 's/"node-sass"/"sass"/g' package.json
 npm install
+npm run locale-compile
 npm run build
 cp -r dist/* "$APP_DIR/frontend/"
 
