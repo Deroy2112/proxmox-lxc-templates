@@ -81,7 +81,6 @@ mkdir -p /run/nginx
 # === Create symbolic links for binaries ===
 ln -sf /usr/bin/python3 /usr/bin/python
 ln -sf /usr/local/openresty/nginx/sbin/nginx /usr/sbin/nginx
-ln -sf /usr/local/openresty/nginx/ /etc/nginx
 
 # === Download NPM source ===
 curl -fsSL "https://github.com/NginxProxyManager/nginx-proxy-manager/archive/refs/tags/v${NPM_VERSION}.tar.gz" \
@@ -89,9 +88,10 @@ curl -fsSL "https://github.com/NginxProxyManager/nginx-proxy-manager/archive/ref
 tar -xzf /tmp/npm.tar.gz -C /tmp
 cd "/tmp/nginx-proxy-manager-${NPM_VERSION}"
 
-# === Copy nginx configuration ===
-cp -r docker/rootfs/etc/nginx /etc/
-rm -f /etc/nginx/conf.d/default.conf
+# === Copy nginx configuration to OpenResty directory ===
+cp -r docker/rootfs/etc/nginx/* /usr/local/openresty/nginx/conf/
+rm -f /usr/local/openresty/nginx/conf/conf.d/default.conf
+ln -sf /usr/local/openresty/nginx/conf /etc/nginx
 
 # === Copy backend ===
 cp -r backend/* "$APP_DIR/backend/"
