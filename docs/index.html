@@ -3,7 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Proxmox LXC Templates</title>
+    <title>Proxmox LXC Templates - Ready-to-use Container Images</title>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Ready-to-use LXC container templates for Proxmox VE with SHA-512 checksum verification, reproducible builds, and in-place updates.">
+    <meta name="keywords" content="Proxmox, LXC, Container, Templates, Linux, Debian, Server, Virtualization">
+    <meta name="author" content="Deroy2112">
+    <meta name="robots" content="index, follow">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Proxmox LXC Templates">
+    <meta property="og:description" content="Ready-to-use LXC container templates with checksum verification and reproducible builds.">
+    <meta property="og:url" content="https://deroy2112.github.io/proxmox-lxc-templates/">
+
+    <!-- Favicon SVG -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%236366f1'/><path d='M25 70V30h15l15 20 15-20h15v40h-12V45l-13 17h-10l-13-17v25z' fill='white'/></svg>">
+
     <style>
         :root {
             --bg-primary: #ffffff;
@@ -485,6 +501,130 @@
             color: #4ade80;
         }
 
+        /* Resource Requirements */
+        .resources {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+            padding: 16px;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+        }
+
+        .resource-item {
+            text-align: center;
+        }
+
+        .resource-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        .resource-value {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .resource-sub {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        /* Proxmox Badge */
+        .proxmox-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: linear-gradient(135deg, #e65100, #ff6d00);
+            color: white;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        /* Template Links */
+        .template-links {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .template-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            transition: all 0.2s;
+        }
+
+        .template-link:hover {
+            background: var(--accent);
+            color: white;
+        }
+
+        /* Footer */
+        .footer {
+            border-top: 1px solid var(--border-color);
+            padding: 24px 32px;
+            background: var(--bg-secondary);
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: color 0.2s;
+        }
+
+        .footer-links a:hover {
+            color: var(--accent);
+        }
+
+        .footer-meta {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .last-updated {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            padding: 8px 16px;
+            background: var(--bg-tertiary);
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+
         /* Empty State */
         .empty-state {
             text-align: center;
@@ -638,6 +778,20 @@
                     <p>Loading templates...</p>
                 </div>
             </div>
+
+            <footer class="footer">
+                <div class="footer-content">
+                    <div class="footer-links">
+                        <a href="https://github.com/Deroy2112/proxmox-lxc-templates">GitHub</a>
+                        <a href="https://github.com/Deroy2112/proxmox-lxc-templates/releases">Releases</a>
+                        <a href="https://github.com/Deroy2112/proxmox-lxc-templates/issues">Issues</a>
+                        <a href="https://github.com/Deroy2112/proxmox-lxc-templates/blob/main/LICENSE">MIT License</a>
+                    </div>
+                    <div class="footer-meta">
+                        <span id="last-updated"></span>
+                    </div>
+                </div>
+            </footer>
         </main>
     </div>
 
@@ -797,18 +951,45 @@
 
         function createTemplateCard(t) {
             const cliCmd = `pvesh create /nodes/$(hostname)/storage/local/download-url --content vztmpl --filename ${t.filename} --url ${t.url} --checksum ${t.sha512} --checksum-algorithm sha512`;
+            const res = t.resources || {};
+            const releaseDate = t.release_date ? new Date(t.release_date).toLocaleDateString() : '';
 
             return `
                 <div class="template-card">
                     <div class="template-header">
                         <div class="template-name">${escapeHtml(t.name)}</div>
                         <div class="template-badges">
+                            <span class="proxmox-badge">Proxmox VE</span>
                             <span class="badge badge-version">v${escapeHtml(t.version)}</span>
                             <span class="badge badge-os">${escapeHtml(t.os)}</span>
                             <span class="badge badge-arch">${escapeHtml(t.arch)}</span>
                         </div>
                     </div>
                     <p class="template-description">${escapeHtml(t.description)}</p>
+
+                    <div class="template-links">
+                        ${t.changelog_url ? `<a href="${escapeHtml(t.changelog_url)}" class="template-link" target="_blank">&#128220; Changelog</a>` : ''}
+                        ${t.release_url ? `<a href="${escapeHtml(t.release_url)}" class="template-link" target="_blank">&#128230; Release</a>` : ''}
+                        ${releaseDate ? `<span class="template-link" style="cursor: default;">&#128197; ${releaseDate}</span>` : ''}
+                    </div>
+
+                    <div class="resources">
+                        <div class="resource-item">
+                            <div class="resource-label">Memory</div>
+                            <div class="resource-value">${res.memory_recommended || 512} MB</div>
+                            <div class="resource-sub">min ${res.memory_min || 256} MB</div>
+                        </div>
+                        <div class="resource-item">
+                            <div class="resource-label">Disk</div>
+                            <div class="resource-value">${escapeHtml(res.disk_recommended || '5G')}</div>
+                            <div class="resource-sub">min ${escapeHtml(res.disk_min || '2G')}</div>
+                        </div>
+                        <div class="resource-item">
+                            <div class="resource-label">CPU</div>
+                            <div class="resource-value">${res.cores || 1} Core${(res.cores || 1) > 1 ? 's' : ''}</div>
+                            <div class="resource-sub">recommended</div>
+                        </div>
+                    </div>
 
                     <div class="copy-group">
                         <div class="copy-label">Download URL</div>
@@ -870,6 +1051,23 @@
                 `).join('');
         }
 
+        // Load meta information
+        async function loadMeta() {
+            try {
+                const response = await fetch('meta.json');
+                if (response.ok) {
+                    const meta = await response.json();
+                    if (meta.last_updated) {
+                        const date = new Date(meta.last_updated);
+                        document.getElementById('last-updated').textContent =
+                            `Last updated: ${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
+                    }
+                }
+            } catch (e) {
+                // Silently fail
+            }
+        }
+
         // Initialize
         async function init() {
             setTheme(getPreferredTheme());
@@ -882,6 +1080,7 @@
                 document.getElementById('total-count').textContent = allTemplates.length;
                 buildTemplateList();
                 renderLanding();
+                loadMeta();
             } catch (e) {
                 document.getElementById('content').innerHTML = `
                     <div class="empty-state">

@@ -324,11 +324,24 @@ jobs:
             BUILD_VERSION=$(grep '^build_version:' "$CONFIG" | cut -d: -f2 | xargs)
             BASE_OS=$(grep '^base_os:' "$CONFIG" | cut -d: -f2 | xargs)
             ARCH=$(grep '^architecture:' "$CONFIG" | cut -d: -f2 | xargs || echo "amd64")
+            MAINTAINER=$(grep '^maintainer:' "$CONFIG" | cut -d: -f2- | xargs || echo "")
+
+            # Resources
+            MEM_MIN=$(grep 'memory_min:' "$CONFIG" | cut -d: -f2 | xargs || echo "256")
+            MEM_REC=$(grep 'memory_recommended:' "$CONFIG" | cut -d: -f2 | xargs || echo "512")
+            DISK_MIN=$(grep 'disk_min:' "$CONFIG" | cut -d: -f2 | xargs || echo "2G")
+            DISK_REC=$(grep 'disk_recommended:' "$CONFIG" | cut -d: -f2 | xargs || echo "5G")
+            CORES=$(grep 'cores:' "$CONFIG" | cut -d: -f2 | xargs || echo "1")
 
             FULL_VERSION="${VERSION}-${BUILD_VERSION}"
             TAG="v${FULL_VERSION}-${NAME}"
             TEMPLATE_FILE="deroy2112-${BASE_OS}-${NAME}_${FULL_VERSION}_${ARCH}.tar.zst"
             URL="https://github.com/${{ github.repository }}/releases/download/${TAG}/${TEMPLATE_FILE}"
+            CHANGELOG_URL="https://github.com/${{ github.repository }}/blob/main/templates/${template}/CHANGELOG.md"
+            RELEASE_URL="https://github.com/${{ github.repository }}/releases/tag/${TAG}"
+
+            # Get release date
+            RELEASE_DATE=$(gh release view "$TAG" --json publishedAt -q '.publishedAt' 2>/dev/null || echo "")
 
             SHA512=$(gh release download "$TAG" --pattern "${TEMPLATE_FILE}.sha512" -O - 2>/dev/null | cut -d' ' -f1 || echo "")
 
@@ -347,15 +360,29 @@ jobs:
               echo "    \"version\": \"${FULL_VERSION}\","
               echo "    \"os\": \"${BASE_OS}\","
               echo "    \"arch\": \"${ARCH}\","
+              echo "    \"maintainer\": \"${MAINTAINER}\","
               echo "    \"filename\": \"${TEMPLATE_FILE}\","
               echo "    \"url\": \"${URL}\","
-              echo "    \"sha512\": \"${SHA512}\""
+              echo "    \"sha512\": \"${SHA512}\","
+              echo "    \"changelog_url\": \"${CHANGELOG_URL}\","
+              echo "    \"release_url\": \"${RELEASE_URL}\","
+              echo "    \"release_date\": \"${RELEASE_DATE}\","
+              echo "    \"resources\": {"
+              echo "      \"memory_min\": ${MEM_MIN},"
+              echo "      \"memory_recommended\": ${MEM_REC},"
+              echo "      \"disk_min\": \"${DISK_MIN}\","
+              echo "      \"disk_recommended\": \"${DISK_REC}\","
+              echo "      \"cores\": ${CORES}"
+              echo "    }"
               echo "  }"
             } >> docs/templates.json
           done
 
           echo "" >> docs/templates.json
           echo "]" >> docs/templates.json
+
+          # Add last_updated timestamp
+          echo "{\"last_updated\": \"$(date -Iseconds)\"}" > docs/meta.json
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
