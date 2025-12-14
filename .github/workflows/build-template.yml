@@ -274,7 +274,7 @@ jobs:
             TEMPLATE_FILE="deroy2112-${BASE_OS}-${NAME}_${FULL_VERSION}_${ARCH}.tar.zst"
             URL="https://github.com/${{ github.repository }}/releases/download/${TAG}/${TEMPLATE_FILE}"
 
-            SHA512=$(gh release download "$TAG" --pattern "*.sha512" -O - 2>/dev/null | cut -d' ' -f1 || echo "")
+            SHA512=$(gh release download "$TAG" --pattern "${TEMPLATE_FILE}.sha512" -O - 2>/dev/null | cut -d' ' -f1 || echo "")
 
             [ -z "$SHA512" ] && continue
 
