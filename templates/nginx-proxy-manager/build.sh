@@ -130,10 +130,6 @@ if [[ ! -f /data/nginx/dummycert.pem ]] || [[ ! -f /data/nginx/dummykey.pem ]]; 
         -out /data/nginx/dummycert.pem
 fi
 
-# === Patch nginx config for non-Docker environment ===
-sed -i 's|include /etc/nginx/conf.d/include/force-ssl.conf;||g' /etc/nginx/conf.d/default.conf
-sed -i 's|include /etc/nginx/conf.d/include/letsencrypt-acme-challenge.conf;||g' /etc/nginx/conf.d/default.conf
-
 # === Create systemd service ===
 cat > /lib/systemd/system/npm.service <<'EOF'
 [Unit]
