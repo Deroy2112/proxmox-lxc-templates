@@ -13,15 +13,18 @@ apt-get install -y --no-install-recommends \
     gnupg
 
 # === Add Jellyfin repository ===
+mkdir -p /etc/apt/keyrings
 curl -fsSL https://repo.jellyfin.org/jellyfin_team.gpg.key \
-    | gpg --dearmor -o /usr/share/keyrings/jellyfin-archive-keyring.gpg
+    | gpg --dearmor -o /etc/apt/keyrings/jellyfin.gpg
+chmod 644 /etc/apt/keyrings/jellyfin.gpg
 
 cat > /etc/apt/sources.list.d/jellyfin.sources <<'EOF'
 Types: deb
 URIs: https://repo.jellyfin.org/debian
-Suites: bookworm
+Suites: trixie
 Components: main
-Signed-By: /usr/share/keyrings/jellyfin-archive-keyring.gpg
+Architectures: amd64
+Signed-By: /etc/apt/keyrings/jellyfin.gpg
 EOF
 
 # === Install Jellyfin ===
