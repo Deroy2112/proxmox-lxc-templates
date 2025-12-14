@@ -1,0 +1,295 @@
+name: Build LXC Template
+
+on:
+  push:
+    paths:
+      - 'templates/**'
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      template:
+        description: 'Template to build (or "all")'
+        required: true
+        default: 'all'
+
+jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      templates: ${{ steps.detect.outputs.templates }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Detect changed templates
+        id: detect
+        run: |
+          if [[ "${{ github.event.inputs.template }}" == "all" ]]; then
+            templates=$(find templates -mindepth 1 -maxdepth 1 -type d -exec basename {} \; | jq -R -s -c 'split("\n") | map(select(. != ""))')
+          elif [[ -n "${{ github.event.inputs.template }}" ]]; then
+            templates='["${{ github.event.inputs.template }}"]'
+          else
+            changed=$(git diff --name-only HEAD~1 HEAD | grep '^templates/' | cut -d'/' -f2 | sort -u | grep -v '^$' || true)
+            if [[ -z "$changed" ]]; then
+              templates='[]'
+            else
+              templates=$(echo "$changed" | jq -R -s -c 'split("\n") | map(select(. != ""))')
+            fi
+          fi
+          echo "templates=${templates}" >> "$GITHUB_OUTPUT"
+          echo "Building templates: ${templates}"
+
+  build:
+    needs: detect-changes
+    runs-on: ubuntu-latest
+    if: ${{ needs.detect-changes.outputs.templates != '[]' }}
+    strategy:
+      matrix:
+        template: ${{ fromJson(needs.detect-changes.outputs.templates) }}
+      fail-fast: false
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            debootstrap \
+            zstd \
+            qemu-user-static
+
+      - name: Read template config
+        id: config
+        run: |
+          CONFIG="templates/${{ matrix.template }}/config.yml"
+
+          NAME=$(grep '^name:' "$CONFIG" | cut -d: -f2 | xargs)
+          VERSION=$(grep '^version:' "$CONFIG" | cut -d: -f2 | xargs)
+          BUILD_VERSION=$(grep '^build_version:' "$CONFIG" | cut -d: -f2 | xargs)
+          BASE_OS=$(grep '^base_os:' "$CONFIG" | cut -d: -f2 | xargs)
+          ARCH=$(grep '^architecture:' "$CONFIG" | cut -d: -f2 | xargs || echo "amd64")
+
+          FULL_VERSION="${VERSION}-${BUILD_VERSION}"
+          TEMPLATE_FILE="${BASE_OS}-${NAME}_${FULL_VERSION}_${ARCH}.tar.zst"
+
+          echo "name=$NAME" >> "$GITHUB_OUTPUT"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "build_version=$BUILD_VERSION" >> "$GITHUB_OUTPUT"
+          echo "full_version=$FULL_VERSION" >> "$GITHUB_OUTPUT"
+          echo "base_os=$BASE_OS" >> "$GITHUB_OUTPUT"
+          echo "arch=$ARCH" >> "$GITHUB_OUTPUT"
+          echo "template_file=$TEMPLATE_FILE" >> "$GITHUB_OUTPUT"
+
+      - name: Create rootfs with debootstrap
+        run: |
+          ROOTFS="${{ runner.temp }}/rootfs"
+          sudo mkdir -p "$ROOTFS"
+
+          case "${{ steps.config.outputs.base_os }}" in
+            debian-13) SUITE="trixie" ;;
+            debian-12) SUITE="bookworm" ;;
+            debian-11) SUITE="bullseye" ;;
+            *) echo "Unknown base_os: ${{ steps.config.outputs.base_os }}"; exit 1 ;;
+          esac
+
+          sudo debootstrap \
+            --arch=${{ steps.config.outputs.arch }} \
+            --variant=minbase \
+            --include=systemd,systemd-sysv,dbus,apt-utils,locales,wget,curl,ca-certificates \
+            "$SUITE" \
+            "$ROOTFS" \
+            http://deb.debian.org/debian
+
+          echo "ROOTFS=$ROOTFS" >> "$GITHUB_ENV"
+
+      - name: Configure base system
+        run: |
+          sudo chroot "$ROOTFS" /bin/bash <<'BASESCRIPT'
+          set -euo pipefail
+          export DEBIAN_FRONTEND=noninteractive
+
+          echo "en_US.UTF-8 UTF-8" > /etc/locale.gen
+          locale-gen
+
+          ln -sf /usr/share/zoneinfo/UTC /etc/localtime
+
+          apt-get clean
+          BASESCRIPT
+
+      - name: Run template build script
+        run: |
+          sudo cp "templates/${{ matrix.template }}/build.sh" "$ROOTFS/tmp/build.sh"
+          sudo chmod +x "$ROOTFS/tmp/build.sh"
+
+          if [[ -d "templates/${{ matrix.template }}/files" ]]; then
+            sudo cp -r "templates/${{ matrix.template }}/files" "$ROOTFS/tmp/files"
+          fi
+
+          TEMPLATE_VERSION="${{ steps.config.outputs.full_version }}"
+          TEMPLATE_NAME="${{ steps.config.outputs.name }}"
+          TEMPLATE_REPO="https://github.com/${{ github.repository }}"
+
+          sudo -E chroot "$ROOTFS" /bin/bash -c "
+            set -euo pipefail
+            export DEBIAN_FRONTEND=noninteractive
+            export TEMPLATE_VERSION='${TEMPLATE_VERSION}'
+            export TEMPLATE_NAME='${TEMPLATE_NAME}'
+            export TEMPLATE_REPO='${TEMPLATE_REPO}'
+            cd /tmp
+            ./build.sh
+          "
+
+      - name: Finalize rootfs
+        run: |
+          build_date=$(date -Iseconds)
+          sudo sed -i "s/__VERSION__/${{ steps.config.outputs.full_version }}/" "$ROOTFS/etc/template-info" 2>/dev/null || true
+          sudo sed -i "s/__DATE__/${build_date}/" "$ROOTFS/etc/template-info" 2>/dev/null || true
+
+          sudo chroot "$ROOTFS" /bin/bash <<'CLEANUP'
+          set -euo pipefail
+
+          truncate -s 0 /etc/machine-id
+
+          rm -f /etc/ssh/ssh_host_*
+
+          find /var/log -type f -exec truncate -s 0 {} \;
+
+          apt-get clean
+          rm -rf /var/lib/apt/lists/*
+
+          rm -rf /tmp/* /var/tmp/*
+
+          rm -f /root/.bash_history
+          CLEANUP
+
+      - name: Create tar.zst archive
+        run: |
+          cd "$ROOTFS"
+
+          sudo tar --numeric-owner --acls --xattrs \
+            -cf - . | zstd -T0 -19 -o "${{ runner.temp }}/${{ steps.config.outputs.template_file }}"
+
+          cd "${{ runner.temp }}"
+          sha256sum "${{ steps.config.outputs.template_file }}" > "${{ steps.config.outputs.template_file }}.sha256"
+          sha512sum "${{ steps.config.outputs.template_file }}" > "${{ steps.config.outputs.template_file }}.sha512"
+          md5sum "${{ steps.config.outputs.template_file }}" > "${{ steps.config.outputs.template_file }}.md5"
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: template-${{ matrix.template }}
+          path: |
+            ${{ runner.temp }}/${{ steps.config.outputs.template_file }}
+            ${{ runner.temp }}/${{ steps.config.outputs.template_file }}.sha256
+            ${{ runner.temp }}/${{ steps.config.outputs.template_file }}.sha512
+            ${{ runner.temp }}/${{ steps.config.outputs.template_file }}.md5
+
+  release:
+    needs: [detect-changes, build]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && needs.detect-changes.outputs.templates != '[]'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Create releases
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          for dir in artifacts/template-*/; do
+            template=$(basename "$dir" | sed 's/template-//')
+
+            CONFIG="templates/$template/config.yml"
+            VERSION=$(grep '^version:' "$CONFIG" | cut -d: -f2 | xargs)
+            BUILD_VERSION=$(grep '^build_version:' "$CONFIG" | cut -d: -f2 | xargs)
+            FULL_VERSION="${VERSION}-${BUILD_VERSION}"
+            TAG="v${FULL_VERSION}-${template}"
+
+            gh release create "$TAG" \
+              --title "$template $FULL_VERSION" \
+              --notes "Build of $template version $FULL_VERSION" \
+              "$dir"/*.tar.zst "$dir"/*.sha256 "$dir"/*.sha512 "$dir"/*.md5 \
+              --latest=false \
+              2>/dev/null || \
+            gh release upload "$TAG" \
+              "$dir"/*.tar.zst "$dir"/*.sha256 "$dir"/*.sha512 "$dir"/*.md5 \
+              --clobber
+          done
+
+  update-index:
+    needs: [detect-changes, release]
+    runs-on: ubuntu-latest
+    if: needs.detect-changes.outputs.templates != '[]'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Generate aplinfo.dat
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir -p docs
+          > docs/aplinfo.dat
+
+          for template_dir in templates/*/; do
+            template=$(basename "$template_dir")
+            CONFIG="${template_dir}config.yml"
+
+            [ -f "$CONFIG" ] || continue
+
+            NAME=$(grep '^name:' "$CONFIG" | cut -d: -f2 | xargs)
+            DESCRIPTION=$(grep '^description:' "$CONFIG" | cut -d: -f2- | xargs)
+            VERSION=$(grep '^version:' "$CONFIG" | cut -d: -f2 | xargs)
+            BUILD_VERSION=$(grep '^build_version:' "$CONFIG" | cut -d: -f2 | xargs)
+            BASE_OS=$(grep '^base_os:' "$CONFIG" | cut -d: -f2 | xargs)
+            MAINTAINER=$(grep '^maintainer:' "$CONFIG" | cut -d: -f2- | xargs)
+            ARCH=$(grep '^architecture:' "$CONFIG" | cut -d: -f2 | xargs || echo "amd64")
+
+            FULL_VERSION="${VERSION}-${BUILD_VERSION}"
+            TAG="v${FULL_VERSION}-${NAME}"
+            TEMPLATE_FILE="${BASE_OS}-${NAME}_${FULL_VERSION}_${ARCH}.tar.zst"
+
+            MD5=$(gh release download "$TAG" --pattern "*.md5" -O - 2>/dev/null | cut -d' ' -f1 || echo "")
+            SHA512=$(gh release download "$TAG" --pattern "*.sha512" -O - 2>/dev/null | cut -d' ' -f1 || echo "")
+
+            [ -z "$MD5" ] && continue
+
+            cat >> docs/aplinfo.dat <<EOF
+Package: ${BASE_OS}-${NAME}
+Version: ${FULL_VERSION}
+Type: lxc
+OS: ${BASE_OS}
+Section: system
+Maintainer: ${MAINTAINER}
+Architecture: ${ARCH}
+Infopage: https://github.com/${{ github.repository }}
+Description: ${DESCRIPTION}
+Location: https://github.com/${{ github.repository }}/releases/download/${TAG}/${TEMPLATE_FILE}
+md5sum: ${MD5}
+sha512sum: ${SHA512}
+
+EOF
+          done
+
+          gzip -9 -k docs/aplinfo.dat
+
+          sha256sum docs/aplinfo.dat.gz | cut -d' ' -f1 > docs/aplinfo.dat.gz.sha256
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs
+          keep_files: true
