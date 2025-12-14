@@ -46,10 +46,11 @@ useradd -r -s /usr/sbin/nologin -d "$SHOKO_DIR" "$SHOKO_USER"
 mkdir -p "$SHOKO_DIR"
 curl -fsSL "https://github.com/ShokoAnime/ShokoServer/releases/download/v${SHOKO_VERSION}/Shoko.CLI_Framework_any-x64.zip" \
     -o /tmp/shoko.zip
-unzip -q /tmp/shoko.zip -d "$SHOKO_DIR"
+unzip -q /tmp/shoko.zip -d /tmp/shoko-extract
+mv /tmp/shoko-extract/net8.0/linux-x64/* "$SHOKO_DIR/"
 chmod +x "$SHOKO_DIR/Shoko.CLI"
 chown -R "$SHOKO_USER:$SHOKO_USER" "$SHOKO_DIR"
-rm /tmp/shoko.zip
+rm -rf /tmp/shoko.zip /tmp/shoko-extract
 
 # === Create media directories ===
 mkdir -p /media/anime
