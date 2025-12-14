@@ -132,13 +132,9 @@ jobs:
           # Proxmox compatibility: install network tools
           apt-get install -y ifupdown2 isc-dhcp-client
 
-          # Network interfaces (Proxmox adds eth0 config on container creation)
-          mkdir -p /etc/network/interfaces.d
+          # Network interfaces - minimal config, Proxmox adds eth0 on container creation
+          # NOTE: Do NOT use interfaces.d - Proxmox writes directly to /etc/network/interfaces
           {
-            echo "# interfaces(5) file used by ifup(8) and ifdown(8)"
-            echo "# Include files from /etc/network/interfaces.d:"
-            echo "source /etc/network/interfaces.d/*"
-            echo ""
             echo "auto lo"
             echo "iface lo inet loopback"
           } > /etc/network/interfaces
