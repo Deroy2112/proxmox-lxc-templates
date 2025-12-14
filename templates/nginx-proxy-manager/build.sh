@@ -87,7 +87,6 @@ cd "/tmp/nginx-proxy-manager-${NPM_VERSION}"
 
 # === Copy nginx configuration to OpenResty directory ===
 cp -r docker/rootfs/etc/nginx/* /usr/local/openresty/nginx/conf/
-rm -f /usr/local/openresty/nginx/conf/conf.d/default.conf
 ln -sf /usr/local/openresty/nginx/conf /etc/nginx
 
 # === Copy backend ===
