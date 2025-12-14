@@ -3,7 +3,6 @@
 set -euo pipefail
 
 # === Configuration ===
-readonly REPO_URL="https://raw.githubusercontent.com/Deroy2112/proxmox-lxc-templates/main"
 readonly PAGES_URL="https://deroy2112.github.io/proxmox-lxc-templates"
 readonly APL_DIR="/var/lib/pve-manager/apl-info"
 readonly APL_FILE="proxmox-lxc-templates.dat"

@@ -93,7 +93,8 @@ cmd_changelog() {
 
 # Create backup before update
 create_backup() {
-    local backup_name="backup-$(date +%Y%m%d-%H%M%S)"
+    local backup_name
+    backup_name="backup-$(date +%Y%m%d-%H%M%S)"
     local backup_path="${BACKUP_DIR}/${backup_name}"
 
     mkdir -p "$backup_path"
