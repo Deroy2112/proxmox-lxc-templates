@@ -22,6 +22,9 @@ concept/
 .DS_Store
 Thumbs.db
 
+# Screenshots
+*.png
+
 # IDE
 .vscode/
 .idea/
