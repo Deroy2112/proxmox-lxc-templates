@@ -97,10 +97,10 @@ jobs:
             *) echo "Unknown base_os: ${{ steps.config.outputs.base_os }}"; exit 1 ;;
           esac
 
+          # Use default variant (essential+important) instead of minbase for better Proxmox compatibility
           sudo debootstrap \
             --arch=${{ steps.config.outputs.arch }} \
-            --variant=minbase \
-            --include=systemd,systemd-sysv,dbus,apt-utils,locales,iproute2,wget,curl,ca-certificates \
+            --include=systemd,systemd-sysv,dbus,apt-utils,locales,iproute2,wget,curl,ca-certificates,less,logrotate,openssh-server \
             "$SUITE" \
             "$ROOTFS" \
             http://deb.debian.org/debian
