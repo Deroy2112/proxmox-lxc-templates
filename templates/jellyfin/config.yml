@@ -1,0 +1,14 @@
+name: jellyfin
+description: Jellyfin Media Server on Debian 13 (Trixie)
+version: 10.10.3
+build_version: 1
+base_os: debian-13
+architecture: amd64
+maintainer: Deroy2112 <81692934+Deroy2112@users.noreply.github.com>
+
+resources:
+  memory_min: 2048
+  memory_recommended: 4096
+  disk_min: 8G
+  disk_recommended: 20G
+  cores: 2
