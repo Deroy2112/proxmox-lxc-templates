@@ -284,18 +284,18 @@ jobs:
               echo "," >> docs/templates.json
             fi
 
-            cat >> docs/templates.json <<JSONENTRY
-  {
-    "name": "${NAME}",
-    "description": "${DESCRIPTION}",
-    "version": "${FULL_VERSION}",
-    "os": "${BASE_OS}",
-    "arch": "${ARCH}",
-    "filename": "${TEMPLATE_FILE}",
-    "url": "${URL}",
-    "sha512": "${SHA512}"
-  }
-JSONENTRY
+            {
+              echo "  {"
+              echo "    \"name\": \"${NAME}\","
+              echo "    \"description\": \"${DESCRIPTION}\","
+              echo "    \"version\": \"${FULL_VERSION}\","
+              echo "    \"os\": \"${BASE_OS}\","
+              echo "    \"arch\": \"${ARCH}\","
+              echo "    \"filename\": \"${TEMPLATE_FILE}\","
+              echo "    \"url\": \"${URL}\","
+              echo "    \"sha512\": \"${SHA512}\""
+              echo "  }"
+            } >> docs/templates.json
           done
 
           echo "" >> docs/templates.json
