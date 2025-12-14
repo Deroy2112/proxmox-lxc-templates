@@ -1,90 +1,84 @@
-# proxmox-lxc-templates
+<p align="center">
+  <h1 align="center">Proxmox LXC Templates</h1>
+  <p align="center">
+    Self-updating LXC template repository with native Proxmox UI integration
+  </p>
+</p>
 
-Self-updating LXC template repository for Proxmox VE with native UI integration.
+<p align="center">
+  <a href="https://github.com/Deroy2112/proxmox-lxc-templates/actions/workflows/build-template.yml">
+    <img src="https://github.com/Deroy2112/proxmox-lxc-templates/actions/workflows/build-template.yml/badge.svg" alt="Build Status">
+  </a>
+  <a href="https://github.com/Deroy2112/proxmox-lxc-templates/releases">
+    <img src="https://img.shields.io/github/v/release/Deroy2112/proxmox-lxc-templates?label=latest" alt="Latest Release">
+  </a>
+  <a href="https://github.com/Deroy2112/proxmox-lxc-templates/blob/main/LICENSE">
+    <img src="https://img.shields.io/github/license/Deroy2112/proxmox-lxc-templates" alt="License">
+  </a>
+</p>
 
-## Features
-
-- **Native Proxmox UI Integration** - Templates appear alongside official Proxmox templates
-- **One-Liner Installation** - Single command with checksum verification
-- **Automatic Updates** - Daily cronjob keeps templates current
-- **In-Container Updates** - Update running containers without rebuilding
-- **Rollback Support** - Automatic backups before updates
-- **Reproducible Builds** - All templates built via GitHub Actions with debootstrap
+---
 
 ## Installation
+
+Run this command on your Proxmox server as root:
 
 ```bash
 bash <(curl -fsSL https://raw.githubusercontent.com/Deroy2112/proxmox-lxc-templates/main/install.sh)
 ```
 
-### What happens
+Templates will appear in **Datacenter → Storage → local → CT Templates**.
 
-1. Verifies checksum of the installer
-2. Checks for Proxmox VE installation
-3. Downloads and verifies template index
-4. Installs to `/var/lib/pve-manager/apl-info/`
-5. Sets up daily update cronjob
+---
 
-### After installation
+## Features
 
-Open Proxmox UI → Datacenter → Storage → local → CT Templates
+| | Feature |
+|---|---------|
+| **Native UI** | Templates appear alongside official Proxmox templates |
+| **Auto Updates** | Daily cronjob keeps your template index current |
+| **Verified** | All downloads are SHA256 verified |
+| **Updateable** | Update running containers without rebuilding |
+| **Rollback** | Automatic backups before every update |
 
-Your templates appear alongside official Proxmox templates.
+---
 
 ## Available Templates
 
 | Template | Description | Base OS |
 |----------|-------------|---------|
-| nginx | Nginx webserver | Debian 13 |
+| **nginx** | Nginx Webserver | Debian 13 |
 
-## In-Container Updates
+---
 
-Each template includes an update tool:
+## Update Running Containers
+
+Every template includes a built-in update tool:
 
 ```bash
-# Check for updates
-template-update status
-
-# Apply update
-template-update update
-
-# Rollback to previous version
-template-update rollback
-
-# Show changelog
-template-update changelog
+template-update status      # Check for updates
+template-update update      # Apply update
+template-update rollback    # Restore previous version
 ```
 
-## Uninstallation
+---
+
+## Uninstall
 
 ```bash
-# Remove cronjob
 rm /etc/cron.daily/proxmox-lxc-templates-update
-
-# Remove template index
 rm /var/lib/pve-manager/apl-info/proxmox-lxc-templates.dat
 ```
 
-## Building Templates
+---
 
-Templates are automatically built via GitHub Actions when changes are pushed to `templates/`.
+## Links
 
-### Template Structure
+- **Website:** https://deroy2112.github.io/proxmox-lxc-templates/
+- **Releases:** https://github.com/Deroy2112/proxmox-lxc-templates/releases
 
-```
-templates/
-└── nginx/
-    ├── config.yml      # Metadata and version
-    ├── build.sh        # Build script (runs in chroot)
-    ├── update.sh       # In-container update script
-    ├── CHANGELOG.md    # Version history
-    └── files/          # Additional config files
-```
-
-### Manual Build Trigger
-
-Go to Actions → Build LXC Template → Run workflow
+---
 
 ## License
 
-MIT License - See [LICENSE](LICENSE)
+[MIT](LICENSE)
