@@ -55,9 +55,9 @@ chmod 644 /etc/apt/keyrings/openresty.gpg
 
 cat > /etc/apt/sources.list.d/openresty.sources <<'EOF'
 Types: deb
-URIs: https://openresty.org/package/debian
+URIs: http://openresty.org/package/debian
 Suites: bookworm
-Components: main
+Components: openresty
 Architectures: amd64
 Signed-By: /etc/apt/keyrings/openresty.gpg
 EOF
