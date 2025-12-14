@@ -75,7 +75,7 @@ jobs:
           ARCH=$(grep '^architecture:' "$CONFIG" | cut -d: -f2 | xargs || echo "amd64")
 
           FULL_VERSION="${VERSION}-${BUILD_VERSION}"
-          TEMPLATE_FILE="${BASE_OS}-${NAME}_${FULL_VERSION}_${ARCH}.tar.zst"
+          TEMPLATE_FILE="deroy2112-${BASE_OS}-${NAME}_${FULL_VERSION}_${ARCH}.tar.zst"
 
           echo "name=$NAME" >> "$GITHUB_OUTPUT"
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
@@ -113,12 +113,23 @@ jobs:
           set -euo pipefail
           export DEBIAN_FRONTEND=noninteractive
 
+          # Locale
           echo "en_US.UTF-8 UTF-8" > /etc/locale.gen
           locale-gen
 
+          # Timezone
           ln -sf /usr/share/zoneinfo/UTC /etc/localtime
 
+          # Proxmox compatibility: disable networkd wait (prevents boot delays)
+          mkdir -p /etc/systemd/system-preset
+          echo "disable systemd-networkd-wait-online.service" > /etc/systemd/system-preset/00-pve-template.preset
+
+          # Proxmox compatibility: install network tools
+          apt-get update
+          apt-get install -y --no-install-recommends ifupdown2 isc-dhcp-client
+
           apt-get clean
+          rm -rf /var/lib/apt/lists/*
           BASESCRIPT
 
       - name: Run template build script
@@ -236,12 +247,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Generate aplinfo.dat
+      - name: Generate templates.json
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           mkdir -p docs
-          > docs/aplinfo.dat
+
+          echo "[" > docs/templates.json
+          first=true
 
           for template_dir in templates/*/; do
             template=$(basename "$template_dir")
@@ -254,38 +267,39 @@ jobs:
             VERSION=$(grep '^version:' "$CONFIG" | cut -d: -f2 | xargs)
             BUILD_VERSION=$(grep '^build_version:' "$CONFIG" | cut -d: -f2 | xargs)
             BASE_OS=$(grep '^base_os:' "$CONFIG" | cut -d: -f2 | xargs)
-            MAINTAINER=$(grep '^maintainer:' "$CONFIG" | cut -d: -f2- | xargs)
             ARCH=$(grep '^architecture:' "$CONFIG" | cut -d: -f2 | xargs || echo "amd64")
 
             FULL_VERSION="${VERSION}-${BUILD_VERSION}"
             TAG="v${FULL_VERSION}-${NAME}"
-            TEMPLATE_FILE="${BASE_OS}-${NAME}_${FULL_VERSION}_${ARCH}.tar.zst"
+            TEMPLATE_FILE="deroy2112-${BASE_OS}-${NAME}_${FULL_VERSION}_${ARCH}.tar.zst"
+            URL="https://github.com/${{ github.repository }}/releases/download/${TAG}/${TEMPLATE_FILE}"
 
-            MD5=$(gh release download "$TAG" --pattern "*.md5" -O - 2>/dev/null | cut -d' ' -f1 || echo "")
             SHA512=$(gh release download "$TAG" --pattern "*.sha512" -O - 2>/dev/null | cut -d' ' -f1 || echo "")
 
-            [ -z "$MD5" ] && continue
+            [ -z "$SHA512" ] && continue
 
-            {
-              echo "Package: ${BASE_OS}-${NAME}"
-              echo "Version: ${FULL_VERSION}"
-              echo "Type: lxc"
-              echo "OS: ${BASE_OS}"
-              echo "Section: system"
-              echo "Maintainer: ${MAINTAINER}"
-              echo "Architecture: ${ARCH}"
-              echo "Infopage: https://github.com/${{ github.repository }}"
-              echo "Description: ${DESCRIPTION}"
-              echo "Location: https://github.com/${{ github.repository }}/releases/download/${TAG}/${TEMPLATE_FILE}"
-              echo "md5sum: ${MD5}"
-              echo "sha512sum: ${SHA512}"
-              echo ""
-            } >> docs/aplinfo.dat
+            if [ "$first" = true ]; then
+              first=false
+            else
+              echo "," >> docs/templates.json
+            fi
+
+            cat >> docs/templates.json <<JSONENTRY
+  {
+    "name": "${NAME}",
+    "description": "${DESCRIPTION}",
+    "version": "${FULL_VERSION}",
+    "os": "${BASE_OS}",
+    "arch": "${ARCH}",
+    "filename": "${TEMPLATE_FILE}",
+    "url": "${URL}",
+    "sha512": "${SHA512}"
+  }
+JSONENTRY
           done
 
-          gzip -9 -k docs/aplinfo.dat
-
-          sha256sum docs/aplinfo.dat.gz | cut -d' ' -f1 > docs/aplinfo.dat.gz.sha256
+          echo "" >> docs/templates.json
+          echo "]" >> docs/templates.json
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4

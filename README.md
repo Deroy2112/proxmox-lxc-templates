@@ -1,7 +1,7 @@
 <p align="center">
   <h1 align="center">Proxmox LXC Templates</h1>
   <p align="center">
-    Self-updating LXC template repository with native Proxmox UI integration
+    Ready-to-use LXC container templates with checksum verification
   </p>
 </p>
 
@@ -21,25 +21,26 @@
 
 ## Installation
 
-Run this command on your Proxmox server as root:
+### Option 1: Web UI
+
+1. Go to **Storage** → **local** → **CT Templates**
+2. Click **Download from URL**
+3. Paste URL and SHA-512 checksum from our [website](https://deroy2112.github.io/proxmox-lxc-templates/)
+
+### Option 2: CLI
+
+Run on your Proxmox node as root:
 
 ```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/Deroy2112/proxmox-lxc-templates/main/install.sh)
+pvesh create /nodes/$(hostname)/storage/local/download-url \
+  --content vztmpl \
+  --filename deroy2112-debian-13-nginx_1.26.0-1_amd64.tar.zst \
+  --url https://github.com/Deroy2112/proxmox-lxc-templates/releases/download/v1.26.0-1-nginx/deroy2112-debian-13-nginx_1.26.0-1_amd64.tar.zst \
+  --checksum <SHA512> \
+  --checksum-algorithm sha512
 ```
 
-Templates will appear in **Datacenter → Storage → local → CT Templates**.
-
----
-
-## Features
-
-| | Feature |
-|---|---------|
-| **Native UI** | Templates appear alongside official Proxmox templates |
-| **Auto Updates** | Daily cronjob keeps your template index current |
-| **Verified** | All downloads are SHA256 verified |
-| **Updateable** | Update running containers without rebuilding |
-| **Rollback** | Automatic backups before every update |
+Get the full command with checksum from our [website](https://deroy2112.github.io/proxmox-lxc-templates/).
 
 ---
 
@@ -51,6 +52,17 @@ Templates will appear in **Datacenter → Storage → local → CT Templates**.
 
 ---
 
+## Features
+
+| | Feature |
+|---|---------|
+| **Verified** | All downloads are SHA-512 verified |
+| **Reproducible** | Built with GitHub Actions using debootstrap |
+| **Updateable** | Update running containers without rebuilding |
+| **Rollback** | Automatic backups before every update |
+
+---
+
 ## Update Running Containers
 
 Every template includes a built-in update tool:
@@ -59,15 +71,6 @@ Every template includes a built-in update tool:
 template-update status      # Check for updates
 template-update update      # Apply update
 template-update rollback    # Restore previous version
-```
-
----
-
-## Uninstall
-
-```bash
-rm /etc/cron.daily/proxmox-lxc-templates-update
-rm /var/lib/pve-manager/apl-info/proxmox-lxc-templates.dat
 ```
 
 ---
