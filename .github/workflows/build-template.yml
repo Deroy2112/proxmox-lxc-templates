@@ -262,9 +262,30 @@ jobs:
             FULL_VERSION="${VERSION}-${BUILD_VERSION}"
             TAG="v${FULL_VERSION}-${template}"
 
+            # Extract release notes from CHANGELOG.md
+            CHANGELOG="templates/$template/CHANGELOG.md"
+            if [[ -f "$CHANGELOG" ]]; then
+              # Extract section for current version (between ## [VERSION] and next ## [)
+              RELEASE_NOTES=$(awk -v ver="$FULL_VERSION" '
+                /^## \[/ {
+                  if (found) exit
+                  if (index($0, "## [" ver "]")) found=1
+                  next
+                }
+                found { print }
+              ' "$CHANGELOG")
+
+              # Fallback if no matching version found
+              if [[ -z "$RELEASE_NOTES" ]]; then
+                RELEASE_NOTES="Build of $template version $FULL_VERSION"
+              fi
+            else
+              RELEASE_NOTES="Build of $template version $FULL_VERSION"
+            fi
+
             gh release create "$TAG" \
               --title "$template $FULL_VERSION" \
-              --notes "Build of $template version $FULL_VERSION" \
+              --notes "$RELEASE_NOTES" \
               "$dir"/*.tar.zst "$dir"/*.sha256 "$dir"/*.sha512 "$dir"/*.md5 \
               --latest=false \
               2>/dev/null || \
