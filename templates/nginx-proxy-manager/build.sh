@@ -95,7 +95,6 @@ ln -sf /usr/local/openresty/nginx/conf /etc/nginx
 
 # === Copy backend ===
 cp -r backend/* "$APP_DIR/backend/"
-cp -r global/* "$APP_DIR/backend/"
 
 # === Build Frontend ===
 cd "/tmp/nginx-proxy-manager-${NPM_VERSION}/frontend"
