@@ -512,16 +512,15 @@ const totalCount = templates.length;
     // Changelog
     const changelogSection = document.getElementById("detail-changelog-section");
     const changelogEl = document.getElementById("detail-changelog");
+    const changelogItem = document.getElementById("changelog-item");
     const changelogToggle = document.getElementById("changelog-toggle");
     if (data.changelog && changelogSection && changelogEl) {
       changelogSection.classList.remove("hidden");
-      changelogEl.innerHTML = escapeHtml(data.changelog as string).replace(/\n/g, '<br>');
+      changelogEl.innerHTML = `<p>${escapeHtml(data.changelog as string).replace(/\n/g, '<br>')}</p>`;
 
-      // Toggle handler
+      // Toggle handler - use accordion-item.open class
       changelogToggle?.addEventListener("click", () => {
-        const isOpen = changelogEl.style.display !== "none";
-        changelogEl.style.display = isOpen ? "none" : "block";
-        changelogToggle.classList.toggle("open", !isOpen);
+        changelogItem?.classList.toggle("open");
       });
     } else {
       changelogSection?.classList.add("hidden");

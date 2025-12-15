@@ -81,14 +81,16 @@
       </div>
 
       <!-- Changelog -->
-      <div id="detail-changelog-section" class="hidden">
-        <button class="accordion-header" id="changelog-toggle" style="width: 100%; border-radius: var(--radius-md);">
-          Changelog
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor">
-            <path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z" />
-          </svg>
-        </button>
-        <div id="detail-changelog" class="changelog-content" style="display: none; padding: 16px; background: var(--bg-light); border-radius: 0 0 var(--radius-md) var(--radius-md); font-size: 0.875rem;"></div>
+      <div id="detail-changelog-section" class="accordion hidden">
+        <div class="accordion-item" id="changelog-item">
+          <button class="accordion-header" id="changelog-toggle">
+            Changelog
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor">
+              <path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z" />
+            </svg>
+          </button>
+          <div id="detail-changelog" class="accordion-content"></div>
+        </div>
       </div>
     </div>
 
@@ -174,10 +176,6 @@
     .detail-sidebar {
       position: static;
     }
-  }
-
-  .changelog-content {
-    background: var(--bg-elevated);
   }
 
 </style>
