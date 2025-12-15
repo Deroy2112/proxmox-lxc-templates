@@ -265,10 +265,15 @@ jobs:
                 -e "s|{{CRED_NOTE}}|${CRED_NOTE}|g" \
                 "$TEMPLATE_HTML" > "$output"
 
+            # Escape & for awk gsub (& has special meaning in replacement strings)
+            QUICK_START_ESC="${QUICK_START//&/\\&}"
+            FAQ_ITEMS_ESC="${FAQ_ITEMS//&/\\&}"
+            CHANGELOG_ESC="${CHANGELOG//&/\\&}"
+
             # Handle conditional sections (markers are always removed, content kept if condition true)
-            awk -v quick_start="$QUICK_START" \
-                -v faq_items="$FAQ_ITEMS" \
-                -v changelog="$CHANGELOG" \
+            awk -v quick_start="$QUICK_START_ESC" \
+                -v faq_items="$FAQ_ITEMS_ESC" \
+                -v changelog="$CHANGELOG_ESC" \
                 -v has_creds="$([[ -n "$CRED_USER" ]] && echo "1" || echo "")" \
                 -v has_faq="$([[ "$faq_count" -gt 0 ]] && echo "1" || echo "")" \
                 -v cred_note="$CRED_NOTE" '
