@@ -14,7 +14,11 @@
   /* Category Colors */
   --color-cat-media: #e74c3c;
   --color-cat-network: #3b82f6;
+  --color-cat-database: #f59e0b;
+  --color-cat-automation: #ec4899;
   --color-cat-monitoring: #22c55e;
+  --color-cat-storage: #06b6d4;
+  --color-cat-security: #6366f1;
   --color-cat-development: #8b5cf6;
 
   /* Status Colors */

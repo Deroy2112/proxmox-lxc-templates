@@ -13,6 +13,7 @@ import CredentialsPanel from "@/components/template/CredentialsPanel.astro";
 import FAQAccordion from "@/components/template/FAQAccordion.astro";
 import ChangelogSection from "@/components/template/ChangelogSection.astro";
 import Button from "@/components/ui/Button.astro";
+import { getCategories } from "@/config/categories";
 
 export async function getStaticPaths() {
   const templates = await getCollection("templates");
@@ -25,13 +26,8 @@ export async function getStaticPaths() {
 const { template, allTemplates } = Astro.props;
 const data = template.data;
 
-// Categories for sidebar with counts
-const categories = [
-  { name: "media", label: "Media & Indexer", icon: "film", count: 0 },
-  { name: "network", label: "Network & Proxy", icon: "globe", count: 0 },
-  { name: "monitoring", label: "Monitoring & Tools", icon: "chart", count: 0 },
-  { name: "development", label: "Development", icon: "code", count: 0 },
-];
+// Get categories with fresh counts
+const categories = getCategories();
 
 // Count templates per category
 allTemplates.forEach((t: typeof template) => {
@@ -39,6 +35,7 @@ allTemplates.forEach((t: typeof template) => {
   if (cat) cat.count++;
 });
 
+const totalCount = allTemplates.length;
 const basePath = import.meta.env.BASE_URL;
 ---
 
@@ -48,7 +45,7 @@ const basePath = import.meta.env.BASE_URL;
 >
   <div class="flex min-h-screen">
     <!-- Sidebar -->
-    <Sidebar categories={categories} />
+    <Sidebar categories={categories} totalCount={totalCount} />
 
     <!-- Mobile Menu -->
     <MobileMenu />

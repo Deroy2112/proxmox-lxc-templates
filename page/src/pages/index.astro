@@ -5,6 +5,7 @@ import Sidebar from "@/components/layout/Sidebar.astro";
 import MobileMenu from "@/components/layout/MobileMenu.astro";
 import Footer from "@/components/layout/Footer.astro";
 import TemplateCard from "@/components/template/TemplateCard.astro";
+import { getCategories } from "@/config/categories";
 
 // Load templates from content collection
 let templates: Awaited<ReturnType<typeof getCollection<"templates">>> = [];
@@ -14,13 +15,8 @@ try {
   // No templates yet - that's fine
 }
 
-// Parse categories
-const categories = [
-  { name: "media", label: "Media & Indexer", icon: "film", count: 0 },
-  { name: "network", label: "Network & Proxy", icon: "globe", count: 0 },
-  { name: "monitoring", label: "Monitoring & Tools", icon: "chart", count: 0 },
-  { name: "development", label: "Development", icon: "code", count: 0 },
-];
+// Get categories with fresh counts
+const categories = getCategories();
 
 // Count templates per category
 templates.forEach((t) => {
@@ -33,13 +29,14 @@ const sortedTemplates = templates.sort((a, b) =>
   a.data.name.localeCompare(b.data.name)
 );
 
+const totalCount = templates.length;
 const basePath = import.meta.env.BASE_URL;
 ---
 
 <BaseLayout title="Home" description="Custom LXC container templates for Proxmox VE. Pre-configured, optimized, and ready to deploy.">
   <div class="flex min-h-screen">
     <!-- Sidebar -->
-    <Sidebar categories={categories} activeCategory="all" />
+    <Sidebar categories={categories} activeCategory="all" totalCount={totalCount} />
 
     <!-- Mobile Menu -->
     <MobileMenu />
