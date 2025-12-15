@@ -2,8 +2,8 @@ import { defineCollection, z } from "astro:content";
 
 /**
  * Templates Collection
- * Data files (YAML) containing template metadata
- * Generated from templates/*/debian-13/config.yml by CI
+ * Data files (YAML) containing template metadata.
+ * Generated from templates config.yml files during CI build.
  */
 const templates = defineCollection({
   type: "data",
