@@ -1,0 +1,95 @@
+---
+interface Props {
+  code: string;
+  language?: string;
+  filename?: string;
+  showCopy?: boolean;
+  class?: string;
+}
+
+const {
+  code,
+  language = "bash",
+  filename,
+  showCopy = true,
+  class: className = "",
+} = Astro.props;
+
+const id = `code-${Math.random().toString(36).slice(2, 9)}`;
+---
+
+<div class={`relative group rounded-lg overflow-hidden ${className}`}>
+  {filename && (
+    <div class="px-4 py-2 bg-[var(--code-bg)] border-b border-[var(--code-border)] text-xs text-[var(--text-muted)] font-mono">
+      {filename}
+    </div>
+  )}
+  <div class="relative">
+    <pre
+      class="p-4 bg-[var(--code-bg)] overflow-x-auto text-sm font-mono text-[var(--text-primary)]"
+    ><code id={id} data-language={language}>{code}</code></pre>
+    {showCopy && (
+      <button
+        type="button"
+        class="copy-btn absolute top-2 right-2 p-2 rounded-md bg-[var(--bg-tertiary)] opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-[var(--border-color)]"
+        data-copy-target={`#${id}`}
+        aria-label="Copy to clipboard"
+      >
+        <svg
+          class="copy-icon w-4 h-4 text-[var(--text-muted)]"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+        </svg>
+        <svg
+          class="check-icon w-4 h-4 text-green-500 hidden"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+      </button>
+    )}
+  </div>
+</div>
+
+<script>
+  document.addEventListener("astro:page-load", () => {
+    document.querySelectorAll(".copy-btn").forEach((btn) => {
+      btn.addEventListener("click", async () => {
+        const targetSelector = btn.getAttribute("data-copy-target");
+        if (!targetSelector) return;
+
+        const target = document.querySelector(targetSelector);
+        if (!target) return;
+
+        const text = target.textContent || "";
+
+        try {
+          await navigator.clipboard.writeText(text);
+
+          const copyIcon = btn.querySelector(".copy-icon");
+          const checkIcon = btn.querySelector(".check-icon");
+
+          if (copyIcon && checkIcon) {
+            copyIcon.classList.add("hidden");
+            checkIcon.classList.remove("hidden");
+
+            setTimeout(() => {
+              copyIcon.classList.remove("hidden");
+              checkIcon.classList.add("hidden");
+            }, 2000);
+          }
+        } catch (err) {
+          console.error("Failed to copy:", err);
+        }
+      });
+    });
+  });
+</script>

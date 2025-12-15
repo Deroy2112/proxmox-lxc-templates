@@ -1,0 +1,49 @@
+---
+import Card from "@/components/ui/Card.astro";
+
+interface Port {
+  port: number;
+  description: string;
+}
+
+interface Props {
+  ports: Port[];
+}
+
+const { ports } = Astro.props;
+---
+
+{ports && ports.length > 0 && (
+  <Card hover={false} class="p-0 overflow-hidden">
+    <div class="px-4 py-3 border-b border-[var(--border-color)] bg-[var(--bg-tertiary)]/50">
+      <h3 class="font-semibold text-[var(--text-primary)] flex items-center gap-2">
+        <svg class="w-4 h-4 text-[var(--color-accent)]" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M15 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V9l-6-6zm3 16H6c-.55 0-1-.45-1-1V6c0-.55.45-1 1-1h8v5h5v8c0 .55-.45 1-1 1z"/>
+        </svg>
+        Exposed Ports
+      </h3>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead class="bg-[var(--bg-tertiary)]/30 text-[var(--text-muted)] text-left">
+          <tr>
+            <th class="px-4 py-2 font-medium">Port</th>
+            <th class="px-4 py-2 font-medium">Description</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-[var(--border-color)]">
+          {ports.map((port) => (
+            <tr class="hover:bg-[var(--bg-secondary)] transition-colors">
+              <td class="px-4 py-2">
+                <code class="px-2 py-0.5 rounded bg-[var(--bg-tertiary)] text-[var(--color-accent)] font-mono text-xs">
+                  {port.port}
+                </code>
+              </td>
+              <td class="px-4 py-2 text-[var(--text-secondary)]">{port.description}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </Card>
+)}

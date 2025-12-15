@@ -1,0 +1,49 @@
+---
+import Card from "@/components/ui/Card.astro";
+
+interface Path {
+  path: string;
+  description: string;
+}
+
+interface Props {
+  paths: Path[];
+}
+
+const { paths } = Astro.props;
+---
+
+{paths && paths.length > 0 && (
+  <Card hover={false} class="p-0 overflow-hidden">
+    <div class="px-4 py-3 border-b border-[var(--border-color)] bg-[var(--bg-tertiary)]/50">
+      <h3 class="font-semibold text-[var(--text-primary)] flex items-center gap-2">
+        <svg class="w-4 h-4 text-[var(--color-accent)]" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/>
+        </svg>
+        Important Paths
+      </h3>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead class="bg-[var(--bg-tertiary)]/30 text-[var(--text-muted)] text-left">
+          <tr>
+            <th class="px-4 py-2 font-medium">Path</th>
+            <th class="px-4 py-2 font-medium">Description</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-[var(--border-color)]">
+          {paths.map((p) => (
+            <tr class="hover:bg-[var(--bg-secondary)] transition-colors">
+              <td class="px-4 py-2">
+                <code class="px-2 py-0.5 rounded bg-[var(--bg-tertiary)] text-[var(--text-primary)] font-mono text-xs">
+                  {p.path}
+                </code>
+              </td>
+              <td class="px-4 py-2 text-[var(--text-secondary)]">{p.description}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </Card>
+)}

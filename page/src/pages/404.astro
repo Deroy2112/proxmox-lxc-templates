@@ -1,0 +1,30 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import Button from "@/components/ui/Button.astro";
+
+const basePath = import.meta.env.BASE_URL;
+---
+
+<BaseLayout title="Page Not Found" description="The page you're looking for doesn't exist.">
+  <main class="flex items-center justify-center min-h-screen p-6">
+    <div class="glass-card p-8 max-w-md text-center animate-fade-in">
+      <div class="icon-box icon-box-xl mx-auto mb-6" style="--icon-color: var(--color-error);">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+        </svg>
+      </div>
+      <h1 class="text-4xl font-bold text-[var(--text-primary)] mb-2">404</h1>
+      <p class="text-xl text-[var(--text-secondary)] mb-6">Page not found</p>
+      <p class="text-[var(--text-muted)] mb-8">
+        The page you're looking for doesn't exist or has been moved.
+      </p>
+      <Button href={basePath} variant="primary">
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+          <polyline points="9 22 9 12 15 12 15 22"/>
+        </svg>
+        Back to Home
+      </Button>
+    </div>
+  </main>
+</BaseLayout>

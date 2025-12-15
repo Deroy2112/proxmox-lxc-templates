@@ -1,0 +1,73 @@
+---
+import Card from "@/components/ui/Card.astro";
+import CodeBlock from "@/components/ui/CodeBlock.astro";
+import Alert from "@/components/ui/Alert.astro";
+
+interface Props {
+  name: string;
+  download_url?: string;
+  sha512?: string;
+  quick_start?: string;
+}
+
+const { name, download_url, sha512, quick_start } = Astro.props;
+
+const installCommand = download_url
+  ? `pvesh create /nodes/\${NODE}/lxc \\
+  -vmid \${VMID} \\
+  -hostname ${name} \\
+  -ostemplate local:vztmpl/${name}.tar.zst \\
+  -storage local-lvm \\
+  -rootfs local-lvm:8 \\
+  -memory 512 \\
+  -cores 1 \\
+  -net0 name=eth0,bridge=vmbr0,ip=dhcp \\
+  -unprivileged 1 \\
+  -features nesting=1 \\
+  -start 1`
+  : "# Template not yet released";
+---
+
+<Card hover={false} class="p-0 overflow-hidden">
+  <div class="px-4 py-3 border-b border-[var(--border-color)] bg-[var(--bg-tertiary)]/50">
+    <h2 class="font-semibold text-[var(--text-primary)] flex items-center gap-2">
+      <svg class="w-4 h-4 text-[var(--color-accent)]" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+      </svg>
+      Installation
+    </h2>
+  </div>
+
+  <div class="p-4 space-y-4">
+    {download_url && (
+      <Alert type="info" size="sm">
+        Download the template and upload to <code class="px-1 py-0.5 rounded bg-[var(--bg-tertiary)] text-sm">/var/lib/vz/template/cache/</code> on your Proxmox node.
+      </Alert>
+    )}
+
+    {download_url && (
+      <div>
+        <label class="block text-sm font-medium text-[var(--text-muted)] mb-2">Download URL</label>
+        <CodeBlock code={download_url} showCopy={true} />
+      </div>
+    )}
+
+    {sha512 && (
+      <div>
+        <label class="block text-sm font-medium text-[var(--text-muted)] mb-2">SHA512 Checksum</label>
+        <CodeBlock code={sha512} showCopy={true} />
+      </div>
+    )}
+
+    <div>
+      <label class="block text-sm font-medium text-[var(--text-muted)] mb-2">Create Container</label>
+      <CodeBlock code={installCommand} language="bash" showCopy={true} />
+    </div>
+
+    {quick_start && (
+      <Alert type="success" title="Quick Start">
+        <div class="whitespace-pre-wrap text-sm">{quick_start}</div>
+      </Alert>
+    )}
+  </div>
+</Card>

@@ -1,0 +1,42 @@
+---
+interface Props {
+  variant?: "default" | "success" | "warning" | "error" | "info" | "category";
+  category?: "media" | "network" | "monitoring" | "development";
+  size?: "sm" | "md";
+  class?: string;
+}
+
+const { variant = "default", category, size = "md", class: className = "" } = Astro.props;
+
+const sizeClasses = {
+  sm: "px-2 py-0.5 text-xs",
+  md: "px-3 py-1 text-sm",
+};
+
+const variantClasses = {
+  default: "bg-[var(--bg-tertiary)] text-[var(--text-secondary)]",
+  success: "bg-green-500/10 text-green-600 dark:text-green-400",
+  warning: "bg-amber-500/10 text-amber-600 dark:text-amber-400",
+  error: "bg-red-500/10 text-red-600 dark:text-red-400",
+  info: "bg-blue-500/10 text-blue-600 dark:text-blue-400",
+  category: "",
+};
+
+const categoryClasses = {
+  media: "bg-[var(--color-cat-media)] text-white",
+  network: "bg-[var(--color-cat-network)] text-white",
+  monitoring: "bg-[var(--color-cat-monitoring)] text-white",
+  development: "bg-[var(--color-cat-development)] text-white",
+};
+
+const classes = `
+  inline-flex items-center font-medium rounded-full
+  ${sizeClasses[size]}
+  ${variant === "category" && category ? categoryClasses[category] : variantClasses[variant]}
+  ${className}
+`.trim();
+---
+
+<span class={classes}>
+  <slot />
+</span>

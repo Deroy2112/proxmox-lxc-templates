@@ -1,0 +1,28 @@
+---
+interface Props {
+  href?: string;
+  class?: string;
+  hover?: boolean;
+}
+
+const { href, class: className = "", hover = true } = Astro.props;
+
+const baseClasses = `
+  glass-card p-5
+  transition-all duration-200
+  ${hover ? "hover:-translate-y-1 hover:shadow-lg" : ""}
+  ${className}
+`.trim();
+
+const Element = href ? "a" : "div";
+---
+
+{href ? (
+  <a href={href} class={baseClasses}>
+    <slot />
+  </a>
+) : (
+  <div class={baseClasses}>
+    <slot />
+  </div>
+)}

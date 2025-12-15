@@ -1,0 +1,64 @@
+---
+import Card from "@/components/ui/Card.astro";
+
+interface Props {
+  content?: string;
+}
+
+const { content } = Astro.props;
+
+// Simple markdown-to-HTML conversion for changelog
+function parseChangelog(md: string): string {
+  if (!md) return "";
+
+  return md
+    // Headers
+    .replace(/^### (.+)$/gm, '<h4 class="text-sm font-semibold text-[var(--text-muted)] mt-4 mb-2">$1</h4>')
+    .replace(/^## \[(.+?)\] - (.+)$/gm, '<h3 class="text-base font-semibold text-[var(--text-primary)] mt-6 mb-2 first:mt-0"><span class="text-[var(--color-accent)]">$1</span> <span class="text-[var(--text-muted)] font-normal">- $2</span></h3>')
+    .replace(/^## (.+)$/gm, '<h3 class="text-base font-semibold text-[var(--text-primary)] mt-6 mb-2 first:mt-0">$1</h3>')
+    // Lists
+    .replace(/^- (.+)$/gm, '<li class="text-[var(--text-secondary)] ml-4 list-disc">$1</li>')
+    // Inline code
+    .replace(/`([^`]+)`/g, '<code class="px-1 py-0.5 rounded bg-[var(--bg-tertiary)] text-sm">$1</code>')
+    // Bold
+    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+    // Links
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" class="text-[var(--color-accent)] hover:underline" target="_blank" rel="noopener">$1</a>')
+    // Wrap consecutive li elements in ul
+    .replace(/(<li[^>]*>.*?<\/li>\n?)+/g, '<ul class="space-y-1 mb-3">$&</ul>')
+    // Paragraphs (lines that don't start with < and aren't empty)
+    .replace(/^(?!<)(?!\s*$)(.+)$/gm, '<p class="text-[var(--text-secondary)] mb-2">$1</p>');
+}
+
+const htmlContent = content ? parseChangelog(content) : "";
+---
+
+{content && (
+  <Card hover={false} class="p-0 overflow-hidden">
+    <div class="px-4 py-3 border-b border-[var(--border-color)] bg-[var(--bg-tertiary)]/50">
+      <h2 class="font-semibold text-[var(--text-primary)] flex items-center gap-2">
+        <svg class="w-4 h-4 text-[var(--color-accent)]" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/>
+        </svg>
+        Changelog
+      </h2>
+    </div>
+    <div class="p-4 max-h-96 overflow-y-auto">
+      <div class="changelog-content text-sm" set:html={htmlContent} />
+    </div>
+  </Card>
+)}
+
+<style>
+  .changelog-content :global(h3:first-child) {
+    margin-top: 0;
+  }
+
+  .changelog-content :global(ul) {
+    padding-left: 0;
+  }
+
+  .changelog-content :global(li) {
+    margin-left: 1.25rem;
+  }
+</style>

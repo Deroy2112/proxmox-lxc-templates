@@ -1,0 +1,172 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import Sidebar from "@/components/layout/Sidebar.astro";
+import MobileMenu from "@/components/layout/MobileMenu.astro";
+import Footer from "@/components/layout/Footer.astro";
+import TemplateHero from "@/components/template/TemplateHero.astro";
+import InstallCommand from "@/components/template/InstallCommand.astro";
+import ResourcesPanel from "@/components/template/ResourcesPanel.astro";
+import PortsTable from "@/components/template/PortsTable.astro";
+import PathsTable from "@/components/template/PathsTable.astro";
+import CredentialsPanel from "@/components/template/CredentialsPanel.astro";
+import FAQAccordion from "@/components/template/FAQAccordion.astro";
+import ChangelogSection from "@/components/template/ChangelogSection.astro";
+import Button from "@/components/ui/Button.astro";
+
+export async function getStaticPaths() {
+  const templates = await getCollection("templates");
+  return templates.map((template) => ({
+    params: { slug: template.data.name },
+    props: { template },
+  }));
+}
+
+const { template } = Astro.props;
+const data = template.data;
+
+// Categories for sidebar
+const categories = [
+  { name: "media", label: "Media & Indexer", icon: "film", count: 0 },
+  { name: "network", label: "Network & Proxy", icon: "globe", count: 0 },
+  { name: "monitoring", label: "Monitoring & Tools", icon: "chart", count: 0 },
+  { name: "development", label: "Development", icon: "code", count: 0 },
+];
+
+const basePath = import.meta.env.BASE_URL;
+---
+
+<BaseLayout
+  title={data.name.charAt(0).toUpperCase() + data.name.slice(1)}
+  description={data.description}
+>
+  <div class="flex min-h-screen">
+    <!-- Sidebar -->
+    <Sidebar categories={categories} />
+
+    <!-- Mobile Menu -->
+    <MobileMenu />
+
+    <!-- Main Content -->
+    <main class="flex-1 ml-0 md:ml-[var(--sidebar-width)] flex flex-col min-h-screen">
+      <div class="flex-1 p-6 pt-16 md:pt-6">
+        <div class="max-w-[var(--content-max)] mx-auto">
+          <!-- Back Button -->
+          <div class="mb-6">
+            <Button href={basePath} variant="ghost" size="sm">
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 12H5M12 19l-7-7 7-7"/>
+              </svg>
+              Back to Templates
+            </Button>
+          </div>
+
+          <!-- Hero -->
+          <TemplateHero
+            name={data.name}
+            description={data.description}
+            category={data.category}
+            icon={data.icon}
+            version={data.version}
+            build_version={data.build_version}
+            base_os={data.base_os}
+            architecture={data.architecture}
+          />
+
+          <!-- Two Column Layout -->
+          <div class="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6">
+            <!-- Main Column -->
+            <div class="space-y-6">
+              <!-- Installation -->
+              <InstallCommand
+                name={data.name}
+                download_url={data.download_url}
+                sha512={data.sha512}
+                quick_start={data.quick_start}
+              />
+
+              <!-- FAQ -->
+              {data.faq && data.faq.length > 0 && (
+                <FAQAccordion items={data.faq} />
+              )}
+
+              <!-- Changelog -->
+              {data.changelog && (
+                <ChangelogSection content={data.changelog} />
+              )}
+            </div>
+
+            <!-- Sidebar Column -->
+            <div class="space-y-6 lg:sticky lg:top-6 lg:self-start">
+              <!-- Download Button -->
+              {data.download_url && (
+                <a
+                  href={data.download_url}
+                  class="flex items-center justify-center gap-2 w-full px-5 py-3 bg-[var(--color-accent)] text-white font-medium rounded-lg hover:bg-[var(--color-accent-hover)] transition-colors"
+                  download
+                >
+                  <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                  </svg>
+                  Download Template
+                </a>
+              )}
+
+              <!-- Resources -->
+              <ResourcesPanel
+                memory_min={data.resources.memory_min}
+                memory_recommended={data.resources.memory_recommended}
+                disk_min={data.resources.disk_min}
+                disk_recommended={data.resources.disk_recommended}
+                cores={data.resources.cores}
+              />
+
+              <!-- Ports -->
+              {data.ports && <PortsTable ports={data.ports} />}
+
+              <!-- Paths -->
+              {data.paths && <PathsTable paths={data.paths} />}
+
+              <!-- Credentials -->
+              {data.credentials && (
+                <CredentialsPanel
+                  username={data.credentials.username}
+                  password={data.credentials.password}
+                  note={data.credentials.note}
+                />
+              )}
+
+              <!-- Release Info -->
+              {data.release_url && (
+                <div class="text-sm text-[var(--text-muted)] space-y-1">
+                  {data.release_date && (
+                    <p>
+                      Released: {new Date(data.release_date).toLocaleDateString("en-US", {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      })}
+                    </p>
+                  )}
+                  <p>
+                    <a
+                      href={data.release_url}
+                      class="text-[var(--color-accent)] hover:underline"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      View on GitHub →
+                    </a>
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <Footer />
+    </main>
+  </div>
+</BaseLayout>
