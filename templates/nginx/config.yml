@@ -22,9 +22,9 @@ ports:
 
 paths:
   - path: /etc/nginx
-    description: Konfiguration
+    description: Configuration
   - path: /var/www/html
-    description: Web Root
+    description: Web root
   - path: /var/log/nginx
     description: Logs
 

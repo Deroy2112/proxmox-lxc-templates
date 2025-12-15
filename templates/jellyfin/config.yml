@@ -22,13 +22,13 @@ ports:
 
 paths:
   - path: /var/lib/jellyfin
-    description: Daten & Konfiguration
+    description: Data & configuration
   - path: /var/log/jellyfin
     description: Logs
   - path: /media
-    description: Media Bibliotheken (mount point)
+    description: Media libraries (mount point)
 
 quick_start: |
   Web UI: http://<IP>:8096
-  Setup-Wizard beim ersten Start
-  Media-Ordner als Mount Points einbinden
+  Setup wizard on first start
+  Mount media folders as bind mounts

@@ -20,11 +20,11 @@ ports:
 
 paths:
   - path: /root/.shoko
-    description: Konfiguration & Datenbank
+    description: Configuration & database
   - path: /anime
-    description: Anime Bibliothek (mount point)
+    description: Anime library (mount point)
 
 quick_start: |
   Web UI: http://<IP>:8111
-  AniDB Account erforderlich
-  Anime-Ordner als Mount Point einbinden
+  AniDB account required
+  Mount anime folder as bind mount

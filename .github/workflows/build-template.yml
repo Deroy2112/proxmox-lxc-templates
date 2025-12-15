@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - 'templates/**'
+      - '!templates/categories.yml'
     branches:
       - main
   workflow_dispatch:
