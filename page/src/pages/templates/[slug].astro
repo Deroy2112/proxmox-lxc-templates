@@ -18,20 +18,26 @@ export async function getStaticPaths() {
   const templates = await getCollection("templates");
   return templates.map((template) => ({
     params: { slug: template.data.name },
-    props: { template },
+    props: { template, allTemplates: templates },
   }));
 }
 
-const { template } = Astro.props;
+const { template, allTemplates } = Astro.props;
 const data = template.data;
 
-// Categories for sidebar
+// Categories for sidebar with counts
 const categories = [
   { name: "media", label: "Media & Indexer", icon: "film", count: 0 },
   { name: "network", label: "Network & Proxy", icon: "globe", count: 0 },
   { name: "monitoring", label: "Monitoring & Tools", icon: "chart", count: 0 },
   { name: "development", label: "Development", icon: "code", count: 0 },
 ];
+
+// Count templates per category
+allTemplates.forEach((t: typeof template) => {
+  const cat = categories.find((c) => c.name === t.data.category);
+  if (cat) cat.count++;
+});
 
 const basePath = import.meta.env.BASE_URL;
 ---
