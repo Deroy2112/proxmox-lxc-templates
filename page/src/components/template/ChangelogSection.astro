@@ -43,13 +43,27 @@ const htmlContent = content ? parseChangelog(content) : "";
         Changelog
       </h2>
     </div>
-    <div class="p-4 max-h-96 overflow-y-auto">
+    <div class="changelog-scroll p-4 max-h-96 overflow-y-auto">
       <div class="changelog-content text-sm" set:html={htmlContent} />
     </div>
   </Card>
 )}
 
 <style>
+  .changelog-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar-thumb) transparent;
+  }
+
+  .changelog-scroll::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .changelog-scroll::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb);
+    border-radius: 3px;
+  }
+
   .changelog-content :global(h3:first-child) {
     margin-top: 0;
   }
