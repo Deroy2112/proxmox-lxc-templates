@@ -3,6 +3,7 @@ import { getCollection } from "astro:content";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import AppShell from "@/components/layout/AppShell.astro";
 import TemplateCard from "@/components/template/TemplateCard.astro";
+import TemplateDetail from "@/components/template/TemplateDetail.astro";
 
 // Category definitions (inline - no external config needed)
 const categoryDefs = [
@@ -36,62 +37,71 @@ const sortedTemplates = templates.sort((a, b) =>
 );
 
 const totalCount = templates.length;
-const basePath = import.meta.env.BASE_URL;
 ---
 
 <BaseLayout title="Home" description="Custom LXC container templates for Proxmox VE. Pre-configured, optimized, and ready to deploy.">
   <AppShell categories={categories} activeCategory="all" totalCount={totalCount}>
-    <!-- Header -->
-    <div class="mb-8">
-      <h1 class="text-2xl font-bold mb-2">
-        LXC Templates
-      </h1>
-      <p class="opacity-70">
-        Pre-configured container templates for Proxmox VE 9.x
-      </p>
+    <!-- Template List (default visible) -->
+    <div id="template-list">
+      <!-- Header -->
+      <div class="mb-8">
+        <h1 class="text-2xl font-bold mb-2">
+          LXC Templates
+        </h1>
+        <p class="opacity-70">
+          Pre-configured container templates for Proxmox VE 9.x
+        </p>
+      </div>
+
+      <!-- Template Grid -->
+      <div
+        id="template-grid"
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"
+      >
+        {sortedTemplates.length > 0 ? (
+          sortedTemplates.map((template, index) => (
+            <TemplateCard
+              name={template.data.name}
+              description={template.data.description}
+              category={template.data.category}
+              icon={template.data.icon}
+              version={template.data.version}
+              build_version={template.data.build_version}
+              base_os={template.data.base_os}
+              memory_min={template.data.resources.memory_min}
+              templateData={JSON.stringify(template.data)}
+              index={index}
+            />
+          ))
+        ) : (
+          <div class="col-span-full text-center py-12 opacity-60">
+            <svg class="w-16 h-16 mx-auto mb-4 opacity-50" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-1 12H5c-.55 0-1-.45-1-1V9c0-.55.45-1 1-1h14c.55 0 1 .45 1 1v8c0 .55-.45 1-1 1z"/>
+            </svg>
+            <p>No templates available yet.</p>
+            <p class="text-sm mt-2">Templates will appear here after the first release.</p>
+          </div>
+        )}
+      </div>
+
+      <!-- No Results Message (hidden by default) -->
+      <div id="no-results" class="hidden text-center py-12 opacity-60">
+        <svg class="w-16 h-16 mx-auto mb-4 opacity-50" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+        </svg>
+        <p>No templates found matching your search.</p>
+      </div>
     </div>
 
-    <!-- Template Grid -->
-    <div
-      id="template-grid"
-      class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"
-    >
-      {sortedTemplates.length > 0 ? (
-        sortedTemplates.map((template, index) => (
-          <TemplateCard
-            name={template.data.name}
-            description={template.data.description}
-            category={template.data.category}
-            icon={template.data.icon}
-            version={template.data.version}
-            base_os={template.data.base_os}
-            memory_min={template.data.resources.memory_min}
-            href={`${basePath}templates/${template.data.name}/`}
-            index={index}
-          />
-        ))
-      ) : (
-        <div class="col-span-full text-center py-12 opacity-60">
-          <svg class="w-16 h-16 mx-auto mb-4 opacity-50" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-1 12H5c-.55 0-1-.45-1-1V9c0-.55.45-1 1-1h14c.55 0 1 .45 1 1v8c0 .55-.45 1-1 1z"/>
-          </svg>
-          <p>No templates available yet.</p>
-          <p class="text-sm mt-2">Templates will appear here after the first release.</p>
-        </div>
-      )}
-    </div>
-
-    <!-- No Results Message (hidden by default) -->
-    <div id="no-results" class="hidden text-center py-12 opacity-60">
-      <svg class="w-16 h-16 mx-auto mb-4 opacity-50" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
-      </svg>
-      <p>No templates found matching your search.</p>
-    </div>
+    <!-- Template Detail (hidden by default) -->
+    <TemplateDetail />
   </AppShell>
 </BaseLayout>
 
 <script>
+  // Template data map for quick access
+  const templatesMap = new Map<string, Record<string, unknown>>();
+
   function initSearch() {
     const searchInput = document.getElementById("search-input") as HTMLInputElement | null;
     const grid = document.getElementById("template-grid");
@@ -104,6 +114,20 @@ const basePath = import.meta.env.BASE_URL;
 
     let currentCategory = "all";
     let currentQuery = "";
+
+    // Build templates map
+    templatesMap.clear();
+    cards.forEach((card) => {
+      const dataStr = card.getAttribute("data-template");
+      if (dataStr) {
+        try {
+          const data = JSON.parse(dataStr);
+          templatesMap.set(data.name, data);
+        } catch {
+          // Invalid JSON, skip
+        }
+      }
+    });
 
     // Get query from URL
     const urlParams = new URLSearchParams(window.location.search);
@@ -208,6 +232,271 @@ const basePath = import.meta.env.BASE_URL;
     applyFilters();
   }
 
+  // Show template detail
+  function showTemplateDetail(data: Record<string, unknown>) {
+    populateDetail(data);
+
+    document.getElementById("template-list")?.classList.add("hidden");
+    document.getElementById("template-detail")?.classList.remove("hidden");
+
+    // Update URL (Deep-Link)
+    const url = new URL(location.href);
+    url.searchParams.set("template", data.name as string);
+    url.searchParams.delete("q");
+    url.searchParams.delete("category");
+    history.pushState({ template: data.name }, "", url);
+
+    // Scroll to top
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  // Hide template detail
+  function hideTemplateDetail() {
+    document.getElementById("template-detail")?.classList.add("hidden");
+    document.getElementById("template-list")?.classList.remove("hidden");
+
+    const url = new URL(location.href);
+    url.searchParams.delete("template");
+    history.pushState({}, "", url);
+  }
+
+  // Populate detail with template data
+  function populateDetail(data: Record<string, unknown>) {
+    const iconUrl = `https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons@main/svg/${data.icon}.svg`;
+    const displayName = (data.name as string).charAt(0).toUpperCase() + (data.name as string).slice(1);
+
+    // Icon & Name
+    const iconEl = document.getElementById("detail-icon") as HTMLImageElement | null;
+    if (iconEl) iconEl.src = iconUrl;
+    const nameEl = document.getElementById("detail-name");
+    if (nameEl) nameEl.textContent = displayName;
+
+    // Description
+    const descEl = document.getElementById("detail-description");
+    if (descEl) descEl.textContent = data.description as string;
+
+    // Badges
+    const badgesEl = document.getElementById("detail-badges");
+    if (badgesEl) {
+      badgesEl.innerHTML = `
+        <span class="badge badge-primary badge-lg">v${data.version}-${data.build_version}</span>
+        <span class="badge badge-outline">${data.base_os}</span>
+        <span class="badge badge-soft badge-info">${data.category}</span>
+      `;
+    }
+
+    // Download
+    const downloadSection = document.getElementById("detail-download-section");
+    const downloadBtn = document.getElementById("detail-download-btn") as HTMLAnchorElement | null;
+    const wgetEl = document.getElementById("detail-wget");
+    const sha512El = document.getElementById("detail-sha512");
+
+    if (data.download_url) {
+      downloadSection?.classList.remove("hidden");
+      if (downloadBtn) downloadBtn.href = data.download_url as string;
+      if (wgetEl) wgetEl.textContent = `wget ${data.download_url}`;
+      if (sha512El) sha512El.textContent = data.sha512 ? `SHA512: ${data.sha512}` : "";
+    } else {
+      downloadSection?.classList.add("hidden");
+    }
+
+    // Quick Start
+    const qsSection = document.getElementById("detail-quickstart-section");
+    const qsEl = document.getElementById("detail-quickstart");
+    if (data.quick_start && qsSection && qsEl) {
+      qsSection.classList.remove("hidden");
+      const lines = (data.quick_start as string).split("\n").filter(l => l.trim());
+      qsEl.innerHTML = lines.map((line, i) =>
+        `<pre data-prefix="${i + 1}"><code>${escapeHtml(line)}</code></pre>`
+      ).join("");
+    } else {
+      qsSection?.classList.add("hidden");
+    }
+
+    // Resources (Stats)
+    const resourcesEl = document.getElementById("detail-resources");
+    const resources = data.resources as Record<string, unknown> | undefined;
+    if (resourcesEl && resources) {
+      resourcesEl.innerHTML = `
+        <div class="stat">
+          <div class="stat-title">Memory</div>
+          <div class="stat-value text-primary">${resources.memory_recommended} MB</div>
+          <div class="stat-desc">min: ${resources.memory_min} MB</div>
+        </div>
+        <div class="stat">
+          <div class="stat-title">Disk</div>
+          <div class="stat-value text-primary">${resources.disk_recommended}</div>
+          <div class="stat-desc">min: ${resources.disk_min}</div>
+        </div>
+        <div class="stat">
+          <div class="stat-title">CPU</div>
+          <div class="stat-value text-primary">${resources.cores}</div>
+          <div class="stat-desc">cores</div>
+        </div>
+      `;
+    }
+
+    // Ports
+    const portsSection = document.getElementById("detail-ports-section");
+    const portsEl = document.getElementById("detail-ports");
+    const ports = data.ports as Array<{port: number; description: string}> | undefined;
+    if (ports?.length && portsSection && portsEl) {
+      portsSection.classList.remove("hidden");
+      portsEl.innerHTML = ports.map(p =>
+        `<tr><td class="font-mono">${p.port}</td><td>${escapeHtml(p.description)}</td></tr>`
+      ).join("");
+    } else {
+      portsSection?.classList.add("hidden");
+    }
+
+    // Paths
+    const pathsSection = document.getElementById("detail-paths-section");
+    const pathsEl = document.getElementById("detail-paths");
+    const paths = data.paths as Array<{path: string; description: string}> | undefined;
+    if (paths?.length && pathsSection && pathsEl) {
+      pathsSection.classList.remove("hidden");
+      pathsEl.innerHTML = paths.map(p =>
+        `<tr><td class="font-mono text-xs">${escapeHtml(p.path)}</td><td>${escapeHtml(p.description)}</td></tr>`
+      ).join("");
+    } else {
+      pathsSection?.classList.add("hidden");
+    }
+
+    // Credentials
+    const credsSection = document.getElementById("detail-credentials-section");
+    const credsEl = document.getElementById("detail-credentials");
+    const credentials = data.credentials as {username: string; password: string; note?: string} | undefined;
+    if (credentials && credsSection && credsEl) {
+      credsSection.classList.remove("hidden");
+      let html = `User: <code class="bg-base-300 px-1 rounded">${escapeHtml(credentials.username)}</code> / Pass: <code class="bg-base-300 px-1 rounded">${escapeHtml(credentials.password)}</code>`;
+      if (credentials.note) {
+        html += `<br><span class="opacity-70">${escapeHtml(credentials.note)}</span>`;
+      }
+      credsEl.innerHTML = html;
+    } else {
+      credsSection?.classList.add("hidden");
+    }
+
+    // FAQ
+    const faqSection = document.getElementById("detail-faq-section");
+    const faqEl = document.getElementById("detail-faq");
+    const faq = data.faq as Array<{question: string; answer: string}> | undefined;
+    if (faq?.length && faqSection && faqEl) {
+      faqSection.classList.remove("hidden");
+      faqEl.innerHTML = faq.map((item, i) => `
+        <div class="collapse collapse-arrow bg-base-200">
+          <input type="radio" name="faq-accordion" ${i === 0 ? 'checked="checked"' : ''} />
+          <div class="collapse-title font-medium">${escapeHtml(item.question)}</div>
+          <div class="collapse-content"><p>${escapeHtml(item.answer)}</p></div>
+        </div>
+      `).join("");
+    } else {
+      faqSection?.classList.add("hidden");
+    }
+
+    // Changelog
+    const changelogSection = document.getElementById("detail-changelog-section");
+    const changelogEl = document.getElementById("detail-changelog");
+    if (data.changelog && changelogSection && changelogEl) {
+      changelogSection.classList.remove("hidden");
+      changelogEl.innerHTML = data.changelog as string;
+    } else {
+      changelogSection?.classList.add("hidden");
+    }
+
+    // Release Info
+    const releaseSection = document.getElementById("detail-release-section");
+    const releaseDateEl = document.getElementById("detail-release-date");
+    const githubLinkEl = document.getElementById("detail-github-link") as HTMLAnchorElement | null;
+
+    if (data.release_url || data.release_date) {
+      releaseSection?.classList.remove("hidden");
+      if (data.release_date && releaseDateEl) {
+        releaseDateEl.textContent = `Released: ${new Date(data.release_date as string).toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        })}`;
+      }
+      if (data.release_url && githubLinkEl) {
+        githubLinkEl.href = data.release_url as string;
+      }
+    } else {
+      releaseSection?.classList.add("hidden");
+    }
+  }
+
+  // Escape HTML for safe insertion
+  function escapeHtml(text: string): string {
+    const div = document.createElement("div");
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
+  // Initialize detail handlers
+  function initDetail() {
+    const grid = document.getElementById("template-grid");
+    const cards = grid?.querySelectorAll(".template-card");
+    const backBtn = document.getElementById("back-to-list");
+
+    // Card click handler
+    cards?.forEach((card) => {
+      const handleClick = () => {
+        const dataStr = card.getAttribute("data-template");
+        if (dataStr) {
+          try {
+            const data = JSON.parse(dataStr);
+            showTemplateDetail(data);
+          } catch {
+            // Invalid JSON
+          }
+        }
+      };
+
+      card.addEventListener("click", handleClick);
+      card.addEventListener("keydown", (e) => {
+        if ((e as KeyboardEvent).key === "Enter" || (e as KeyboardEvent).key === " ") {
+          e.preventDefault();
+          handleClick();
+        }
+      });
+    });
+
+    // Back button handler
+    backBtn?.addEventListener("click", hideTemplateDetail);
+
+    // Browser Back/Forward
+    window.addEventListener("popstate", (e) => {
+      if ((e.state as {template?: string} | null)?.template) {
+        const data = templatesMap.get((e.state as {template: string}).template);
+        if (data) {
+          populateDetail(data);
+          document.getElementById("template-list")?.classList.add("hidden");
+          document.getElementById("template-detail")?.classList.remove("hidden");
+        }
+      } else {
+        document.getElementById("template-detail")?.classList.add("hidden");
+        document.getElementById("template-list")?.classList.remove("hidden");
+      }
+    });
+
+    // Deep-Link on page load
+    const params = new URLSearchParams(location.search);
+    const templateName = params.get("template");
+    if (templateName) {
+      const data = templatesMap.get(templateName);
+      if (data) {
+        populateDetail(data);
+        document.getElementById("template-list")?.classList.add("hidden");
+        document.getElementById("template-detail")?.classList.remove("hidden");
+      }
+    }
+  }
+
   initSearch();
-  document.addEventListener("astro:after-swap", initSearch);
+  initDetail();
+  document.addEventListener("astro:after-swap", () => {
+    initSearch();
+    initDetail();
+  });
 </script>
