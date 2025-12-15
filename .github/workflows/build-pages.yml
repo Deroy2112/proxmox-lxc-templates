@@ -99,38 +99,34 @@ jobs:
               echo "," >> page/templates.json
             fi
 
-            QUICK_START_ESCAPED=$(echo "$QUICK_START" | jq -Rs '.')
-
-            cat >> page/templates.json <<JSONEOF
-  {
-    "name": "${NAME}",
-    "description": "${DESCRIPTION}",
-    "category": "${CATEGORY}",
-    "icon": "${ICON}",
-    "version": "${FULL_VERSION}",
-    "os": "${BASE_OS}",
-    "arch": "${ARCH}",
-    "maintainer": "${MAINTAINER}",
-    "filename": "${TEMPLATE_FILE}",
-    "url": "${URL}",
-    "sha512": "${SHA512}",
-    "changelog_url": "${CHANGELOG_URL}",
-    "release_url": "${RELEASE_URL}",
-    "release_date": "${RELEASE_DATE}",
-    "resources": {
-      "memory_min": ${MEM_MIN},
-      "memory_recommended": ${MEM_REC},
-      "disk_min": "${DISK_MIN}",
-      "disk_recommended": "${DISK_REC}",
-      "cores": ${CORES}
-    },
-    "ports": ${PORTS_JSON},
-    "credentials": ${CREDENTIALS_JSON},
-    "paths": ${PATHS_JSON},
-    "environment": ${ENV_JSON},
-    "quick_start": ${QUICK_START_ESCAPED}
-  }
-JSONEOF
+            # Build JSON object with jq to avoid YAML parsing issues
+            jq -n \
+              --arg name "$NAME" \
+              --arg desc "$DESCRIPTION" \
+              --arg cat "$CATEGORY" \
+              --arg icon "$ICON" \
+              --arg ver "$FULL_VERSION" \
+              --arg os "$BASE_OS" \
+              --arg arch "$ARCH" \
+              --arg maint "$MAINTAINER" \
+              --arg file "$TEMPLATE_FILE" \
+              --arg url "$URL" \
+              --arg sha "$SHA512" \
+              --arg cl_url "$CHANGELOG_URL" \
+              --arg rel_url "$RELEASE_URL" \
+              --arg rel_date "$RELEASE_DATE" \
+              --argjson mem_min "$MEM_MIN" \
+              --argjson mem_rec "$MEM_REC" \
+              --arg disk_min "$DISK_MIN" \
+              --arg disk_rec "$DISK_REC" \
+              --argjson cores "$CORES" \
+              --argjson ports "$PORTS_JSON" \
+              --argjson creds "$CREDENTIALS_JSON" \
+              --argjson paths "$PATHS_JSON" \
+              --argjson env "$ENV_JSON" \
+              --arg qs "$QUICK_START" \
+              '{name:$name,description:$desc,category:$cat,icon:$icon,version:$ver,os:$os,arch:$arch,maintainer:$maint,filename:$file,url:$url,sha512:$sha,changelog_url:$cl_url,release_url:$rel_url,release_date:$rel_date,resources:{memory_min:$mem_min,memory_recommended:$mem_rec,disk_min:$disk_min,disk_recommended:$disk_rec,cores:$cores},ports:$ports,credentials:$creds,paths:$paths,environment:$env,quick_start:$qs}' \
+              >> page/templates.json
           done
 
           echo "" >> page/templates.json

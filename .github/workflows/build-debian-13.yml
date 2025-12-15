@@ -85,24 +85,25 @@ jobs:
           echo "arch=$ARCH" >> "$GITHUB_OUTPUT"
           echo "template_file=$TEMPLATE_FILE" >> "$GITHUB_OUTPUT"
 
-      # Stufe 1: Debootstrap Base-Rootfs Cache
+      # Stufe 1: Debootstrap Base-Rootfs Cache (als tar-Archiv)
       - name: Cache debootstrap rootfs
         id: cache-rootfs
         uses: actions/cache@v4
         with:
-          path: /tmp/debootstrap-cache
-          key: debootstrap-trixie-amd64-${{ hashFiles('.github/workflows/build-debian-13.yml') }}
+          path: /tmp/debootstrap-cache.tar.zst
+          key: debootstrap-trixie-amd64-v1-${{ hashFiles('.github/workflows/build-debian-13.yml') }}
           restore-keys: |
-            debootstrap-trixie-amd64-
+            debootstrap-trixie-amd64-v1-
 
       - name: Create rootfs with debootstrap
         run: |
           ROOTFS="${{ runner.temp }}/rootfs"
-          CACHE_DIR="/tmp/debootstrap-cache"
+          CACHE_FILE="/tmp/debootstrap-cache.tar.zst"
 
-          if [[ -d "$CACHE_DIR/rootfs" ]]; then
+          if [[ -f "$CACHE_FILE" ]]; then
             echo "::notice::Restoring rootfs from cache..."
-            sudo cp -a "$CACHE_DIR/rootfs" "$ROOTFS"
+            sudo mkdir -p "$ROOTFS"
+            sudo tar --zstd -xf "$CACHE_FILE" -C "$ROOTFS"
           else
             echo "::notice::Building fresh rootfs with debootstrap..."
             sudo mkdir -p "$ROOTFS"
@@ -115,10 +116,11 @@ jobs:
               "$ROOTFS" \
               http://deb.debian.org/debian
 
-            # Cache for next run
+            # Cache for next run (als tar-Archiv, um Berechtigungsprobleme zu vermeiden)
             echo "::notice::Saving rootfs to cache..."
-            sudo mkdir -p "$CACHE_DIR"
-            sudo cp -a "$ROOTFS" "$CACHE_DIR/rootfs"
+            sudo tar --zstd -cf "$CACHE_FILE" -C "$ROOTFS" .
+            # Berechtigungen für Cache-Action setzen
+            sudo chown "$(id -u):$(id -g)" "$CACHE_FILE"
           fi
 
           echo "ROOTFS=$ROOTFS" >> "$GITHUB_ENV"
@@ -227,6 +229,8 @@ jobs:
           echo "::notice::Saving APT cache for future builds..."
           sudo mkdir -p "$APT_CACHE"
           sudo cp -a "$ROOTFS/var/cache/apt/archives"/*.deb "$APT_CACHE/" 2>/dev/null || true
+          # Berechtigungen für Cache-Action setzen
+          sudo chown -R "$(id -u):$(id -g)" "$APT_CACHE"
 
       - name: Finalize rootfs
         run: |
