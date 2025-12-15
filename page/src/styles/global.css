@@ -165,13 +165,13 @@ body {
 /* ============================================
    Link Styles
    ============================================ */
-a {
+a:not(.btn):not([class*="bg-"]) {
   color: var(--color-accent);
   text-decoration: none;
   transition: color var(--transition-fast) ease;
 }
 
-a:hover {
+a:not(.btn):not([class*="bg-"]):hover {
   color: var(--color-accent-hover);
 }
 
