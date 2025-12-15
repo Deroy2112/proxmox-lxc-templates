@@ -265,7 +265,7 @@ jobs:
                 -e "s|{{CRED_NOTE}}|${CRED_NOTE}|g" \
                 "$TEMPLATE_HTML" > "$output"
 
-            # Handle conditional sections
+            # Handle conditional sections (markers are always removed, content kept if condition true)
             awk -v quick_start="$QUICK_START" \
                 -v faq_items="$FAQ_ITEMS" \
                 -v changelog="$CHANGELOG" \
@@ -273,18 +273,20 @@ jobs:
                 -v has_faq="$([[ "$faq_count" -gt 0 ]] && echo "1" || echo "")" \
                 -v cred_note="$CRED_NOTE" '
             {
-              if (/\{\{#QUICK_START\}\}/) { in_quick=1; if (quick_start != "") print; next }
-              if (/\{\{\/QUICK_START\}\}/) { in_quick=0; if (quick_start != "") print; next }
+              # Conditional blocks - markers are NEVER printed
+              if (/\{\{#QUICK_START\}\}/) { in_quick=1; next }
+              if (/\{\{\/QUICK_START\}\}/) { in_quick=0; next }
               if (in_quick && quick_start == "") next
-              if (/\{\{#CREDENTIALS\}\}/) { in_creds=1; if (has_creds) print; next }
-              if (/\{\{\/CREDENTIALS\}\}/) { in_creds=0; if (has_creds) print; next }
+              if (/\{\{#CREDENTIALS\}\}/) { in_creds=1; next }
+              if (/\{\{\/CREDENTIALS\}\}/) { in_creds=0; next }
               if (in_creds && !has_creds) next
-              if (/\{\{#CRED_NOTE\}\}/) { in_cred_note=1; if (cred_note != "") print; next }
-              if (/\{\{\/CRED_NOTE\}\}/) { in_cred_note=0; if (cred_note != "") print; next }
+              if (/\{\{#CRED_NOTE\}\}/) { in_cred_note=1; next }
+              if (/\{\{\/CRED_NOTE\}\}/) { in_cred_note=0; next }
               if (in_cred_note && cred_note == "") next
-              if (/\{\{#FAQ\}\}/) { in_faq=1; if (has_faq) print; next }
-              if (/\{\{\/FAQ\}\}/) { in_faq=0; if (has_faq) print; next }
+              if (/\{\{#FAQ\}\}/) { in_faq=1; next }
+              if (/\{\{\/FAQ\}\}/) { in_faq=0; next }
               if (in_faq && !has_faq) next
+              # Replace placeholders
               gsub(/\{\{QUICK_START\}\}/, quick_start)
               gsub(/\{\{FAQ_ITEMS\}\}/, faq_items)
               gsub(/\{\{CHANGELOG\}\}/, changelog)
