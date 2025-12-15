@@ -50,8 +50,14 @@
             </svg>
             Download Template
           </a>
-          <div class="mockup-code mt-4 text-sm">
-            <pre data-prefix="$"><code id="detail-wget"></code></pre>
+          <div class="join w-full mt-4">
+            <input id="detail-wget" type="text" readonly class="input input-sm join-item flex-1 font-mono text-xs" />
+            <button id="detail-wget-copy" class="btn btn-sm btn-neutral join-item" title="Copy to clipboard">
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+              </svg>
+            </button>
           </div>
           <p id="detail-sha512" class="text-xs opacity-50 font-mono break-all mt-2"></p>
         </div>

@@ -195,6 +195,12 @@ const totalCount = templates.length;
       clearTimeout(timeout);
       timeout = setTimeout(() => {
         currentQuery = searchInput.value.toLowerCase();
+
+        // Close detail view if open
+        if (!document.getElementById("template-detail")?.classList.contains("hidden")) {
+          hideTemplateDetail();
+        }
+
         applyFilters();
 
         // Update URL
@@ -213,6 +219,12 @@ const totalCount = templates.length;
       link.addEventListener("click", (e) => {
         e.preventDefault();
         currentCategory = link.getAttribute("data-category") || "all";
+
+        // Close detail view if open
+        if (!document.getElementById("template-detail")?.classList.contains("hidden")) {
+          hideTemplateDetail();
+        }
+
         updateCategoryUI();
         applyFilters();
 
@@ -288,13 +300,13 @@ const totalCount = templates.length;
     // Download
     const downloadSection = document.getElementById("detail-download-section");
     const downloadBtn = document.getElementById("detail-download-btn") as HTMLAnchorElement | null;
-    const wgetEl = document.getElementById("detail-wget");
+    const wgetEl = document.getElementById("detail-wget") as HTMLInputElement | null;
     const sha512El = document.getElementById("detail-sha512");
 
     if (data.download_url) {
       downloadSection?.classList.remove("hidden");
       if (downloadBtn) downloadBtn.href = data.download_url as string;
-      if (wgetEl) wgetEl.textContent = `wget ${data.download_url}`;
+      if (wgetEl) wgetEl.value = `wget ${data.download_url}`;
       if (sha512El) sha512El.textContent = data.sha512 ? `SHA512: ${data.sha512}` : "";
     } else {
       downloadSection?.classList.add("hidden");
@@ -438,6 +450,22 @@ const totalCount = templates.length;
     const grid = document.getElementById("template-grid");
     const cards = grid?.querySelectorAll(".template-card");
     const backBtn = document.getElementById("back-to-list");
+    const wgetCopyBtn = document.getElementById("detail-wget-copy");
+    const wgetInput = document.getElementById("detail-wget") as HTMLInputElement | null;
+
+    // Copy wget command to clipboard
+    wgetCopyBtn?.addEventListener("click", async () => {
+      if (wgetInput?.value) {
+        try {
+          await navigator.clipboard.writeText(wgetInput.value);
+          wgetCopyBtn.classList.add("btn-success");
+          setTimeout(() => wgetCopyBtn.classList.remove("btn-success"), 1500);
+        } catch {
+          wgetInput.select();
+          document.execCommand("copy");
+        }
+      }
+    });
 
     // Card click handler
     cards?.forEach((card) => {

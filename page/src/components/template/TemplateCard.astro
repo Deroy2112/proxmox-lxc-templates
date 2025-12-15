@@ -28,18 +28,6 @@ const {
 const iconUrl = `https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons@main/svg/${icon}.svg`;
 const delay = Math.min(index * 0.05, 0.5);
 const displayName = name.charAt(0).toUpperCase() + name.slice(1);
-
-// Map categories to DaisyUI badge colors
-const categoryBadge: Record<string, string> = {
-  media: "badge-error",
-  network: "badge-info",
-  database: "badge-warning",
-  automation: "badge-secondary",
-  monitoring: "badge-success",
-  storage: "badge-accent",
-  security: "badge-primary",
-  development: "badge-neutral",
-};
 ---
 
 <div
