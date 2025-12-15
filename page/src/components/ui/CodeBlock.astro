@@ -75,8 +75,12 @@ const id = `code-${Math.random().toString(36).slice(2, 9)}`;
 </style>
 
 <script>
-  document.addEventListener("astro:page-load", () => {
+  function initCopyButtons() {
     document.querySelectorAll(".copy-btn").forEach((btn) => {
+      // Prevent duplicate listeners
+      if (btn.dataset.initialized) return;
+      btn.dataset.initialized = "true";
+
       btn.addEventListener("click", async () => {
         const targetSelector = btn.getAttribute("data-copy-target");
         if (!targetSelector) return;
@@ -98,5 +102,8 @@ const id = `code-${Math.random().toString(36).slice(2, 9)}`;
         }
       });
     });
-  });
+  }
+
+  document.addEventListener("astro:page-load", initCopyButtons);
+  document.addEventListener("astro:after-swap", initCopyButtons);
 </script>

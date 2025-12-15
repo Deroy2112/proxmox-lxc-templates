@@ -30,7 +30,45 @@ function parseChangelog(md: string): string {
     .replace(/^(?!<)(?!\s*$)(.+)$/gm, '<p class="text-[var(--text-secondary)] mb-2">$1</p>');
 }
 
-const htmlContent = content ? parseChangelog(content) : "";
+// Split changelog into versions
+function splitVersions(md: string): { latest: string; older: string[]; olderCount: number } {
+  if (!md) return { latest: "", older: [], olderCount: 0 };
+
+  // Split by version headers (## [x.x.x] or ## [x.x.x-x])
+  const versionRegex = /^## \[[\d.]+(?:-\d+)?\]/gm;
+  const matches = [...md.matchAll(versionRegex)];
+
+  if (matches.length === 0) {
+    // No version headers found, return everything as latest
+    return { latest: md, older: [], olderCount: 0 };
+  }
+
+  if (matches.length === 1) {
+    // Only one version
+    return { latest: md, older: [], olderCount: 0 };
+  }
+
+  // Get position of first and second version header
+  const firstPos = matches[0].index!;
+  const secondPos = matches[1].index!;
+
+  // Latest version is from start to second header
+  const latest = md.slice(firstPos, secondPos).trim();
+
+  // Older versions are from second header to end
+  const olderContent = md.slice(secondPos).trim();
+  const older = olderContent ? [olderContent] : [];
+
+  return {
+    latest,
+    older,
+    olderCount: matches.length - 1,
+  };
+}
+
+const versions = content ? splitVersions(content) : { latest: "", older: [], olderCount: 0 };
+const latestHtml = parseChangelog(versions.latest);
+const olderHtml = versions.older.length > 0 ? parseChangelog(versions.older[0]) : "";
 ---
 
 {content && (
@@ -43,27 +81,32 @@ const htmlContent = content ? parseChangelog(content) : "";
         Changelog
       </h2>
     </div>
-    <div class="changelog-scroll p-4 max-h-96 overflow-y-auto">
-      <div class="changelog-content text-sm" set:html={htmlContent} />
+    <div class="p-4">
+      <!-- Latest Version (always visible) -->
+      <div class="changelog-content text-sm" set:html={latestHtml} />
+
+      <!-- Older Versions (collapsible) -->
+      {versions.olderCount > 0 && (
+        <>
+          <div id="older-changelog" class="changelog-content text-sm hidden border-t border-[var(--border-color)] pt-4 mt-4" set:html={olderHtml} />
+
+          <button
+            type="button"
+            id="toggle-changelog"
+            class="mt-4 w-full py-2 px-4 text-sm text-[var(--text-muted)] hover:text-[var(--text-primary)] border border-[var(--border-color)] rounded-lg hover:bg-[var(--bg-tertiary)] transition-colors flex items-center justify-center gap-2"
+          >
+            <span class="toggle-text">Show {versions.olderCount} older version{versions.olderCount > 1 ? 's' : ''}</span>
+            <svg class="toggle-icon w-4 h-4 transition-transform duration-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </button>
+        </>
+      )}
     </div>
   </Card>
 )}
 
 <style>
-  .changelog-scroll {
-    scrollbar-width: thin;
-    scrollbar-color: var(--scrollbar-thumb) transparent;
-  }
-
-  .changelog-scroll::-webkit-scrollbar {
-    width: 6px;
-  }
-
-  .changelog-scroll::-webkit-scrollbar-thumb {
-    background: var(--scrollbar-thumb);
-    border-radius: 3px;
-  }
-
   .changelog-content :global(h3:first-child) {
     margin-top: 0;
   }
@@ -75,4 +118,40 @@ const htmlContent = content ? parseChangelog(content) : "";
   .changelog-content :global(li) {
     margin-left: 1.25rem;
   }
+
+  #toggle-changelog.expanded .toggle-icon {
+    transform: rotate(180deg);
+  }
 </style>
+
+<script>
+  function initChangelog() {
+    const btn = document.getElementById("toggle-changelog");
+    const older = document.getElementById("older-changelog");
+    const toggleText = btn?.querySelector(".toggle-text");
+
+    if (!btn || !older) return;
+
+    // Prevent duplicate listeners
+    if (btn.dataset.initialized) return;
+    btn.dataset.initialized = "true";
+
+    let isExpanded = false;
+
+    btn.addEventListener("click", () => {
+      isExpanded = !isExpanded;
+      older.classList.toggle("hidden", !isExpanded);
+      btn.classList.toggle("expanded", isExpanded);
+
+      if (toggleText) {
+        const count = toggleText.textContent?.match(/\d+/)?.[0] || "0";
+        toggleText.textContent = isExpanded
+          ? "Hide older versions"
+          : `Show ${count} older version${parseInt(count) > 1 ? "s" : ""}`;
+      }
+    });
+  }
+
+  document.addEventListener("astro:page-load", initChangelog);
+  document.addEventListener("astro:after-swap", initChangelog);
+</script>
