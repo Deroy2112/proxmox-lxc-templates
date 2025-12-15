@@ -1,7 +1,7 @@
 name: shoko
 description: Shoko Anime Server on Debian 13 (Trixie)
 category: media
-icon: shoko-anime
+icon: shoko
 version: 5.1.0
 build_version: 1
 base_os: debian-13
