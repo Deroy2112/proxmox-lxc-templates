@@ -1,7 +1,6 @@
 ---
 import Logo from "./Logo.astro";
 import SearchBox from "./SearchBox.astro";
-import ThemeToggle from "./ThemeToggle.astro";
 
 interface Category {
   name: string;
@@ -22,8 +21,8 @@ const basePath = import.meta.env.BASE_URL;
 <aside class="sidebar" id="sidebar">
   <!-- Header with Logo -->
   <div class="sidebar-header">
-    <a href={basePath} class="flex items-center gap-3">
-      <Logo variant="white" class="h-8 w-auto" />
+    <a href={basePath} class="logo">
+      <Logo variant="white" />
     </a>
   </div>
 
@@ -121,7 +120,7 @@ const basePath = import.meta.env.BASE_URL;
         </svg>
         GitHub
         <!-- External Link Icon -->
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor" style="width: 12px; height: 12px; opacity: 0.5; margin-left: auto;">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor" class="external-icon">
           <path d="M224,104a8,8,0,0,1-16,0V59.32l-66.33,66.34a8,8,0,0,1-11.32-11.32L196.68,48H152a8,8,0,0,1,0-16h64a8,8,0,0,1,8,8Zm-40,24a8,8,0,0,0-8,8v72H48V80h72a8,8,0,0,0,0-16H48A16,16,0,0,0,32,80V208a16,16,0,0,0,16,16H176a16,16,0,0,0,16-16V136A8,8,0,0,0,184,128Z" />
         </svg>
       </a>
@@ -131,30 +130,26 @@ const basePath = import.meta.env.BASE_URL;
           <path d="M243.31,136,144,36.69A15.86,15.86,0,0,0,132.69,32H40a8,8,0,0,0-8,8v92.69A15.86,15.86,0,0,0,36.69,144L136,243.31a16,16,0,0,0,22.63,0l84.68-84.68a16,16,0,0,0,0-22.63Zm-96,96L48,132.69V48h84.69L232,147.31ZM96,84A12,12,0,1,1,84,72,12,12,0,0,1,96,84Z" />
         </svg>
         Releases
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor" style="width: 12px; height: 12px; opacity: 0.5; margin-left: auto;">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor" class="external-icon">
           <path d="M224,104a8,8,0,0,1-16,0V59.32l-66.33,66.34a8,8,0,0,1-11.32-11.32L196.68,48H152a8,8,0,0,1,0-16h64a8,8,0,0,1,8,8Zm-40,24a8,8,0,0,0-8,8v72H48V80h72a8,8,0,0,0,0-16H48A16,16,0,0,0,32,80V208a16,16,0,0,0,16,16H176a16,16,0,0,0,16-16V136A8,8,0,0,0,184,128Z" />
         </svg>
       </a>
     </div>
   </nav>
 
-  <!-- Footer with Theme Toggle -->
+  <!-- Footer -->
   <div class="sidebar-footer">
-    <div class="flex items-center justify-between">
-      <span class="text-sm text-muted">Theme</span>
-      <ThemeToggle />
+    <div class="text-xs text-muted" style="text-align: center;">
+      Proxmox LXC Templates
     </div>
   </div>
 </aside>
 
-<!-- Mobile Overlay -->
-<div class="sidebar-overlay" id="sidebar-overlay"></div>
-
 <style>
-  .h-8 {
-    height: 32px;
-  }
-  .w-auto {
-    width: auto;
+  .external-icon {
+    width: 12px;
+    height: 12px;
+    opacity: 0.5;
+    margin-left: auto;
   }
 </style>

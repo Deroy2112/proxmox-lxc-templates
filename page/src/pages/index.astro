@@ -3,7 +3,6 @@ import { getCollection } from "astro:content";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import Sidebar from "@/components/Sidebar.astro";
 import Header from "@/components/Header.astro";
-import Footer from "@/components/Footer.astro";
 import Toast from "@/components/Toast.astro";
 import TemplateCard from "@/components/TemplateCard.astro";
 import TemplateDetail from "@/components/TemplateDetail.astro";
@@ -40,74 +39,179 @@ const sortedTemplates = templates.sort((a, b) =>
 );
 
 const totalCount = templates.length;
+
+// Get first 3 templates for featured section (if available)
+const featuredTemplates = sortedTemplates.slice(0, 3);
 ---
 
-<BaseLayout title="Home" description="Custom LXC container templates for Proxmox VE. Pre-configured, optimized, and ready to deploy.">
+<BaseLayout title="LXC Templates" description="Custom LXC container templates for Proxmox VE. Pre-configured, optimized, and ready to deploy.">
   <div class="app-layout">
     <!-- Sidebar -->
     <Sidebar categories={categories} activeCategory="all" totalCount={totalCount} />
+
+    <!-- Sidebar Overlay (mobile) -->
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
     <!-- Main -->
     <main class="main">
       <!-- Mobile Header -->
       <Header />
 
-      <!-- Main Header -->
-      <header class="main-header">
-        <h1 class="main-title">LXC Templates</h1>
-        <span class="text-sm text-muted">Pre-configured containers for Proxmox VE</span>
+      <!-- Header -->
+      <header class="header">
+        <div class="header-inner">
+          <h1 class="header-title">LXC Templates</h1>
+          <div class="header-actions">
+            <a href="https://github.com/deroy2112/proxmox-lxc-templates" target="_blank" rel="noopener noreferrer" class="btn btn-icon" title="GitHub Repository">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor">
+                <path d="M208.31,75.68A59.78,59.78,0,0,0,202.93,28,8,8,0,0,0,196,24a59.75,59.75,0,0,0-48,24H124A59.75,59.75,0,0,0,76,24a8,8,0,0,0-6.93,4,59.78,59.78,0,0,0-5.38,47.68A58.14,58.14,0,0,0,56,104v8a56.06,56.06,0,0,0,48.44,55.47A39.8,39.8,0,0,0,96,192v8H72a24,24,0,0,1-24-24A40,40,0,0,0,8,136a8,8,0,0,0,0,16,24,24,0,0,1,24,24,40,40,0,0,0,40,40H96v16a8,8,0,0,0,16,0V192a24,24,0,0,1,48,0v40a8,8,0,0,0,16,0V192a39.8,39.8,0,0,0-8.44-24.53A56.06,56.06,0,0,0,216,112v-8A58.14,58.14,0,0,0,208.31,75.68Z"/>
+              </svg>
+            </a>
+          </div>
+        </div>
       </header>
 
       <!-- Content -->
-      <div class="main-content">
+      <div class="content">
         <!-- Template List (default visible) -->
         <div id="template-list">
-          <!-- Template Grid -->
-          <div id="template-grid" class="template-grid">
-            {sortedTemplates.length > 0 ? (
-              sortedTemplates.map((template, index) => (
-                <TemplateCard
-                  name={template.data.name}
-                  description={template.data.description}
-                  category={template.data.category}
-                  icon={template.data.icon}
-                  version={template.data.version}
-                  build_version={template.data.build_version}
-                  base_os={template.data.base_os}
-                  memory_min={template.data.resources.memory_min}
-                  disk_min={template.data.resources.disk_min}
-                  cores={template.data.resources.cores}
-                  templateData={JSON.stringify(template.data)}
-                  index={index}
-                />
-              ))
-            ) : (
-              <div class="empty-state">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor" style="width: 64px; height: 64px; opacity: 0.3; margin-bottom: 16px;">
-                  <path d="M216,72H56a8,8,0,0,1,0-16H192a8,8,0,0,0,0-16H56A24,24,0,0,0,32,64V192a24,24,0,0,0,24,24H216a16,16,0,0,0,16-16V88A16,16,0,0,0,216,72Zm0,128H56a8,8,0,0,1-8-8V86.63A23.84,23.84,0,0,0,56,88H216Z" />
-                </svg>
-                <p style="font-size: 1rem; margin-bottom: 8px;">No templates available yet.</p>
-                <p class="text-sm text-muted">Templates will appear here after the first release.</p>
-              </div>
-            )}
-          </div>
+          <!-- Featured Section -->
+          {featuredTemplates.length > 0 && (
+            <section class="featured">
+              <div class="featured-grid">
+                {featuredTemplates[0] && (
+                  <div class="featured-card large" data-template={JSON.stringify(featuredTemplates[0].data)} role="button" tabindex="0">
+                    <div class="featured-card-bg"></div>
+                    <div class="featured-card-content">
+                      <div class="featured-badge">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor">
+                          <path d="M234.29,114.85l-45,38.83L203,211.75a16.4,16.4,0,0,1-24.5,17.82L128,198.49,77.47,229.57A16.4,16.4,0,0,1,53,211.75l13.76-58.07-45-38.83A16.46,16.46,0,0,1,31.08,86l59-4.76,22.76-55.08a16.36,16.36,0,0,1,30.27,0l22.75,55.08,59,4.76a16.46,16.46,0,0,1,9.37,28.86Z"/>
+                        </svg>
+                        Featured
+                      </div>
+                      <div class="featured-icon">
+                        <img
+                          src={`https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons@main/svg/${featuredTemplates[0].data.icon}.svg`}
+                          alt=""
+                          onerror="this.style.display='none'"
+                        />
+                      </div>
+                      <h3 class="featured-title">{featuredTemplates[0].data.name.charAt(0).toUpperCase() + featuredTemplates[0].data.name.slice(1)}</h3>
+                      <p class="featured-description">{featuredTemplates[0].data.description}</p>
+                      <div class="featured-meta">
+                        <div class="featured-meta-item">
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M128,136H48a8,8,0,0,1,0-16h80a8,8,0,0,1,0,16Z"/></svg>
+                          {featuredTemplates[0].data.resources.memory_min >= 1024
+                            ? `${featuredTemplates[0].data.resources.memory_min / 1024}GB`
+                            : `${featuredTemplates[0].data.resources.memory_min}MB`}
+                        </div>
+                        <div class="featured-meta-item">
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M216,72H56a8,8,0,0,1,0-16H192a8,8,0,0,0,0-16H56A24,24,0,0,0,32,64V192a24,24,0,0,0,24,24H216a16,16,0,0,0,16-16V88A16,16,0,0,0,216,72Z"/></svg>
+                          {featuredTemplates[0].data.resources.disk_min}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
 
-          <!-- No Results Message (hidden by default) -->
-          <div id="no-results" class="empty-state hidden">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor" style="width: 64px; height: 64px; opacity: 0.3; margin-bottom: 16px;">
-              <path d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z" />
-            </svg>
-            <p style="font-size: 1rem; margin-bottom: 8px;">No templates found.</p>
-            <p class="text-sm text-muted">Try a different search term or category.</p>
-          </div>
+                {featuredTemplates[1] && (
+                  <div class="featured-card" data-template={JSON.stringify(featuredTemplates[1].data)} role="button" tabindex="0">
+                    <div class="featured-card-content">
+                      <div class="featured-icon purple">
+                        <img
+                          src={`https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons@main/svg/${featuredTemplates[1].data.icon}.svg`}
+                          alt=""
+                          onerror="this.style.display='none'"
+                        />
+                      </div>
+                      <h3 class="featured-title">{featuredTemplates[1].data.name.charAt(0).toUpperCase() + featuredTemplates[1].data.name.slice(1)}</h3>
+                      <p class="featured-description" style="font-size: 0.8125rem;">{featuredTemplates[1].data.description}</p>
+                    </div>
+                  </div>
+                )}
+
+                {featuredTemplates[2] && (
+                  <div class="featured-card" data-template={JSON.stringify(featuredTemplates[2].data)} role="button" tabindex="0">
+                    <div class="featured-card-content">
+                      <div class="featured-icon blue">
+                        <img
+                          src={`https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons@main/svg/${featuredTemplates[2].data.icon}.svg`}
+                          alt=""
+                          onerror="this.style.display='none'"
+                        />
+                      </div>
+                      <h3 class="featured-title">{featuredTemplates[2].data.name.charAt(0).toUpperCase() + featuredTemplates[2].data.name.slice(1)}</h3>
+                      <p class="featured-description" style="font-size: 0.8125rem;">{featuredTemplates[2].data.description}</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </section>
+          )}
+
+          <!-- Category Pills -->
+          <section class="section">
+            <div class="category-pills" id="category-pills">
+              <button class="pill active" data-category="all">All</button>
+              {categories.filter(c => c.count > 0).map((category) => (
+                <button class="pill" data-category={category.name}>
+                  {category.label}
+                </button>
+              ))}
+            </div>
+          </section>
+
+          <!-- All Apps Section -->
+          <section class="section">
+            <div class="section-header">
+              <h2 class="section-title">All Templates</h2>
+              <span class="text-sm text-muted"><span id="visible-count">{totalCount}</span> templates</span>
+            </div>
+
+            <!-- App Grid -->
+            <div id="template-grid" class="app-grid">
+              {sortedTemplates.length > 0 ? (
+                sortedTemplates.map((template, index) => (
+                  <TemplateCard
+                    name={template.data.name}
+                    description={template.data.description}
+                    category={template.data.category}
+                    icon={template.data.icon}
+                    version={template.data.version}
+                    build_version={template.data.build_version}
+                    base_os={template.data.base_os}
+                    memory_min={template.data.resources.memory_min}
+                    disk_min={template.data.resources.disk_min}
+                    cores={template.data.resources.cores}
+                    templateData={JSON.stringify(template.data)}
+                    index={index}
+                  />
+                ))
+              ) : (
+                <div class="empty-state">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor">
+                    <path d="M216,72H56a8,8,0,0,1,0-16H192a8,8,0,0,0,0-16H56A24,24,0,0,0,32,64V192a24,24,0,0,0,24,24H216a16,16,0,0,0,16-16V88A16,16,0,0,0,216,72Zm0,128H56a8,8,0,0,1-8-8V86.63A23.84,23.84,0,0,0,56,88H216Z" />
+                  </svg>
+                  <p>No templates available yet.</p>
+                  <span class="text-muted">Templates will appear here after the first release.</span>
+                </div>
+              )}
+            </div>
+
+            <!-- No Results Message (hidden by default) -->
+            <div id="no-results" class="empty-state hidden">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor">
+                <path d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z" />
+              </svg>
+              <p>No templates found.</p>
+              <span class="text-muted">Try a different search term or category.</span>
+            </div>
+          </section>
         </div>
 
         <!-- Template Detail (hidden by default) -->
         <TemplateDetail />
       </div>
-
-      <!-- Footer -->
-      <Footer />
     </main>
   </div>
 
@@ -121,21 +225,35 @@ const totalCount = templates.length;
     text-align: center;
     padding: 64px 24px;
   }
+
+  .empty-state svg {
+    width: 64px;
+    height: 64px;
+    opacity: 0.3;
+    margin-bottom: 16px;
+  }
+
+  .empty-state p {
+    font-size: 1rem;
+    margin-bottom: 8px;
+  }
 </style>
 
 <script>
   // Template data map for quick access
   const templatesMap = new Map<string, Record<string, unknown>>();
 
-  function initSearch() {
+  function initApp() {
     const searchInput = document.getElementById("search-input") as HTMLInputElement | null;
     const grid = document.getElementById("template-grid");
     const noResults = document.getElementById("no-results");
-    const cards = grid?.querySelectorAll(".template-card");
-    const categoryButtons = document.querySelectorAll("button[data-category]");
-    const counters = document.querySelectorAll("[data-count]");
+    const cards = grid?.querySelectorAll(".app-card");
+    const pillButtons = document.querySelectorAll("#category-pills .pill");
+    const sidebarButtons = document.querySelectorAll(".sidebar-nav button[data-category]");
+    const visibleCountEl = document.getElementById("visible-count");
+    const featuredCards = document.querySelectorAll(".featured-card[data-template]");
 
-    if (!searchInput || !grid || !cards) return;
+    if (!grid || !cards) return;
 
     let currentCategory = "all";
     let currentQuery = "";
@@ -154,19 +272,39 @@ const totalCount = templates.length;
       }
     });
 
+    // Also add featured cards to map
+    featuredCards.forEach((card) => {
+      const dataStr = card.getAttribute("data-template");
+      if (dataStr) {
+        try {
+          const data = JSON.parse(dataStr);
+          templatesMap.set(data.name, data);
+        } catch {
+          // Invalid JSON
+        }
+      }
+    });
+
     // Get query from URL
     const urlParams = new URLSearchParams(window.location.search);
     const initialQuery = urlParams.get("q") || "";
     const initialCategory = urlParams.get("category") || "all";
 
-    if (initialQuery) {
+    if (initialQuery && searchInput) {
       searchInput.value = initialQuery;
       currentQuery = initialQuery.toLowerCase();
     }
     currentCategory = initialCategory;
 
     function updateCategoryUI() {
-      categoryButtons.forEach((btn) => {
+      // Update pills
+      pillButtons.forEach((btn) => {
+        const cat = btn.getAttribute("data-category");
+        btn.classList.toggle("active", cat === currentCategory);
+      });
+
+      // Update sidebar
+      sidebarButtons.forEach((btn) => {
         const cat = btn.getAttribute("data-category");
         btn.classList.toggle("active", cat === currentCategory);
       });
@@ -174,7 +312,6 @@ const totalCount = templates.length;
 
     function applyFilters() {
       let visibleCount = 0;
-      const categoryCounts: Record<string, number> = { all: 0 };
 
       cards.forEach((card) => {
         const name = card.getAttribute("data-name") || "";
@@ -195,19 +332,12 @@ const totalCount = templates.length;
         if (isVisible) {
           visibleCount++;
         }
-
-        // Count for category (only if matches search)
-        if (matchesSearch) {
-          categoryCounts.all = (categoryCounts.all || 0) + 1;
-          categoryCounts[category] = (categoryCounts[category] || 0) + 1;
-        }
       });
 
-      // Update counters
-      counters.forEach((counter) => {
-        const cat = counter.getAttribute("data-count") || "";
-        counter.textContent = String(categoryCounts[cat] || 0);
-      });
+      // Update visible count
+      if (visibleCountEl) {
+        visibleCountEl.textContent = String(visibleCount);
+      }
 
       // Show/hide no results
       noResults?.classList.toggle("hidden", visibleCount > 0);
@@ -216,7 +346,7 @@ const totalCount = templates.length;
 
     // Search input handler (debounced)
     let timeout: ReturnType<typeof setTimeout>;
-    searchInput.addEventListener("input", () => {
+    searchInput?.addEventListener("input", () => {
       clearTimeout(timeout);
       timeout = setTimeout(() => {
         currentQuery = searchInput.value.toLowerCase();
@@ -239,27 +369,41 @@ const totalCount = templates.length;
       }, 150);
     });
 
-    // Category click handler
-    categoryButtons.forEach((btn) => {
+    // Category pill click handler
+    function handleCategoryClick(category: string) {
+      currentCategory = category;
+
+      // Close detail view if open
+      if (!document.getElementById("template-detail")?.classList.contains("hidden")) {
+        hideTemplateDetail();
+      }
+
+      updateCategoryUI();
+      applyFilters();
+
+      // Update URL
+      const url = new URL(window.location.href);
+      if (currentCategory !== "all") {
+        url.searchParams.set("category", currentCategory);
+      } else {
+        url.searchParams.delete("category");
+      }
+      history.replaceState(null, "", url.toString());
+    }
+
+    pillButtons.forEach((btn) => {
       btn.addEventListener("click", () => {
-        currentCategory = btn.getAttribute("data-category") || "all";
+        handleCategoryClick(btn.getAttribute("data-category") || "all");
+      });
+    });
 
-        // Close detail view if open
-        if (!document.getElementById("template-detail")?.classList.contains("hidden")) {
-          hideTemplateDetail();
-        }
+    sidebarButtons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        handleCategoryClick(btn.getAttribute("data-category") || "all");
 
-        updateCategoryUI();
-        applyFilters();
-
-        // Update URL
-        const url = new URL(window.location.href);
-        if (currentCategory !== "all") {
-          url.searchParams.set("category", currentCategory);
-        } else {
-          url.searchParams.delete("category");
-        }
-        history.replaceState(null, "", url.toString());
+        // Close mobile sidebar
+        document.querySelector(".sidebar")?.classList.remove("open");
+        document.getElementById("sidebar-overlay")?.classList.remove("open");
       });
     });
 
@@ -409,7 +553,7 @@ const totalCount = templates.length;
     const credentials = data.credentials as {username: string; password: string; note?: string} | undefined;
     if (credentials && credsSection && credsEl) {
       credsSection.classList.remove("hidden");
-      let html = `User: <code style="background: var(--bg-light); padding: 2px 6px; border-radius: 4px;">${escapeHtml(credentials.username)}</code> / Pass: <code style="background: var(--bg-light); padding: 2px 6px; border-radius: 4px;">${escapeHtml(credentials.password)}</code>`;
+      let html = `User: <code>${escapeHtml(credentials.username)}</code> / Pass: <code>${escapeHtml(credentials.password)}</code>`;
       if (credentials.note) {
         html += `<br><span class="text-muted">${escapeHtml(credentials.note)}</span>`;
       }
@@ -490,7 +634,8 @@ const totalCount = templates.length;
   // Initialize detail handlers
   function initDetail() {
     const grid = document.getElementById("template-grid");
-    const cards = grid?.querySelectorAll(".template-card");
+    const cards = grid?.querySelectorAll(".app-card");
+    const featuredCards = document.querySelectorAll(".featured-card[data-template]");
     const backBtn = document.getElementById("back-to-list");
     const wgetCopyBtn = document.getElementById("detail-wget-copy");
     const wgetInput = document.getElementById("detail-wget") as HTMLInputElement | null;
@@ -510,24 +655,34 @@ const totalCount = templates.length;
     });
 
     // Card click handler
-    cards?.forEach((card) => {
-      const handleClick = () => {
-        const dataStr = card.getAttribute("data-template");
-        if (dataStr) {
-          try {
-            const data = JSON.parse(dataStr);
-            showTemplateDetail(data);
-          } catch {
-            // Invalid JSON
-          }
+    function handleCardClick(card: Element) {
+      const dataStr = card.getAttribute("data-template");
+      if (dataStr) {
+        try {
+          const data = JSON.parse(dataStr);
+          showTemplateDetail(data);
+        } catch {
+          // Invalid JSON
         }
-      };
+      }
+    }
 
-      card.addEventListener("click", handleClick);
+    cards?.forEach((card) => {
+      card.addEventListener("click", () => handleCardClick(card));
       card.addEventListener("keydown", (e) => {
         if ((e as KeyboardEvent).key === "Enter" || (e as KeyboardEvent).key === " ") {
           e.preventDefault();
-          handleClick();
+          handleCardClick(card);
+        }
+      });
+    });
+
+    featuredCards.forEach((card) => {
+      card.addEventListener("click", () => handleCardClick(card));
+      card.addEventListener("keydown", (e) => {
+        if ((e as KeyboardEvent).key === "Enter" || (e as KeyboardEvent).key === " ") {
+          e.preventDefault();
+          handleCardClick(card);
         }
       });
     });
@@ -563,6 +718,23 @@ const totalCount = templates.length;
     }
   }
 
+  // Mobile sidebar toggle
+  function initMobileSidebar() {
+    const menuToggle = document.getElementById("menu-toggle");
+    const sidebar = document.querySelector(".sidebar");
+    const overlay = document.getElementById("sidebar-overlay");
+
+    menuToggle?.addEventListener("click", () => {
+      sidebar?.classList.toggle("open");
+      overlay?.classList.toggle("open");
+    });
+
+    overlay?.addEventListener("click", () => {
+      sidebar?.classList.remove("open");
+      overlay?.classList.remove("open");
+    });
+  }
+
   // Keyboard shortcut for search
   function initKeyboardShortcuts() {
     document.addEventListener("keydown", (e) => {
@@ -576,13 +748,15 @@ const totalCount = templates.length;
   }
 
   // Initialize everything
-  initSearch();
+  initApp();
   initDetail();
+  initMobileSidebar();
   initKeyboardShortcuts();
 
   document.addEventListener("astro:after-swap", () => {
-    initSearch();
+    initApp();
     initDetail();
+    initMobileSidebar();
     initKeyboardShortcuts();
   });
 </script>
