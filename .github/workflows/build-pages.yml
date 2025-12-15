@@ -1,0 +1,308 @@
+name: Build and Deploy GitHub Pages
+
+on:
+  # Trigger after build-debian-13 completes
+  workflow_run:
+    workflows: ["Build Debian 13 LXC Template"]
+    types:
+      - completed
+    branches:
+      - main
+  # Direct page changes
+  push:
+    paths:
+      - 'page/**'
+      - '!page/templates/**'
+      - '!page/templates.json'
+      - '!page/meta.json'
+    branches:
+      - main
+  # Manual trigger
+  workflow_dispatch:
+
+jobs:
+  build-pages:
+    runs-on: ubuntu-latest
+    # Only run if build succeeded or manual/push trigger
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      github.event_name == 'push' ||
+      github.event.workflow_run.conclusion == 'success'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install yq
+        uses: mikefarah/yq@v4
+
+      - name: Generate templates.json
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir -p page/templates
+
+          # Load categories from page/categories.yml
+          CATEGORIES_JSON=$(yq -o=json 'del(.categories[].description)' page/categories.yml)
+
+          echo "[" > page/templates.json
+          first=true
+
+          for template_dir in templates/*/debian-13/; do
+            [[ -d "$template_dir" ]] || continue
+            template=$(echo "$template_dir" | cut -d'/' -f2)
+            CONFIG="${template_dir}config.yml"
+
+            [[ -f "$CONFIG" ]] || continue
+
+            # Read all config values using yq
+            NAME=$(yq '.name' "$CONFIG")
+            DESCRIPTION=$(yq '.description' "$CONFIG")
+            VERSION=$(yq '.version' "$CONFIG")
+            BUILD_VERSION=$(yq '.build_version' "$CONFIG")
+            BASE_OS=$(yq '.base_os' "$CONFIG")
+            ARCH=$(yq '.architecture // "amd64"' "$CONFIG")
+            MAINTAINER=$(yq '.maintainer // ""' "$CONFIG")
+            CATEGORY=$(yq '.category // ""' "$CONFIG")
+            ICON=$(yq '.icon // .name' "$CONFIG")
+
+            # Resources
+            MEM_MIN=$(yq '.resources.memory_min // 256' "$CONFIG")
+            MEM_REC=$(yq '.resources.memory_recommended // 512' "$CONFIG")
+            DISK_MIN=$(yq '.resources.disk_min // "2G"' "$CONFIG")
+            DISK_REC=$(yq '.resources.disk_recommended // "5G"' "$CONFIG")
+            CORES=$(yq '.resources.cores // 1' "$CONFIG")
+
+            # JSON fields
+            PORTS_JSON=$(yq -o=json '.ports // []' "$CONFIG")
+            CREDENTIALS_JSON=$(yq -o=json '.credentials // null' "$CONFIG")
+            PATHS_JSON=$(yq -o=json '.paths // []' "$CONFIG")
+            ENV_JSON=$(yq -o=json '.environment // []' "$CONFIG")
+            QUICK_START=$(yq '.quick_start // ""' "$CONFIG")
+
+            FULL_VERSION="${VERSION}-${BUILD_VERSION}"
+            TAG="v${FULL_VERSION}-${NAME}"
+            TEMPLATE_FILE="deroy2112-${BASE_OS}-${NAME}_${FULL_VERSION}_${ARCH}.tar.zst"
+            URL="https://github.com/${{ github.repository }}/releases/download/${TAG}/${TEMPLATE_FILE}"
+            CHANGELOG_URL="https://github.com/${{ github.repository }}/blob/main/templates/${template}/debian-13/CHANGELOG.md"
+            RELEASE_URL="https://github.com/${{ github.repository }}/releases/tag/${TAG}"
+
+            # Get release info
+            RELEASE_DATE=$(gh release view "$TAG" --json publishedAt -q '.publishedAt' 2>/dev/null || echo "")
+            SHA512=$(gh release download "$TAG" --pattern "${TEMPLATE_FILE}.sha512" -O - 2>/dev/null | cut -d' ' -f1 || echo "")
+
+            [[ -z "$SHA512" ]] && continue
+
+            if [ "$first" = true ]; then
+              first=false
+            else
+              echo "," >> page/templates.json
+            fi
+
+            QUICK_START_ESCAPED=$(echo "$QUICK_START" | jq -Rs '.')
+
+            cat >> page/templates.json <<JSONEOF
+  {
+    "name": "${NAME}",
+    "description": "${DESCRIPTION}",
+    "category": "${CATEGORY}",
+    "icon": "${ICON}",
+    "version": "${FULL_VERSION}",
+    "os": "${BASE_OS}",
+    "arch": "${ARCH}",
+    "maintainer": "${MAINTAINER}",
+    "filename": "${TEMPLATE_FILE}",
+    "url": "${URL}",
+    "sha512": "${SHA512}",
+    "changelog_url": "${CHANGELOG_URL}",
+    "release_url": "${RELEASE_URL}",
+    "release_date": "${RELEASE_DATE}",
+    "resources": {
+      "memory_min": ${MEM_MIN},
+      "memory_recommended": ${MEM_REC},
+      "disk_min": "${DISK_MIN}",
+      "disk_recommended": "${DISK_REC}",
+      "cores": ${CORES}
+    },
+    "ports": ${PORTS_JSON},
+    "credentials": ${CREDENTIALS_JSON},
+    "paths": ${PATHS_JSON},
+    "environment": ${ENV_JSON},
+    "quick_start": ${QUICK_START_ESCAPED}
+  }
+JSONEOF
+          done
+
+          echo "" >> page/templates.json
+          echo "]" >> page/templates.json
+
+          # Generate categories.json
+          echo "$CATEGORIES_JSON" > page/categories.json
+
+          # Add metadata
+          echo "{\"last_updated\": \"$(date -Iseconds)\"}" > page/meta.json
+
+      - name: Generate template HTML pages
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: |
+          TEMPLATE_HTML="page/_template.html"
+          OUTPUT_DIR="page/templates"
+          mkdir -p "$OUTPUT_DIR"
+
+          for template_dir in templates/*/debian-13/; do
+            [[ -d "$template_dir" ]] || continue
+            template=$(echo "$template_dir" | cut -d'/' -f2)
+            config="${template_dir}config.yml"
+            changelog="${template_dir}CHANGELOG.md"
+
+            [[ -f "$config" ]] || continue
+
+            echo "Generating page for: $template"
+
+            # Read config values
+            NAME=$(yq -r '.name' "$config")
+            DESCRIPTION=$(yq -r '.description // ""' "$config")
+            CATEGORY=$(yq -r '.category // ""' "$config")
+            VERSION=$(yq -r '.version' "$config")
+            BUILD_VERSION=$(yq -r '.build_version' "$config")
+            BASE_OS=$(yq -r '.base_os' "$config")
+            ARCH=$(yq -r '.architecture // "amd64"' "$config")
+            ICON=$(yq -r '.icon // .name' "$config")
+
+            # Resources
+            MEM_MIN=$(yq -r '.resources.memory_min // 256' "$config")
+            MEM_REC=$(yq -r '.resources.memory_recommended // 512' "$config")
+            DISK_MIN=$(yq -r '.resources.disk_min // "2G"' "$config")
+            DISK_REC=$(yq -r '.resources.disk_recommended // "5G"' "$config")
+            CORES=$(yq -r '.resources.cores // 1' "$config")
+
+            QUICK_START=$(yq -r '.quick_start // ""' "$config")
+            CRED_USER=$(yq -r '.credentials.username // ""' "$config")
+            CRED_PASS=$(yq -r '.credentials.password // ""' "$config")
+            CRED_NOTE=$(yq -r '.credentials.note // ""' "$config")
+
+            FULL_VERSION="${VERSION}-${BUILD_VERSION}"
+            TAG="v${FULL_VERSION}-${NAME}"
+            FILENAME="deroy2112-${BASE_OS}-${NAME}_${FULL_VERSION}_${ARCH}.tar.zst"
+            URL="https://github.com/${{ github.repository }}/releases/download/${TAG}/${FILENAME}"
+            CHANGELOG_URL="https://github.com/${{ github.repository }}/blob/main/templates/${template}/debian-13/CHANGELOG.md"
+            RELEASE_URL="https://github.com/${{ github.repository }}/releases/tag/${TAG}"
+
+            SHA512=$(gh release download "$TAG" --pattern "${FILENAME}.sha512" -O - 2>/dev/null | cut -d' ' -f1 || echo "(available after release)")
+
+            # Generate ports rows
+            PORTS_ROWS=""
+            port_count=$(yq -r '.ports | length' "$config")
+            for ((i=0; i<port_count; i++)); do
+              port=$(yq -r ".ports[$i].port" "$config")
+              desc=$(yq -r ".ports[$i].description // \"\"" "$config")
+              PORTS_ROWS+="<tr><td><code>${port}</code></td><td>${desc}</td></tr>"
+            done
+            [[ -z "$PORTS_ROWS" ]] && PORTS_ROWS="<tr><td colspan=\"2\" class=\"text-muted\">No ports defined</td></tr>"
+
+            # Generate paths rows
+            PATHS_ROWS=""
+            path_count=$(yq -r '.paths | length' "$config")
+            for ((i=0; i<path_count; i++)); do
+              path=$(yq -r ".paths[$i].path" "$config")
+              desc=$(yq -r ".paths[$i].description // \"\"" "$config")
+              PATHS_ROWS+="<tr><td><code>${path}</code></td><td>${desc}</td></tr>"
+            done
+            [[ -z "$PATHS_ROWS" ]] && PATHS_ROWS="<tr><td colspan=\"2\" class=\"text-muted\">No paths defined</td></tr>"
+
+            # Generate FAQ items
+            FAQ_ITEMS=""
+            faq_count=$(yq -r '.faq | length' "$config")
+            if [[ "$faq_count" -gt 0 ]]; then
+              for ((i=0; i<faq_count; i++)); do
+                question=$(yq -r ".faq[$i].question" "$config")
+                answer=$(yq -r ".faq[$i].answer" "$config")
+                answer=$(echo "$answer" | sed 's/&/\&amp;/g; s/</\&lt;/g; s/>/\&gt;/g')
+                FAQ_ITEMS+="<div class=\"faq-item\">"
+                FAQ_ITEMS+="<button class=\"faq-question\">${question}"
+                FAQ_ITEMS+="<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><polyline points=\"6 9 12 15 18 9\"></polyline></svg>"
+                FAQ_ITEMS+="</button>"
+                FAQ_ITEMS+="<div class=\"faq-answer\"><p>${answer}</p></div>"
+                FAQ_ITEMS+="</div>"
+              done
+            fi
+
+            # Read changelog
+            CHANGELOG=""
+            if [[ -f "$changelog" ]]; then
+              CHANGELOG=$(head -100 "$changelog" | sed '
+                s/^## \[\([^]]*\)\]/\n<h3>[\1]<\/h3>/g
+                s/^### \(.*\)/<h4>\1<\/h4>/g
+                s/^- \(.*\)/<li>\1<\/li>/g
+                s/`\([^`]*\)`/<code>\1<\/code>/g
+              ')
+            else
+              CHANGELOG="<p class=\"text-muted\">No changelog available.</p>"
+            fi
+
+            # Generate HTML
+            output="${OUTPUT_DIR}/${NAME}.html"
+
+            sed -e "s|{{NAME}}|${NAME}|g" \
+                -e "s|{{DESCRIPTION}}|${DESCRIPTION}|g" \
+                -e "s|{{CATEGORY}}|${CATEGORY}|g" \
+                -e "s|{{VERSION}}|${FULL_VERSION}|g" \
+                -e "s|{{OS}}|${BASE_OS}|g" \
+                -e "s|{{ARCH}}|${ARCH}|g" \
+                -e "s|{{ICON}}|${ICON}|g" \
+                -e "s|{{FILENAME}}|${FILENAME}|g" \
+                -e "s|{{URL}}|${URL}|g" \
+                -e "s|{{SHA512}}|${SHA512}|g" \
+                -e "s|{{RELEASE_URL}}|${RELEASE_URL}|g" \
+                -e "s|{{CHANGELOG_URL}}|${CHANGELOG_URL}|g" \
+                -e "s|{{MEM_MIN}}|${MEM_MIN}|g" \
+                -e "s|{{MEM_REC}}|${MEM_REC}|g" \
+                -e "s|{{DISK_MIN}}|${DISK_MIN}|g" \
+                -e "s|{{DISK_REC}}|${DISK_REC}|g" \
+                -e "s|{{CORES}}|${CORES}|g" \
+                -e "s|{{PORTS_ROWS}}|${PORTS_ROWS}|g" \
+                -e "s|{{PATHS_ROWS}}|${PATHS_ROWS}|g" \
+                -e "s|{{CRED_USER}}|${CRED_USER}|g" \
+                -e "s|{{CRED_PASS}}|${CRED_PASS}|g" \
+                -e "s|{{CRED_NOTE}}|${CRED_NOTE}|g" \
+                "$TEMPLATE_HTML" > "$output"
+
+            # Handle conditional sections
+            awk -v quick_start="$QUICK_START" \
+                -v faq_items="$FAQ_ITEMS" \
+                -v changelog="$CHANGELOG" \
+                -v has_creds="$([[ -n "$CRED_USER" ]] && echo "1" || echo "")" \
+                -v has_faq="$([[ "$faq_count" -gt 0 ]] && echo "1" || echo "")" \
+                -v cred_note="$CRED_NOTE" '
+            {
+              if (/\{\{#QUICK_START\}\}/) { in_quick=1; if (quick_start != "") print; next }
+              if (/\{\{\/QUICK_START\}\}/) { in_quick=0; if (quick_start != "") print; next }
+              if (in_quick && quick_start == "") next
+              if (/\{\{#CREDENTIALS\}\}/) { in_creds=1; if (has_creds) print; next }
+              if (/\{\{\/CREDENTIALS\}\}/) { in_creds=0; if (has_creds) print; next }
+              if (in_creds && !has_creds) next
+              if (/\{\{#CRED_NOTE\}\}/) { in_cred_note=1; if (cred_note != "") print; next }
+              if (/\{\{\/CRED_NOTE\}\}/) { in_cred_note=0; if (cred_note != "") print; next }
+              if (in_cred_note && cred_note == "") next
+              if (/\{\{#FAQ\}\}/) { in_faq=1; if (has_faq) print; next }
+              if (/\{\{\/FAQ\}\}/) { in_faq=0; if (has_faq) print; next }
+              if (in_faq && !has_faq) next
+              gsub(/\{\{QUICK_START\}\}/, quick_start)
+              gsub(/\{\{FAQ_ITEMS\}\}/, faq_items)
+              gsub(/\{\{CHANGELOG\}\}/, changelog)
+              print
+            }' "$output" > "${output}.tmp" && mv "${output}.tmp" "$output"
+
+            echo "  -> ${output}"
+          done
+
+          echo "Page generation complete!"
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./page
+          keep_files: true
