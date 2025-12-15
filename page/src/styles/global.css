@@ -69,7 +69,7 @@
   /* Glassmorphism */
   --glass-bg: rgba(255, 255, 255, 0.8);
   --glass-bg-solid: rgba(255, 255, 255, 0.95);
-  --glass-border: rgba(255, 255, 255, 0.5);
+  --glass-border: rgba(0, 0, 0, 0.1);
   --glass-blur: 24px;
 
   /* Code blocks */

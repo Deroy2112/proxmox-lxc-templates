@@ -23,27 +23,15 @@ const { paths } = Astro.props;
         Important Paths
       </h3>
     </div>
-    <div class="overflow-x-auto">
-      <table class="w-full text-sm">
-        <thead class="bg-[var(--bg-tertiary)]/30 text-[var(--text-muted)] text-left">
-          <tr>
-            <th class="px-4 py-2 font-medium">Path</th>
-            <th class="px-4 py-2 font-medium">Description</th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-[var(--border-color)]">
-          {paths.map((p) => (
-            <tr class="hover:bg-[var(--bg-secondary)] transition-colors">
-              <td class="px-4 py-2">
-                <code class="px-2 py-0.5 rounded bg-[var(--bg-tertiary)] text-[var(--text-primary)] font-mono text-xs">
-                  {p.path}
-                </code>
-              </td>
-              <td class="px-4 py-2 text-[var(--text-secondary)]">{p.description}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+    <div class="p-4 space-y-3">
+      {paths.map((p) => (
+        <div class="flex flex-col gap-1">
+          <code class="px-2 py-1 rounded bg-[var(--bg-tertiary)] text-[var(--text-primary)] font-mono text-xs break-all">
+            {p.path}
+          </code>
+          <span class="text-sm text-[var(--text-muted)]">{p.description}</span>
+        </div>
+      ))}
     </div>
   </Card>
 )}

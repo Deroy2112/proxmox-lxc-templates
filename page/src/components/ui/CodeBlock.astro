@@ -46,11 +46,12 @@ const id = `code-${Math.random().toString(36).slice(2, 9)}`;
           <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
         </svg>
         <svg
-          class="check-icon w-4 h-4 text-green-500 hidden"
+          class="check-icon w-4 h-4 text-[var(--color-success)]"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
           stroke-width="2"
+          style="display: none;"
         >
           <polyline points="20 6 9 17 4 12"></polyline>
         </svg>
@@ -74,16 +75,16 @@ const id = `code-${Math.random().toString(36).slice(2, 9)}`;
         try {
           await navigator.clipboard.writeText(text);
 
-          const copyIcon = btn.querySelector(".copy-icon");
-          const checkIcon = btn.querySelector(".check-icon");
+          const copyIcon = btn.querySelector(".copy-icon") as HTMLElement;
+          const checkIcon = btn.querySelector(".check-icon") as HTMLElement;
 
           if (copyIcon && checkIcon) {
-            copyIcon.classList.add("hidden");
-            checkIcon.classList.remove("hidden");
+            copyIcon.style.display = "none";
+            checkIcon.style.display = "block";
 
             setTimeout(() => {
-              copyIcon.classList.remove("hidden");
-              checkIcon.classList.add("hidden");
+              copyIcon.style.display = "block";
+              checkIcon.style.display = "none";
             }, 2000);
           }
         } catch (err) {
