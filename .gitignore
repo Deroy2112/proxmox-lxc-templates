@@ -22,8 +22,9 @@ concept/
 .DS_Store
 Thumbs.db
 
-# Screenshots
+# Screenshots (but not PWA icons)
 *.png
+!page/public/icon-*.png
 
 # IDE
 .vscode/

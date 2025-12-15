@@ -6,9 +6,10 @@ interface Props {
   description?: string;
 }
 
-const { title, description = "Custom LXC container templates for Proxmox VE" } = Astro.props;
+const { title, description = "Custom LXC container templates for Proxmox VE. Pre-configured, optimized, and ready to deploy." } = Astro.props;
 const siteTitle = `${title} | Proxmox LXC Templates`;
 const basePath = import.meta.env.BASE_URL;
+const siteUrl = "https://deroy2112.github.io/proxmox-lxc-templates";
 ---
 
 <!doctype html>
@@ -16,12 +17,50 @@ const basePath = import.meta.env.BASE_URL;
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content={description} />
 
+    <!-- Primary Meta Tags -->
     <title>{siteTitle}</title>
+    <meta name="title" content={siteTitle} />
+    <meta name="description" content={description} />
+    <meta name="author" content="Deroy2112" />
+    <meta name="keywords" content="Proxmox, LXC, Container, Templates, Linux, Virtualization, Homelab, Self-hosted" />
+    <meta name="robots" content="index, follow" />
 
-    <!-- Favicon -->
+    <!-- Canonical -->
+    <link rel="canonical" href={siteUrl} />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={siteUrl} />
+    <meta property="og:title" content={siteTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={`${siteUrl}/icon-512.png`} />
+    <meta property="og:site_name" content="Proxmox LXC Templates" />
+    <meta property="og:locale" content="en_US" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:url" content={siteUrl} />
+    <meta name="twitter:title" content={siteTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={`${siteUrl}/icon-512.png`} />
+
+    <!-- Favicons -->
     <link rel="icon" type="image/svg+xml" href={`${basePath}/icon.svg`} />
+    <link rel="icon" type="image/png" sizes="192x192" href={`${basePath}/icon-192.png`} />
+    <link rel="icon" type="image/png" sizes="512x512" href={`${basePath}/icon-512.png`} />
+    <link rel="apple-touch-icon" sizes="192x192" href={`${basePath}/icon-192.png`} />
+
+    <!-- PWA -->
+    <link rel="manifest" href={`${basePath}/site.webmanifest`} />
+    <meta name="theme-color" content="#E25B5B" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="LXC Templates" />
+    <meta name="application-name" content="Proxmox LXC Templates" />
+    <meta name="msapplication-TileColor" content="#E25B5B" />
+    <meta name="msapplication-TileImage" content={`${basePath}/icon-192.png`} />
 
     <!-- Preconnect -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -30,6 +69,30 @@ const basePath = import.meta.env.BASE_URL;
 
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+
+    <!-- Structured Data (JSON-LD) -->
+    <script type="application/ld+json" set:html={JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "Proxmox LXC Templates",
+      "url": siteUrl,
+      "description": description,
+      "author": {
+        "@type": "Person",
+        "name": "Deroy2112",
+        "url": "https://github.com/Deroy2112"
+      },
+      "publisher": {
+        "@type": "Person",
+        "name": "Deroy2112"
+      },
+      "inLanguage": "en-US",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": `${siteUrl}/?q={search_term_string}`,
+        "query-input": "required name=search_term_string"
+      }
+    })} />
   </head>
 
   <body>
