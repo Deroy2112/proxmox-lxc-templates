@@ -1,0 +1,257 @@
+[
+{
+  "name": "jellyfin",
+  "description": "Jellyfin Media Server on Debian 13 (Trixie)",
+  "category": "media",
+  "icon": "jellyfin",
+  "version": "10.10.3",
+  "build_version": 1,
+  "base_os": "debian-13",
+  "architecture": "amd64",
+  "maintainer": "Deroy2112 <81692934+Deroy2112@users.noreply.github.com>",
+  "resources": {
+    "memory_min": 2048,
+    "memory_recommended": 4096,
+    "disk_min": "8G",
+    "disk_recommended": "20G",
+    "cores": 2
+  },
+  "ports": [
+    {
+      "port": 8096,
+      "description": "Web UI"
+    },
+    {
+      "port": 8920,
+      "description": "HTTPS (optional)"
+    }
+  ],
+  "paths": [
+    {
+      "path": "/var/lib/jellyfin",
+      "description": "Data & configuration"
+    },
+    {
+      "path": "/var/log/jellyfin",
+      "description": "Logs"
+    },
+    {
+      "path": "/media",
+      "description": "Media libraries (mount point)"
+    }
+  ],
+  "quick_start": "Web UI: http://<IP>:8096\nSetup wizard on first start\nMount media folders as bind mounts\n",
+  "faq": [
+    {
+      "question": "How do I add media libraries?",
+      "answer": "Mount your media folders as bind mounts in Proxmox (e.g., /media/movies),\nthen add them as libraries in Jellyfin's web UI under Dashboard > Libraries.\n"
+    },
+    {
+      "question": "How do I enable hardware transcoding?",
+      "answer": "Pass through your GPU in Proxmox container settings,\nthen enable hardware acceleration in Dashboard > Playback > Transcoding.\n"
+    },
+    {
+      "question": "How do I access Jellyfin remotely?",
+      "answer": "Set up a reverse proxy (e.g., nginx) with SSL,\nor use Jellyfin's built-in HTTPS on port 8920.\n"
+    }
+  ],
+  "download_url": "https://github.com/Deroy2112/proxmox-lxc-templates/releases/download/v10.10.3-1-jellyfin/deroy2112-debian-13-jellyfin_10.10.3-1_amd64.tar.zst",
+  "release_url": "https://github.com/Deroy2112/proxmox-lxc-templates/releases/tag/v10.10.3-1-jellyfin",
+  "sha512": "5b12046e53a63aae1308bf86e0880e56d72b1f1980e80f8ebb53577333f8b382dae2d660b1b3a156a82f201ad65628de486248ecae37482bfcfa867d1b2afa71",
+  "release_date": "2025-12-15T12:58:50Z"
+}
+,
+{
+  "name": "nginx-proxy-manager",
+  "description": "Nginx Proxy Manager - Web-based reverse proxy management on Debian 13 (Trixie)",
+  "category": "network",
+  "icon": "nginx-proxy-manager",
+  "version": "2.13.5",
+  "build_version": 1,
+  "base_os": "debian-13",
+  "architecture": "amd64",
+  "maintainer": "Deroy2112 <81692934+Deroy2112@users.noreply.github.com>",
+  "resources": {
+    "memory_min": 512,
+    "memory_recommended": 1024,
+    "disk_min": "4G",
+    "disk_recommended": "8G",
+    "cores": 2
+  },
+  "ports": [
+    {
+      "port": 81,
+      "description": "Admin UI"
+    },
+    {
+      "port": 80,
+      "description": "HTTP"
+    },
+    {
+      "port": 443,
+      "description": "HTTPS"
+    }
+  ],
+  "credentials": {
+    "username": "admin@example.com",
+    "password": "changeme",
+    "note": "Change on first login!"
+  },
+  "paths": [
+    {
+      "path": "/data",
+      "description": "Configuration & database"
+    },
+    {
+      "path": "/data/letsencrypt",
+      "description": "SSL certificates"
+    },
+    {
+      "path": "/var/log/nginx",
+      "description": "Logs"
+    }
+  ],
+  "environment": [
+    {
+      "name": "NPM_PORT",
+      "default": "81",
+      "description": "Admin UI port"
+    }
+  ],
+  "quick_start": "Web UI: http://<IP>:81\nLogin: admin@example.com / changeme\nChange password immediately!\n",
+  "faq": [
+    {
+      "question": "How do I add a proxy host?",
+      "answer": "Go to Hosts > Proxy Hosts > Add Proxy Host.\nEnter domain name, forward hostname/IP, and port.\n"
+    },
+    {
+      "question": "How do I get SSL certificates?",
+      "answer": "When adding a proxy host, go to the SSL tab,\nselect \"Request a new SSL Certificate\" with Let's Encrypt.\n"
+    },
+    {
+      "question": "How do I expose multiple services on one IP?",
+      "answer": "Create separate proxy hosts for each subdomain (e.g., app1.example.com, app2.example.com).\nAll will share ports 80/443 on this container.\n"
+    }
+  ],
+  "download_url": "https://github.com/Deroy2112/proxmox-lxc-templates/releases/download/v2.13.5-1-nginx-proxy-manager/deroy2112-debian-13-nginx-proxy-manager_2.13.5-1_amd64.tar.zst",
+  "release_url": "https://github.com/Deroy2112/proxmox-lxc-templates/releases/tag/v2.13.5-1-nginx-proxy-manager",
+  "sha512": "cc5a7a2749a3b231f48b2743ad885f2f0df7bc92b2a6c06eb617a3289a70d3508852bef163c6b593c6b7df16dce8d14bf78c6b42e32c0844c33a61b2f2493f54",
+  "release_date": "2025-12-15T12:58:59Z"
+}
+,
+{
+  "name": "nginx",
+  "description": "Nginx webserver on Debian 13 (Trixie)",
+  "category": "network",
+  "icon": "nginx",
+  "version": "1.26.0",
+  "build_version": 1,
+  "base_os": "debian-13",
+  "architecture": "amd64",
+  "maintainer": "Deroy2112 <81692934+Deroy2112@users.noreply.github.com>",
+  "resources": {
+    "memory_min": 256,
+    "memory_recommended": 512,
+    "disk_min": "2G",
+    "disk_recommended": "5G",
+    "cores": 1
+  },
+  "ports": [
+    {
+      "port": 80,
+      "description": "HTTP"
+    },
+    {
+      "port": 443,
+      "description": "HTTPS"
+    }
+  ],
+  "paths": [
+    {
+      "path": "/etc/nginx",
+      "description": "Configuration"
+    },
+    {
+      "path": "/var/www/html",
+      "description": "Web root"
+    },
+    {
+      "path": "/var/log/nginx",
+      "description": "Logs"
+    }
+  ],
+  "quick_start": "Web Server: http://<IP>\nConfig: /etc/nginx/nginx.conf\nTest: nginx -t\nReload: systemctl reload nginx\n",
+  "faq": [
+    {
+      "question": "How do I add a new virtual host?",
+      "answer": "Create a config file in /etc/nginx/sites-available/,\nthen symlink it to /etc/nginx/sites-enabled/ and reload nginx.\n"
+    },
+    {
+      "question": "How do I enable SSL with Let's Encrypt?",
+      "answer": "Install certbot: apt install certbot python3-certbot-nginx\nThen run: certbot --nginx\n"
+    },
+    {
+      "question": "How do I check for configuration errors?",
+      "answer": "Run: nginx -t\nThis validates the configuration before reloading.\n"
+    }
+  ],
+  "download_url": "https://github.com/Deroy2112/proxmox-lxc-templates/releases/download/v1.26.0-1-nginx/deroy2112-debian-13-nginx_1.26.0-1_amd64.tar.zst",
+  "release_url": "https://github.com/Deroy2112/proxmox-lxc-templates/releases/tag/v1.26.0-1-nginx",
+  "sha512": "ec9f26182a1480425c9c420831f6a702e2e777b685d1cd1bd9dfb7ce3425a45e439e21aacfa7323db83dd7b58a4ce083d0c459e5caac3e76a830cd816754f868",
+  "release_date": "2025-12-15T12:59:03Z"
+}
+,
+{
+  "name": "shoko",
+  "description": "Shoko Anime Server on Debian 13 (Trixie)",
+  "category": "media",
+  "icon": "shoko",
+  "version": "5.1.0",
+  "build_version": 1,
+  "base_os": "debian-13",
+  "architecture": "amd64",
+  "maintainer": "Deroy2112 <81692934+Deroy2112@users.noreply.github.com>",
+  "resources": {
+    "memory_min": 1024,
+    "memory_recommended": 2048,
+    "disk_min": "5G",
+    "disk_recommended": "10G",
+    "cores": 2
+  },
+  "ports": [
+    {
+      "port": 8111,
+      "description": "Web UI"
+    }
+  ],
+  "paths": [
+    {
+      "path": "/root/.shoko",
+      "description": "Configuration & database"
+    },
+    {
+      "path": "/anime",
+      "description": "Anime library (mount point)"
+    }
+  ],
+  "quick_start": "Web UI: http://<IP>:8111\nAniDB account required\nMount anime folder as bind mount\n",
+  "faq": [
+    {
+      "question": "Do I need an AniDB account?",
+      "answer": "Yes, Shoko requires an AniDB account to fetch anime metadata.\nCreate one at https://anidb.net/user/register\n"
+    },
+    {
+      "question": "How do I add my anime library?",
+      "answer": "Mount your anime folder as a bind mount in Proxmox (e.g., /anime),\nthen add it as an import folder in Shoko's web UI.\n"
+    },
+    {
+      "question": "How do I integrate with Jellyfin/Plex?",
+      "answer": "Install the Shoko plugin for your media server.\nIt will use Shoko's metadata and organization.\n"
+    }
+  ],
+  "download_url": "https://github.com/Deroy2112/proxmox-lxc-templates/releases/download/v5.1.0-1-shoko/deroy2112-debian-13-shoko_5.1.0-1_amd64.tar.zst",
+  "release_url": "https://github.com/Deroy2112/proxmox-lxc-templates/releases/tag/v5.1.0-1-shoko",
+  "sha512": "9403f2419d9ae7f93f2173b9b0dd69d85b4902a670d4690fbc2378aa89bcec3bae46961d9dc00e77c331e8859c75b154cfdac6be6ab2b211cad9b757f3c90c6a",
+  "release_date": "2025-12-15T12:59:10Z"
+}
+]
