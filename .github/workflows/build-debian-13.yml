@@ -90,15 +90,15 @@ jobs:
         id: cache-rootfs
         uses: actions/cache@v4
         with:
-          path: /tmp/debootstrap-cache.tar.zst
-          key: debootstrap-trixie-amd64-v1-${{ hashFiles('.github/workflows/build-debian-13.yml') }}
+          path: debootstrap-cache.tar.zst
+          key: debootstrap-trixie-amd64-v2
           restore-keys: |
-            debootstrap-trixie-amd64-v1-
+            debootstrap-trixie-amd64-
 
       - name: Create rootfs with debootstrap
         run: |
           ROOTFS="${{ runner.temp }}/rootfs"
-          CACHE_FILE="/tmp/debootstrap-cache.tar.zst"
+          CACHE_FILE="${{ github.workspace }}/debootstrap-cache.tar.zst"
 
           if [[ -f "$CACHE_FILE" ]]; then
             echo "::notice::Restoring rootfs from cache..."
