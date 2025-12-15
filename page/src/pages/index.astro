@@ -3,6 +3,7 @@ import { getCollection } from "astro:content";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import Sidebar from "@/components/Sidebar.astro";
 import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
 import Toast from "@/components/Toast.astro";
 import TemplateCard from "@/components/TemplateCard.astro";
 import TemplateDetail from "@/components/TemplateDetail.astro";
@@ -136,6 +137,9 @@ const totalCount = templates.length;
         <!-- Template Detail (hidden by default) -->
         <TemplateDetail />
       </div>
+
+      <!-- Footer -->
+      <Footer />
     </main>
   </div>
 
