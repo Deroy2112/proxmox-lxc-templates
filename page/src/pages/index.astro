@@ -110,7 +110,7 @@ const basePath = import.meta.env.BASE_URL;
     const grid = document.getElementById("template-grid");
     const noResults = document.getElementById("no-results");
     const cards = grid?.querySelectorAll(".template-card");
-    const categoryLinks = document.querySelectorAll("[data-category]");
+    const categoryLinks = document.querySelectorAll(".nav-item[data-category]");
     const counters = document.querySelectorAll("[data-count]");
 
     if (!searchInput || !grid || !cards) return;
