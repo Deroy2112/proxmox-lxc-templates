@@ -54,7 +54,7 @@ const categoryDisplay = category.charAt(0).toUpperCase() + category.slice(1);
         src={iconUrl}
         alt=""
         loading="lazy"
-        onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"
+        onerror="this.onerror=null;this.style.display='none';this.nextElementSibling.style.display='flex'"
       />
       <!-- Fallback Icon -->
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor" style="display: none;">
