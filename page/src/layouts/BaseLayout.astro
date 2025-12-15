@@ -8,6 +8,7 @@ interface Props {
 
 const { title, description = "Custom LXC container templates for Proxmox VE" } = Astro.props;
 const siteTitle = `${title} | Proxmox LXC Templates`;
+const basePath = import.meta.env.BASE_URL;
 ---
 
 <!doctype html>
@@ -20,35 +21,33 @@ const siteTitle = `${title} | Proxmox LXC Templates`;
     <title>{siteTitle}</title>
 
     <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href={`${import.meta.env.BASE_URL}favicon.svg`} />
+    <link rel="icon" type="image/svg+xml" href={`${basePath}favicon.svg`} />
 
-    <!-- Preconnect to external resources -->
-    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+    <!-- Preconnect -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
 
     <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
 
-    <!-- Theme Script (runs before body to prevent flash) -->
+    <!-- Theme Script (prevents flash) -->
     <script is:inline>
       (function() {
         const stored = localStorage.getItem("theme");
         const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-
         let theme;
         if (stored === "dark" || stored === "light") {
           theme = stored;
         } else {
           theme = prefersDark ? "dark" : "light";
         }
-
         document.documentElement.setAttribute("data-theme", theme);
       })();
     </script>
   </head>
 
-  <body class="min-h-screen bg-base-100 text-base-content">
+  <body>
     <slot />
   </body>
 </html>

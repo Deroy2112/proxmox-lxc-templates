@@ -1,0 +1,75 @@
+---
+import Logo from "./Logo.astro";
+import ThemeToggle from "./ThemeToggle.astro";
+
+const basePath = import.meta.env.BASE_URL;
+---
+
+<!-- Mobile Header (hidden on desktop) -->
+<header class="mobile-header">
+  <div class="mobile-header-inner">
+    <button class="menu-toggle" id="menu-toggle" aria-label="Open menu">
+      <!-- Hamburger Icon -->
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor">
+        <path d="M224,128a8,8,0,0,1-8,8H40a8,8,0,0,1,0-16H216A8,8,0,0,1,224,128ZM40,72H216a8,8,0,0,0,0-16H40a8,8,0,0,0,0,16ZM216,184H40a8,8,0,0,0,0,16H216a8,8,0,0,0,0-16Z" />
+      </svg>
+    </button>
+
+    <a href={basePath} class="flex items-center gap-2">
+      <Logo variant="white" class="h-6 w-auto" />
+    </a>
+
+    <ThemeToggle />
+  </div>
+</header>
+
+<script>
+  function initMobileMenu() {
+    const toggle = document.getElementById("menu-toggle");
+    const sidebar = document.getElementById("sidebar");
+    const overlay = document.getElementById("sidebar-overlay");
+
+    if (!toggle || !sidebar || !overlay) return;
+
+    function openMenu() {
+      sidebar.classList.add("open");
+      overlay.classList.add("open");
+      document.body.style.overflow = "hidden";
+    }
+
+    function closeMenu() {
+      sidebar.classList.remove("open");
+      overlay.classList.remove("open");
+      document.body.style.overflow = "";
+    }
+
+    toggle.addEventListener("click", openMenu);
+    overlay.addEventListener("click", closeMenu);
+
+    // Close on escape
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") closeMenu();
+    });
+
+    // Close on navigation
+    sidebar.querySelectorAll("a, button[data-category]").forEach((el) => {
+      el.addEventListener("click", () => {
+        if (window.innerWidth <= 900) {
+          closeMenu();
+        }
+      });
+    });
+  }
+
+  initMobileMenu();
+  document.addEventListener("astro:after-swap", initMobileMenu);
+</script>
+
+<style>
+  .h-6 {
+    height: 24px;
+  }
+  .w-auto {
+    width: auto;
+  }
+</style>

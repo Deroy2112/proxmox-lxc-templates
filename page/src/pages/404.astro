@@ -1,32 +1,72 @@
 ---
 import BaseLayout from "@/layouts/BaseLayout.astro";
-import Button from "@/components/ui/Button.astro";
+import Logo from "@/components/Logo.astro";
 
 const basePath = import.meta.env.BASE_URL;
 ---
 
-<BaseLayout title="Page Not Found" description="The page you're looking for doesn't exist.">
-  <main class="flex items-center justify-center min-h-screen p-6 bg-base-100">
-    <div class="card glass p-8 max-w-md text-center">
-      <div class="avatar placeholder mx-auto mb-6">
-        <div class="bg-error text-error-content rounded-full w-16 h-16">
-          <svg class="w-8 h-8" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
-          </svg>
-        </div>
-      </div>
-      <h1 class="text-4xl font-bold mb-2">404</h1>
-      <p class="text-xl opacity-80 mb-6">Page not found</p>
-      <p class="opacity-60 mb-8">
+<BaseLayout title="404 - Not Found" description="Page not found">
+  <div class="error-page">
+    <div class="error-content">
+      <Logo variant="gray" class="error-logo" />
+
+      <h1 class="error-code">404</h1>
+      <p class="error-title">Page Not Found</p>
+      <p class="error-description">
         The page you're looking for doesn't exist or has been moved.
       </p>
-      <Button href={basePath} variant="primary">
-        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-          <polyline points="9 22 9 12 15 12 15 22"/>
+
+      <a href={basePath} class="btn btn-primary">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor" style="width: 18px; height: 18px;">
+          <path d="M224,128a8,8,0,0,1-8,8H59.31l58.35,58.34a8,8,0,0,1-11.32,11.32l-72-72a8,8,0,0,1,0-11.32l72-72a8,8,0,0,1,11.32,11.32L59.31,120H216A8,8,0,0,1,224,128Z" />
         </svg>
         Back to Home
-      </Button>
+      </a>
     </div>
-  </main>
+  </div>
 </BaseLayout>
+
+<style>
+  .error-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px;
+    background: var(--bg-dark);
+  }
+
+  .error-content {
+    text-align: center;
+    max-width: 400px;
+  }
+
+  .error-logo {
+    height: 48px;
+    width: auto;
+    margin-bottom: 48px;
+    opacity: 0.3;
+  }
+
+  .error-code {
+    font-family: var(--font-mono);
+    font-size: 6rem;
+    font-weight: 700;
+    color: var(--primary);
+    line-height: 1;
+    margin-bottom: 16px;
+  }
+
+  .error-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+  }
+
+  .error-description {
+    font-size: 1rem;
+    color: var(--text-muted);
+    margin-bottom: 32px;
+  }
+</style>
