@@ -40,8 +40,6 @@ const sortedTemplates = templates.sort((a, b) =>
 
 const totalCount = templates.length;
 
-// Get first 3 templates for featured section (if available)
-const featuredTemplates = sortedTemplates.slice(0, 3);
 ---
 
 <BaseLayout title="LXC Templates" description="Custom LXC container templates for Proxmox VE. Pre-configured, optimized, and ready to deploy.">
@@ -75,80 +73,6 @@ const featuredTemplates = sortedTemplates.slice(0, 3);
       <div class="content">
         <!-- Template List (default visible) -->
         <div id="template-list">
-          <!-- Featured Section -->
-          {featuredTemplates.length > 0 && (
-            <section class="featured">
-              <div class="featured-grid">
-                {featuredTemplates[0] && (
-                  <div class="featured-card large" data-template={JSON.stringify(featuredTemplates[0].data)} role="button" tabindex="0">
-                    <div class="featured-card-bg"></div>
-                    <div class="featured-card-content">
-                      <div class="featured-badge">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor">
-                          <path d="M234.29,114.85l-45,38.83L203,211.75a16.4,16.4,0,0,1-24.5,17.82L128,198.49,77.47,229.57A16.4,16.4,0,0,1,53,211.75l13.76-58.07-45-38.83A16.46,16.46,0,0,1,31.08,86l59-4.76,22.76-55.08a16.36,16.36,0,0,1,30.27,0l22.75,55.08,59,4.76a16.46,16.46,0,0,1,9.37,28.86Z"/>
-                        </svg>
-                        Featured
-                      </div>
-                      <div class="featured-icon">
-                        <img
-                          src={`https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons@main/svg/${featuredTemplates[0].data.icon}.svg`}
-                          alt=""
-                          onerror="this.style.display='none'"
-                        />
-                      </div>
-                      <h3 class="featured-title">{featuredTemplates[0].data.name.charAt(0).toUpperCase() + featuredTemplates[0].data.name.slice(1)}</h3>
-                      <p class="featured-description">{featuredTemplates[0].data.description}</p>
-                      <div class="featured-meta">
-                        <div class="featured-meta-item">
-                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M128,136H48a8,8,0,0,1,0-16h80a8,8,0,0,1,0,16Z"/></svg>
-                          {featuredTemplates[0].data.resources.memory_min >= 1024
-                            ? `${featuredTemplates[0].data.resources.memory_min / 1024}GB`
-                            : `${featuredTemplates[0].data.resources.memory_min}MB`}
-                        </div>
-                        <div class="featured-meta-item">
-                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M216,72H56a8,8,0,0,1,0-16H192a8,8,0,0,0,0-16H56A24,24,0,0,0,32,64V192a24,24,0,0,0,24,24H216a16,16,0,0,0,16-16V88A16,16,0,0,0,216,72Z"/></svg>
-                          {featuredTemplates[0].data.resources.disk_min}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {featuredTemplates[1] && (
-                  <div class="featured-card" data-template={JSON.stringify(featuredTemplates[1].data)} role="button" tabindex="0">
-                    <div class="featured-card-content">
-                      <div class="featured-icon purple">
-                        <img
-                          src={`https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons@main/svg/${featuredTemplates[1].data.icon}.svg`}
-                          alt=""
-                          onerror="this.style.display='none'"
-                        />
-                      </div>
-                      <h3 class="featured-title">{featuredTemplates[1].data.name.charAt(0).toUpperCase() + featuredTemplates[1].data.name.slice(1)}</h3>
-                      <p class="featured-description" style="font-size: 0.8125rem;">{featuredTemplates[1].data.description}</p>
-                    </div>
-                  </div>
-                )}
-
-                {featuredTemplates[2] && (
-                  <div class="featured-card" data-template={JSON.stringify(featuredTemplates[2].data)} role="button" tabindex="0">
-                    <div class="featured-card-content">
-                      <div class="featured-icon blue">
-                        <img
-                          src={`https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons@main/svg/${featuredTemplates[2].data.icon}.svg`}
-                          alt=""
-                          onerror="this.style.display='none'"
-                        />
-                      </div>
-                      <h3 class="featured-title">{featuredTemplates[2].data.name.charAt(0).toUpperCase() + featuredTemplates[2].data.name.slice(1)}</h3>
-                      <p class="featured-description" style="font-size: 0.8125rem;">{featuredTemplates[2].data.description}</p>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </section>
-          )}
-
           <!-- Category Pills -->
           <section class="section">
             <div class="category-pills" id="category-pills">
@@ -251,7 +175,6 @@ const featuredTemplates = sortedTemplates.slice(0, 3);
     const pillButtons = document.querySelectorAll("#category-pills .pill");
     const sidebarButtons = document.querySelectorAll(".sidebar-nav button[data-category]");
     const visibleCountEl = document.getElementById("visible-count");
-    const featuredCards = document.querySelectorAll(".featured-card[data-template]");
 
     if (!grid || !cards) return;
 
@@ -268,19 +191,6 @@ const featuredTemplates = sortedTemplates.slice(0, 3);
           templatesMap.set(data.name, data);
         } catch {
           // Invalid JSON, skip
-        }
-      }
-    });
-
-    // Also add featured cards to map
-    featuredCards.forEach((card) => {
-      const dataStr = card.getAttribute("data-template");
-      if (dataStr) {
-        try {
-          const data = JSON.parse(dataStr);
-          templatesMap.set(data.name, data);
-        } catch {
-          // Invalid JSON
         }
       }
     });
@@ -474,15 +384,22 @@ const featuredTemplates = sortedTemplates.slice(0, 3);
 
     // Download
     const downloadSection = document.getElementById("detail-download-section");
-    const downloadBtn = document.getElementById("detail-download-btn") as HTMLAnchorElement | null;
     const wgetEl = document.getElementById("detail-wget") as HTMLInputElement | null;
     const sha512El = document.getElementById("detail-sha512");
 
     if (data.download_url) {
       downloadSection?.classList.remove("hidden");
-      if (downloadBtn) downloadBtn.href = data.download_url as string;
       if (wgetEl) wgetEl.value = `wget ${data.download_url}`;
-      if (sha512El) sha512El.textContent = data.sha512 ? `SHA512: ${data.sha512}` : "";
+      if (sha512El) {
+        if (data.sha512) {
+          sha512El.textContent = `SHA512: ${data.sha512}`;
+          sha512El.setAttribute("data-sha512", data.sha512 as string);
+          sha512El.parentElement?.classList.remove("hidden");
+        } else {
+          sha512El.textContent = "";
+          sha512El.parentElement?.classList.add("hidden");
+        }
+      }
     } else {
       downloadSection?.classList.add("hidden");
     }
@@ -635,10 +552,10 @@ const featuredTemplates = sortedTemplates.slice(0, 3);
   function initDetail() {
     const grid = document.getElementById("template-grid");
     const cards = grid?.querySelectorAll(".app-card");
-    const featuredCards = document.querySelectorAll(".featured-card[data-template]");
     const backBtn = document.getElementById("back-to-list");
     const wgetCopyBtn = document.getElementById("detail-wget-copy");
     const wgetInput = document.getElementById("detail-wget") as HTMLInputElement | null;
+    const sha512CopyBtn = document.getElementById("detail-sha512-copy");
 
     // Copy wget command to clipboard
     wgetCopyBtn?.addEventListener("click", async () => {
@@ -650,6 +567,20 @@ const featuredTemplates = sortedTemplates.slice(0, 3);
           wgetInput.select();
           document.execCommand("copy");
           window.showToast?.("Copied!");
+        }
+      }
+    });
+
+    // Copy SHA512 to clipboard
+    sha512CopyBtn?.addEventListener("click", async () => {
+      const sha512El = document.getElementById("detail-sha512");
+      const sha512Value = sha512El?.getAttribute("data-sha512");
+      if (sha512Value) {
+        try {
+          await navigator.clipboard.writeText(sha512Value);
+          window.showToast?.("SHA512 copied to clipboard!");
+        } catch {
+          window.showToast?.("Failed to copy");
         }
       }
     });
@@ -668,16 +599,6 @@ const featuredTemplates = sortedTemplates.slice(0, 3);
     }
 
     cards?.forEach((card) => {
-      card.addEventListener("click", () => handleCardClick(card));
-      card.addEventListener("keydown", (e) => {
-        if ((e as KeyboardEvent).key === "Enter" || (e as KeyboardEvent).key === " ") {
-          e.preventDefault();
-          handleCardClick(card);
-        }
-      });
-    });
-
-    featuredCards.forEach((card) => {
       card.addEventListener("click", () => handleCardClick(card));
       card.addEventListener("keydown", (e) => {
         if ((e as KeyboardEvent).key === "Enter" || (e as KeyboardEvent).key === " ") {

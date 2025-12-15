@@ -42,12 +42,6 @@
       <div id="detail-download-section" class="card mb-6">
         <div class="card-body">
           <h2 style="font-size: 1.125rem; font-weight: 600; margin-bottom: 16px;">Download</h2>
-          <a id="detail-download-btn" class="btn btn-primary btn-lg" style="width: 100%; margin-bottom: 16px;" download>
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor" style="width: 20px; height: 20px;">
-              <path d="M224,152v56a16,16,0,0,1-16,16H48a16,16,0,0,1-16-16V152a8,8,0,0,1,16,0v56H208V152a8,8,0,0,1,16,0Zm-101.66,5.66a8,8,0,0,0,11.32,0l40-40a8,8,0,0,0-11.32-11.32L136,132.69V40a8,8,0,0,0-16,0v92.69L93.66,106.34a8,8,0,0,0-11.32,11.32Z" />
-            </svg>
-            Download Template
-          </a>
 
           <div class="input-group">
             <input id="detail-wget" type="text" readonly />
@@ -58,7 +52,15 @@
             </button>
           </div>
 
-          <p id="detail-sha512" class="font-mono text-xs text-muted mt-2" style="word-break: break-all;"></p>
+          <!-- SHA512 with Copy Button -->
+          <div id="detail-sha512-wrapper" class="sha512-wrapper mt-3">
+            <p id="detail-sha512" class="font-mono text-xs text-muted" style="word-break: break-all; margin: 0;"></p>
+            <button id="detail-sha512-copy" class="btn-copy-sha" title="Copy SHA512">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor" style="width: 14px; height: 14px;">
+                <path d="M216,32H88a8,8,0,0,0-8,8V80H40a8,8,0,0,0-8,8V216a8,8,0,0,0,8,8H168a8,8,0,0,0,8-8V176h40a8,8,0,0,0,8-8V40A8,8,0,0,0,216,32ZM160,208H48V96H160Zm48-48H176V88a8,8,0,0,0-8-8H96V48H208Z" />
+              </svg>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -138,7 +140,7 @@
 </article>
 
 <style>
-  [data-theme="dark"] #detail-description {
+  #detail-description {
     color: var(--text-secondary);
   }
 
@@ -174,7 +176,34 @@
     }
   }
 
-  [data-theme="dark"] .changelog-content {
+  .changelog-content {
     background: var(--bg-elevated);
+  }
+
+  .sha512-wrapper {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .sha512-wrapper p {
+    flex: 1;
+  }
+
+  .btn-copy-sha {
+    flex-shrink: 0;
+    padding: 4px 8px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .btn-copy-sha:hover {
+    background: var(--bg-card);
+    color: var(--text-primary);
+    border-color: var(--border-light);
   }
 </style>
