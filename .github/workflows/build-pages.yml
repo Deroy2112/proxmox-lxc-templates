@@ -266,9 +266,10 @@ jobs:
                 "$TEMPLATE_HTML" > "$output"
 
             # Escape & for awk gsub (& has special meaning in replacement strings)
-            QUICK_START_ESC="${QUICK_START//&/\\&}"
-            FAQ_ITEMS_ESC="${FAQ_ITEMS//&/\\&}"
-            CHANGELOG_ESC="${CHANGELOG//&/\\&}"
+            # Need double escape: \\\\ in bash -> \\ in variable -> \& in awk gsub
+            QUICK_START_ESC="${QUICK_START//&/\\\\&}"
+            FAQ_ITEMS_ESC="${FAQ_ITEMS//&/\\\\&}"
+            CHANGELOG_ESC="${CHANGELOG//&/\\\\&}"
 
             # Handle conditional sections (markers are always removed, content kept if condition true)
             awk -v quick_start="$QUICK_START_ESC" \
