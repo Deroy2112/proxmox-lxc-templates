@@ -1,6 +1,7 @@
 name: jellyfin
 description: Jellyfin Media Server on Debian 13 (Trixie)
 category: media
+icon: jellyfin
 version: 10.10.3
 build_version: 1
 base_os: debian-13
@@ -32,3 +33,17 @@ quick_start: |
   Web UI: http://<IP>:8096
   Setup wizard on first start
   Mount media folders as bind mounts
+
+faq:
+  - question: How do I add media libraries?
+    answer: |
+      Mount your media folders as bind mounts in Proxmox (e.g., /media/movies),
+      then add them as libraries in Jellyfin's web UI under Dashboard > Libraries.
+  - question: How do I enable hardware transcoding?
+    answer: |
+      Pass through your GPU in Proxmox container settings,
+      then enable hardware acceleration in Dashboard > Playback > Transcoding.
+  - question: How do I access Jellyfin remotely?
+    answer: |
+      Set up a reverse proxy (e.g., nginx) with SSL,
+      or use Jellyfin's built-in HTTPS on port 8920.

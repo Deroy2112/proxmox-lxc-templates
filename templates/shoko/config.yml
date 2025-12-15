@@ -1,6 +1,7 @@
 name: shoko
 description: Shoko Anime Server on Debian 13 (Trixie)
 category: media
+icon: shoko-anime
 version: 5.1.0
 build_version: 1
 base_os: debian-13
@@ -28,3 +29,17 @@ quick_start: |
   Web UI: http://<IP>:8111
   AniDB account required
   Mount anime folder as bind mount
+
+faq:
+  - question: Do I need an AniDB account?
+    answer: |
+      Yes, Shoko requires an AniDB account to fetch anime metadata.
+      Create one at https://anidb.net/user/register
+  - question: How do I add my anime library?
+    answer: |
+      Mount your anime folder as a bind mount in Proxmox (e.g., /anime),
+      then add it as an import folder in Shoko's web UI.
+  - question: How do I integrate with Jellyfin/Plex?
+    answer: |
+      Install the Shoko plugin for your media server.
+      It will use Shoko's metadata and organization.

@@ -311,12 +311,12 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          mkdir -p docs
+          mkdir -p page/templates
 
           # Load categories
           CATEGORIES_JSON=$(yq -o=json 'del(.categories[].description)' templates/categories.yml)
 
-          echo "[" > docs/templates.json
+          echo "[" > page/templates.json
           first=true
 
           for template_dir in templates/*/; do
@@ -334,6 +334,7 @@ jobs:
             ARCH=$(yq '.architecture // "amd64"' "$CONFIG")
             MAINTAINER=$(yq '.maintainer // ""' "$CONFIG")
             CATEGORY=$(yq '.category // ""' "$CONFIG")
+            ICON=$(yq '.icon // .name' "$CONFIG")
 
             # Resources
             MEM_MIN=$(yq '.resources.memory_min // 256' "$CONFIG")
@@ -366,7 +367,7 @@ jobs:
             if [ "$first" = true ]; then
               first=false
             else
-              echo "," >> docs/templates.json
+              echo "," >> page/templates.json
             fi
 
             # Escape quick_start for JSON
@@ -377,6 +378,7 @@ jobs:
               echo "    \"name\": \"${NAME}\","
               echo "    \"description\": \"${DESCRIPTION}\","
               echo "    \"category\": \"${CATEGORY}\","
+              echo "    \"icon\": \"${ICON}\","
               echo "    \"version\": \"${FULL_VERSION}\","
               echo "    \"os\": \"${BASE_OS}\","
               echo "    \"arch\": \"${ARCH}\","
@@ -400,21 +402,29 @@ jobs:
               echo "    \"environment\": ${ENV_JSON},"
               echo "    \"quick_start\": ${QUICK_START_ESCAPED}"
               echo "  }"
-            } >> docs/templates.json
+            } >> page/templates.json
           done
 
-          echo "" >> docs/templates.json
-          echo "]" >> docs/templates.json
+          echo "" >> page/templates.json
+          echo "]" >> page/templates.json
 
           # Generate categories.json
-          echo "$CATEGORIES_JSON" > docs/categories.json
+          echo "$CATEGORIES_JSON" > page/categories.json
 
           # Add last_updated timestamp
-          echo "{\"last_updated\": \"$(date -Iseconds)\"}" > docs/meta.json
+          echo "{\"last_updated\": \"$(date -Iseconds)\"}" > page/meta.json
+
+      - name: Generate template pages
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: |
+          chmod +x scripts/generate-pages.sh
+          ./scripts/generate-pages.sh
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./docs
+          publish_dir: ./page
           keep_files: true

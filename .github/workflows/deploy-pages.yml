@@ -3,7 +3,7 @@ name: Deploy GitHub Pages
 on:
   push:
     paths:
-      - 'docs/**'
+      - 'page/**'
     branches:
       - main
   workflow_dispatch:
@@ -20,5 +20,5 @@ jobs:
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./docs
+          publish_dir: ./page
           keep_files: true

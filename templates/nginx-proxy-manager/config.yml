@@ -1,6 +1,7 @@
 name: nginx-proxy-manager
 description: Nginx Proxy Manager - Web-based reverse proxy management on Debian 13 (Trixie)
 category: network
+icon: nginx-proxy-manager
 version: 2.13.5
 build_version: 1
 base_os: debian-13
@@ -44,3 +45,17 @@ quick_start: |
   Web UI: http://<IP>:81
   Login: admin@example.com / changeme
   Change password immediately!
+
+faq:
+  - question: How do I add a proxy host?
+    answer: |
+      Go to Hosts > Proxy Hosts > Add Proxy Host.
+      Enter domain name, forward hostname/IP, and port.
+  - question: How do I get SSL certificates?
+    answer: |
+      When adding a proxy host, go to the SSL tab,
+      select "Request a new SSL Certificate" with Let's Encrypt.
+  - question: How do I expose multiple services on one IP?
+    answer: |
+      Create separate proxy hosts for each subdomain (e.g., app1.example.com, app2.example.com).
+      All will share ports 80/443 on this container.
