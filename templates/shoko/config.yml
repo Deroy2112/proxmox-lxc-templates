@@ -1,5 +1,6 @@
 name: shoko
 description: Shoko Anime Server on Debian 13 (Trixie)
+category: media
 version: 5.1.0
 build_version: 1
 base_os: debian-13
@@ -12,3 +13,18 @@ resources:
   disk_min: 5G
   disk_recommended: 10G
   cores: 2
+
+ports:
+  - port: 8111
+    description: Web UI
+
+paths:
+  - path: /root/.shoko
+    description: Konfiguration & Datenbank
+  - path: /anime
+    description: Anime Bibliothek (mount point)
+
+quick_start: |
+  Web UI: http://<IP>:8111
+  AniDB Account erforderlich
+  Anime-Ordner als Mount Point einbinden

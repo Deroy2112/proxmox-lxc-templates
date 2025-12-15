@@ -303,11 +303,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Install yq
+        uses: mikefarah/yq@v4
+
       - name: Generate templates.json
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           mkdir -p docs
+
+          # Load categories
+          CATEGORIES_JSON=$(yq -o=json 'del(.categories[].description)' templates/categories.yml)
 
           echo "[" > docs/templates.json
           first=true
@@ -318,20 +324,29 @@ jobs:
 
             [ -f "$CONFIG" ] || continue
 
-            NAME=$(grep '^name:' "$CONFIG" | cut -d: -f2 | xargs)
-            DESCRIPTION=$(grep '^description:' "$CONFIG" | cut -d: -f2- | xargs)
-            VERSION=$(grep '^version:' "$CONFIG" | cut -d: -f2 | xargs)
-            BUILD_VERSION=$(grep '^build_version:' "$CONFIG" | cut -d: -f2 | xargs)
-            BASE_OS=$(grep '^base_os:' "$CONFIG" | cut -d: -f2 | xargs)
-            ARCH=$(grep '^architecture:' "$CONFIG" | cut -d: -f2 | xargs || echo "amd64")
-            MAINTAINER=$(grep '^maintainer:' "$CONFIG" | cut -d: -f2- | xargs || echo "")
+            # Basic fields with yq
+            NAME=$(yq '.name' "$CONFIG")
+            DESCRIPTION=$(yq '.description' "$CONFIG")
+            VERSION=$(yq '.version' "$CONFIG")
+            BUILD_VERSION=$(yq '.build_version' "$CONFIG")
+            BASE_OS=$(yq '.base_os' "$CONFIG")
+            ARCH=$(yq '.architecture // "amd64"' "$CONFIG")
+            MAINTAINER=$(yq '.maintainer // ""' "$CONFIG")
+            CATEGORY=$(yq '.category // ""' "$CONFIG")
 
             # Resources
-            MEM_MIN=$(grep 'memory_min:' "$CONFIG" | cut -d: -f2 | xargs || echo "256")
-            MEM_REC=$(grep 'memory_recommended:' "$CONFIG" | cut -d: -f2 | xargs || echo "512")
-            DISK_MIN=$(grep 'disk_min:' "$CONFIG" | cut -d: -f2 | xargs || echo "2G")
-            DISK_REC=$(grep 'disk_recommended:' "$CONFIG" | cut -d: -f2 | xargs || echo "5G")
-            CORES=$(grep 'cores:' "$CONFIG" | cut -d: -f2 | xargs || echo "1")
+            MEM_MIN=$(yq '.resources.memory_min // 256' "$CONFIG")
+            MEM_REC=$(yq '.resources.memory_recommended // 512' "$CONFIG")
+            DISK_MIN=$(yq '.resources.disk_min // "2G"' "$CONFIG")
+            DISK_REC=$(yq '.resources.disk_recommended // "5G"' "$CONFIG")
+            CORES=$(yq '.resources.cores // 1' "$CONFIG")
+
+            # New fields as JSON
+            PORTS_JSON=$(yq -o=json '.ports // []' "$CONFIG")
+            CREDENTIALS_JSON=$(yq -o=json '.credentials // null' "$CONFIG")
+            PATHS_JSON=$(yq -o=json '.paths // []' "$CONFIG")
+            ENV_JSON=$(yq -o=json '.environment // []' "$CONFIG")
+            QUICK_START=$(yq '.quick_start // ""' "$CONFIG")
 
             FULL_VERSION="${VERSION}-${BUILD_VERSION}"
             TAG="v${FULL_VERSION}-${NAME}"
@@ -353,10 +368,14 @@ jobs:
               echo "," >> docs/templates.json
             fi
 
+            # Escape quick_start for JSON
+            QUICK_START_ESCAPED=$(echo "$QUICK_START" | jq -Rs '.')
+
             {
               echo "  {"
               echo "    \"name\": \"${NAME}\","
               echo "    \"description\": \"${DESCRIPTION}\","
+              echo "    \"category\": \"${CATEGORY}\","
               echo "    \"version\": \"${FULL_VERSION}\","
               echo "    \"os\": \"${BASE_OS}\","
               echo "    \"arch\": \"${ARCH}\","
@@ -373,13 +392,21 @@ jobs:
               echo "      \"disk_min\": \"${DISK_MIN}\","
               echo "      \"disk_recommended\": \"${DISK_REC}\","
               echo "      \"cores\": ${CORES}"
-              echo "    }"
+              echo "    },"
+              echo "    \"ports\": ${PORTS_JSON},"
+              echo "    \"credentials\": ${CREDENTIALS_JSON},"
+              echo "    \"paths\": ${PATHS_JSON},"
+              echo "    \"environment\": ${ENV_JSON},"
+              echo "    \"quick_start\": ${QUICK_START_ESCAPED}"
               echo "  }"
             } >> docs/templates.json
           done
 
           echo "" >> docs/templates.json
           echo "]" >> docs/templates.json
+
+          # Generate categories.json
+          echo "$CATEGORIES_JSON" > docs/categories.json
 
           # Add last_updated timestamp
           echo "{\"last_updated\": \"$(date -Iseconds)\"}" > docs/meta.json

@@ -1,0 +1,20 @@
+categories:
+  - id: media
+    name: Media & Indexer
+    icon: "\U0001F3AC"
+    description: Media Server und Verwaltung
+
+  - id: network
+    name: Network & Proxy
+    icon: "\U0001F310"
+    description: Reverse Proxies, Webserver, DNS
+
+  - id: monitoring
+    name: Monitoring & Tools
+    icon: "\U0001F4CA"
+    description: System-Überwachung und Utilities
+
+  - id: development
+    name: Development
+    icon: "\U0001F4BB"
+    description: Entwicklungs-Tools und CI/CD

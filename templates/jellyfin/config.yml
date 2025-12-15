@@ -1,5 +1,6 @@
 name: jellyfin
 description: Jellyfin Media Server on Debian 13 (Trixie)
+category: media
 version: 10.10.3
 build_version: 1
 base_os: debian-13
@@ -12,3 +13,22 @@ resources:
   disk_min: 8G
   disk_recommended: 20G
   cores: 2
+
+ports:
+  - port: 8096
+    description: Web UI
+  - port: 8920
+    description: HTTPS (optional)
+
+paths:
+  - path: /var/lib/jellyfin
+    description: Daten & Konfiguration
+  - path: /var/log/jellyfin
+    description: Logs
+  - path: /media
+    description: Media Bibliotheken (mount point)
+
+quick_start: |
+  Web UI: http://<IP>:8096
+  Setup-Wizard beim ersten Start
+  Media-Ordner als Mount Points einbinden

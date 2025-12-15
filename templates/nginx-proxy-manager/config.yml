@@ -1,5 +1,6 @@
 name: nginx-proxy-manager
 description: Nginx Proxy Manager - Web-based reverse proxy management on Debian 13 (Trixie)
+category: network
 version: 2.13.5
 build_version: 1
 base_os: debian-13
@@ -12,3 +13,34 @@ resources:
   disk_min: 4G
   disk_recommended: 8G
   cores: 2
+
+ports:
+  - port: 81
+    description: Admin UI
+  - port: 80
+    description: HTTP
+  - port: 443
+    description: HTTPS
+
+credentials:
+  username: admin@example.com
+  password: changeme
+  note: Beim ersten Login ändern!
+
+paths:
+  - path: /data
+    description: Konfiguration & Datenbank
+  - path: /data/letsencrypt
+    description: SSL Zertifikate
+  - path: /var/log/nginx
+    description: Logs
+
+environment:
+  - name: NPM_PORT
+    default: "81"
+    description: Admin UI Port
+
+quick_start: |
+  Web UI: http://<IP>:81
+  Login: admin@example.com / changeme
+  Passwort sofort ändern!

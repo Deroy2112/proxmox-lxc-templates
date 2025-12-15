@@ -29,6 +29,7 @@
             --bg-sidebar: #f8fafc;
             --bg-input: #ffffff;
             --bg-code: #1e293b;
+            --bg-modal: rgba(0,0,0,0.6);
             --text-primary: #0f172a;
             --text-secondary: #475569;
             --text-muted: #94a3b8;
@@ -36,14 +37,22 @@
             --accent: #6366f1;
             --accent-hover: #4f46e5;
             --success: #10b981;
+            --warning: #f59e0b;
             --badge-green-bg: #ecfdf5;
             --badge-green-text: #047857;
             --badge-blue-bg: #eff6ff;
             --badge-blue-text: #1d4ed8;
             --badge-purple-bg: #faf5ff;
             --badge-purple-text: #7c3aed;
+            --badge-orange-bg: #fff7ed;
+            --badge-orange-text: #c2410c;
             --shadow: 0 1px 3px rgba(0,0,0,0.1);
             --shadow-lg: 0 10px 40px rgba(0,0,0,0.1);
+            --card-max-width: 320px;
+            --category-media: #ef4444;
+            --category-network: #3b82f6;
+            --category-monitoring: #22c55e;
+            --category-development: #a855f7;
         }
 
         [data-theme="dark"] {
@@ -54,6 +63,7 @@
             --bg-sidebar: #1e293b;
             --bg-input: #334155;
             --bg-code: #0f172a;
+            --bg-modal: rgba(0,0,0,0.8);
             --text-primary: #f1f5f9;
             --text-secondary: #cbd5e1;
             --text-muted: #64748b;
@@ -64,6 +74,8 @@
             --badge-blue-text: #93c5fd;
             --badge-purple-bg: #4c1d95;
             --badge-purple-text: #c4b5fd;
+            --badge-orange-bg: #431407;
+            --badge-orange-text: #fdba74;
             --shadow: 0 1px 3px rgba(0,0,0,0.3);
             --shadow-lg: 0 10px 40px rgba(0,0,0,0.4);
         }
@@ -99,7 +111,7 @@
             top: 0;
             left: 0;
             height: 100vh;
-            height: 100dvh; /* Dynamic viewport height for mobile */
+            height: 100dvh;
             z-index: 100;
             transition: transform 0.3s ease;
             padding-bottom: env(safe-area-inset-bottom, 0);
@@ -132,7 +144,7 @@
             padding: 10px 14px;
             border: 1px solid var(--border-color);
             border-radius: 8px;
-            font-size: 16px; /* Prevents iOS zoom on focus */
+            font-size: 16px;
             background: var(--bg-input);
             color: var(--text-primary);
             transition: border-color 0.2s;
@@ -149,7 +161,7 @@
 
         .sidebar-nav {
             flex: 1;
-            min-height: 0; /* Allows flex shrinking for scroll */
+            min-height: 0;
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
             padding: 12px 0;
@@ -179,6 +191,7 @@
             transition: background 0.15s;
             color: var(--text-secondary);
             font-size: 0.9rem;
+            gap: 8px;
         }
 
         .nav-item:hover {
@@ -188,6 +201,16 @@
         .nav-item.active {
             background: var(--accent);
             color: white;
+        }
+
+        .nav-item-icon {
+            font-size: 1.1rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        .nav-item-label {
+            flex: 1;
         }
 
         .nav-item-count {
@@ -229,11 +252,6 @@
             border-color: var(--accent);
         }
 
-        .sidebar-links {
-            display: flex;
-            gap: 12px;
-        }
-
         .sidebar-links a {
             color: var(--text-muted);
             transition: color 0.2s;
@@ -248,6 +266,8 @@
             flex: 1;
             margin-left: 280px;
             min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
         .main-header {
@@ -283,7 +303,477 @@
 
         .content {
             padding: 24px 32px;
+            flex: 1;
         }
+
+        /* Template Grid - Compact Cards */
+        .template-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(var(--card-max-width), 1fr));
+            gap: 20px;
+        }
+
+        .template-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: box-shadow 0.2s, transform 0.2s;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .template-card:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-2px);
+        }
+
+        .card-header {
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .card-title-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .card-icon {
+            font-size: 1.25rem;
+        }
+
+        .card-name {
+            font-size: 1rem;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .card-version {
+            font-size: 0.75rem;
+            padding: 2px 8px;
+            border-radius: 4px;
+            background: var(--badge-green-bg);
+            color: var(--badge-green-text);
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .card-description {
+            padding: 0 16px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin: 12px 0;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .card-info {
+            padding: 12px 16px;
+            background: var(--bg-tertiary);
+            font-size: 0.8rem;
+        }
+
+        .card-info-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 4px;
+            color: var(--text-secondary);
+        }
+
+        .card-info-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .card-info-icon {
+            width: 16px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .card-info-text {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .card-resources {
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 16px;
+            border-top: 1px solid var(--border-color);
+            font-size: 0.75rem;
+            text-align: center;
+        }
+
+        .card-resource {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .card-resource-label {
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-size: 0.65rem;
+            letter-spacing: 0.05em;
+        }
+
+        .card-resource-value {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 8px;
+            padding: 12px 16px;
+            border-top: 1px solid var(--border-color);
+            margin-top: auto;
+        }
+
+        .card-btn {
+            flex: 1;
+            padding: 10px 12px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            border: none;
+        }
+
+        .card-btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+
+        .card-btn-primary:hover {
+            background: var(--accent-hover);
+        }
+
+        .card-btn-primary.copied {
+            background: var(--success);
+        }
+
+        .card-btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+
+        .card-btn-secondary:hover {
+            background: var(--bg-secondary);
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--bg-modal);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-overlay.open {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--bg-card);
+            border-radius: 16px;
+            max-width: 700px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            background: var(--bg-card);
+            z-index: 10;
+        }
+
+        .modal-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            padding: 8px;
+            border: none;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            cursor: pointer;
+            color: var(--text-secondary);
+            font-size: 1.25rem;
+            line-height: 1;
+            transition: all 0.2s;
+        }
+
+        .modal-close:hover {
+            background: var(--accent);
+            color: white;
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .modal-section {
+            margin-bottom: 24px;
+        }
+
+        .modal-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .modal-section-title {
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+        }
+
+        .modal-badges {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+
+        .modal-quick-start {
+            background: var(--bg-tertiary);
+            padding: 16px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            white-space: pre-wrap;
+            font-family: "SF Mono", Monaco, monospace;
+        }
+
+        .modal-credentials {
+            background: var(--badge-orange-bg);
+            border: 1px solid var(--warning);
+            border-radius: 8px;
+            padding: 16px;
+        }
+
+        .modal-credentials-warning {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--warning);
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .modal-credentials-grid {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 8px 16px;
+            font-size: 0.85rem;
+        }
+
+        .modal-credentials-label {
+            color: var(--text-muted);
+        }
+
+        .modal-credentials-value {
+            font-family: "SF Mono", Monaco, monospace;
+        }
+
+        .modal-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .modal-list-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            font-size: 0.85rem;
+        }
+
+        .modal-list-port {
+            font-family: "SF Mono", Monaco, monospace;
+            font-weight: 600;
+            color: var(--accent);
+            min-width: 50px;
+        }
+
+        .modal-list-path {
+            font-family: "SF Mono", Monaco, monospace;
+            color: var(--text-secondary);
+            flex: 1;
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .copy-group {
+            margin-bottom: 16px;
+        }
+
+        .copy-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .copy-label {
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+
+        .copy-row {
+            display: flex;
+            gap: 8px;
+        }
+
+        .copy-input {
+            flex: 1;
+            padding: 10px 14px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-family: "SF Mono", Monaco, monospace;
+            font-size: 0.8rem;
+            background: var(--bg-input);
+            color: var(--text-primary);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .copy-input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .copy-btn {
+            padding: 10px 16px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.8rem;
+            transition: background 0.2s;
+            white-space: nowrap;
+        }
+
+        .copy-btn:hover {
+            background: var(--accent-hover);
+        }
+
+        .copy-btn.copied {
+            background: var(--success);
+        }
+
+        .cli-box {
+            background: var(--bg-code);
+            border-radius: 8px;
+            padding: 16px;
+        }
+
+        .cli-box .copy-label {
+            color: #94a3b8;
+        }
+
+        .cli-box .copy-input {
+            background: #0f172a;
+            border-color: #334155;
+            color: #4ade80;
+        }
+
+        .cli-note {
+            margin-top: 10px;
+            font-size: 0.75rem;
+            color: #64748b;
+        }
+
+        .cli-note code {
+            background: #334155;
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: #4ade80;
+        }
+
+        /* Badge */
+        .badge {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .badge-version {
+            background: var(--badge-green-bg);
+            color: var(--badge-green-text);
+        }
+
+        .badge-os {
+            background: var(--badge-blue-bg);
+            color: var(--badge-blue-text);
+        }
+
+        .badge-arch {
+            background: var(--badge-purple-bg);
+            color: var(--badge-purple-text);
+        }
+
+        .badge-category {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: white;
+        }
+
+        .badge-category-media { background: var(--category-media); }
+        .badge-category-network { background: var(--category-network); }
+        .badge-category-monitoring { background: var(--category-monitoring); }
+        .badge-category-development { background: var(--category-development); }
 
         /* Landing Page */
         .landing {
@@ -341,239 +831,6 @@
             margin-bottom: 0;
         }
 
-        /* Template Grid */
-        .template-grid {
-            display: grid;
-            gap: 20px;
-        }
-
-        .template-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 24px;
-            box-shadow: var(--shadow);
-            transition: box-shadow 0.2s;
-        }
-
-        .template-card:hover {
-            box-shadow: var(--shadow-lg);
-        }
-
-        .template-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 12px;
-            flex-wrap: wrap;
-            gap: 12px;
-        }
-
-        .template-name {
-            font-size: 1.25rem;
-            font-weight: 600;
-        }
-
-        .template-badges {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-
-        .badge {
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-size: 0.75rem;
-            font-weight: 500;
-        }
-
-        .badge-version {
-            background: var(--badge-green-bg);
-            color: var(--badge-green-text);
-        }
-
-        .badge-os {
-            background: var(--badge-blue-bg);
-            color: var(--badge-blue-text);
-        }
-
-        .badge-arch {
-            background: var(--badge-purple-bg);
-            color: var(--badge-purple-text);
-        }
-
-        .template-description {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            margin-bottom: 20px;
-        }
-
-        .copy-group {
-            margin-bottom: 16px;
-        }
-
-        .copy-group:last-child {
-            margin-bottom: 0;
-        }
-
-        .copy-label {
-            font-size: 0.8rem;
-            font-weight: 500;
-            color: var(--text-muted);
-            margin-bottom: 6px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .copy-row {
-            display: flex;
-            gap: 8px;
-        }
-
-        .copy-input {
-            flex: 1;
-            padding: 10px 14px;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            font-family: "SF Mono", Monaco, monospace;
-            font-size: 0.8rem;
-            background: var(--bg-input);
-            color: var(--text-primary);
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        .copy-input:focus {
-            outline: none;
-            border-color: var(--accent);
-        }
-
-        .copy-btn {
-            padding: 10px 16px;
-            background: var(--accent);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 500;
-            font-size: 0.8rem;
-            transition: background 0.2s;
-            white-space: nowrap;
-        }
-
-        .copy-btn:hover {
-            background: var(--accent-hover);
-        }
-
-        .copy-btn.copied {
-            background: var(--success);
-        }
-
-        .cli-box {
-            background: var(--bg-code);
-            border-radius: 8px;
-            padding: 16px;
-            margin-top: 16px;
-        }
-
-        .cli-box .copy-label {
-            color: #94a3b8;
-        }
-
-        .cli-box .copy-input {
-            background: #0f172a;
-            border-color: #334155;
-            color: #4ade80;
-        }
-
-        .cli-note {
-            margin-top: 10px;
-            font-size: 0.75rem;
-            color: #64748b;
-        }
-
-        .cli-note code {
-            background: #334155;
-            padding: 2px 6px;
-            border-radius: 4px;
-            color: #4ade80;
-        }
-
-        /* Resource Requirements */
-        .resources {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-            margin-bottom: 20px;
-            padding: 16px;
-            background: var(--bg-tertiary);
-            border-radius: 8px;
-        }
-
-        .resource-item {
-            text-align: center;
-        }
-
-        .resource-label {
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: var(--text-muted);
-            margin-bottom: 4px;
-        }
-
-        .resource-value {
-            font-size: 1rem;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .resource-sub {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-        }
-
-        /* Proxmox Badge */
-        .proxmox-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 6px 12px;
-            background: linear-gradient(135deg, #e65100, #ff6d00);
-            color: white;
-            border-radius: 6px;
-            font-size: 0.75rem;
-            font-weight: 600;
-        }
-
-        /* Template Links */
-        .template-links {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 16px;
-            flex-wrap: wrap;
-        }
-
-        .template-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 6px 12px;
-            background: var(--bg-tertiary);
-            color: var(--text-secondary);
-            text-decoration: none;
-            border-radius: 6px;
-            font-size: 0.8rem;
-            transition: all 0.2s;
-        }
-
-        .template-link:hover {
-            background: var(--accent);
-            color: white;
-        }
-
         /* Footer */
         .footer {
             border-top: 1px solid var(--border-color);
@@ -611,18 +868,6 @@
         .footer-meta {
             font-size: 0.8rem;
             color: var(--text-muted);
-        }
-
-        .last-updated {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            padding: 8px 16px;
-            background: var(--bg-tertiary);
-            border-radius: 6px;
-            margin-bottom: 20px;
         }
 
         /* Empty State */
@@ -700,6 +945,10 @@
                 padding: 16px 20px;
             }
 
+            .template-grid {
+                grid-template-columns: 1fr;
+            }
+
             .landing {
                 padding: 40px 20px;
             }
@@ -710,6 +959,11 @@
 
             .copy-row {
                 flex-direction: column;
+            }
+
+            .modal {
+                max-height: 100vh;
+                border-radius: 0;
             }
         }
     </style>
@@ -732,17 +986,19 @@
                 <div class="nav-section">
                     <div class="nav-section-title">Navigation</div>
                     <div class="nav-item active" onclick="showLanding()">
-                        <span>Home</span>
+                        <span class="nav-item-icon">&#127968;</span>
+                        <span class="nav-item-label">Home</span>
                     </div>
                     <div class="nav-item" onclick="showAllTemplates()">
-                        <span>All Templates</span>
+                        <span class="nav-item-icon">&#128230;</span>
+                        <span class="nav-item-label">All Templates</span>
                         <span class="nav-item-count" id="total-count">0</span>
                     </div>
                 </div>
 
                 <div class="nav-section">
-                    <div class="nav-section-title">Templates</div>
-                    <div id="template-list"></div>
+                    <div class="nav-section-title">Categories</div>
+                    <div id="category-list"></div>
                 </div>
             </nav>
 
@@ -795,10 +1051,27 @@
         </main>
     </div>
 
+    <!-- Details Modal -->
+    <div class="modal-overlay" id="modal" onclick="closeModalOnOverlay(event)">
+        <div class="modal" id="modal-content">
+            <!-- Content injected by JS -->
+        </div>
+    </div>
+
     <script>
         let allTemplates = [];
+        let allCategories = [];
         let currentFilter = null;
+        let currentCategory = null;
         let searchQuery = '';
+
+        // Category icons and colors
+        const categoryMeta = {
+            media: { icon: '\uD83C\uDFAC', color: 'media' },
+            network: { icon: '\uD83C\uDF10', color: 'network' },
+            monitoring: { icon: '\uD83D\uDCCA', color: 'monitoring' },
+            development: { icon: '\uD83D\uDCBB', color: 'development' }
+        };
 
         // Theme Management
         function getPreferredTheme() {
@@ -810,7 +1083,7 @@
         function setTheme(theme) {
             document.documentElement.setAttribute('data-theme', theme);
             localStorage.setItem('theme', theme);
-            document.getElementById('theme-icon').textContent = theme === 'dark' ? '☀' : '☾';
+            document.getElementById('theme-icon').textContent = theme === 'dark' ? '\u2600' : '\u263E';
             document.getElementById('theme-label').textContent = theme === 'dark' ? 'Light' : 'Dark';
         }
 
@@ -825,6 +1098,11 @@
             document.querySelector('.sidebar-overlay').classList.toggle('open');
         }
 
+        function closeMobileSidebar() {
+            document.querySelector('.sidebar').classList.remove('open');
+            document.querySelector('.sidebar-overlay').classList.remove('open');
+        }
+
         // Navigation
         function setActiveNav(element) {
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
@@ -833,6 +1111,7 @@
 
         function showLanding() {
             currentFilter = null;
+            currentCategory = null;
             searchQuery = '';
             document.querySelector('.search-input').value = '';
             setActiveNav(document.querySelector('.nav-item'));
@@ -843,20 +1122,21 @@
 
         function showAllTemplates() {
             currentFilter = null;
-            setActiveNav(document.querySelectorAll('.nav-item')[1]);
+            currentCategory = null;
+            setActiveNav(document.querySelectorAll('.nav-section')[0].querySelectorAll('.nav-item')[1]);
             updateHeader('All Templates', `${allTemplates.length} available`);
             renderTemplates(filterBySearch(allTemplates));
             closeMobileSidebar();
         }
 
-        function showTemplate(name, element) {
-            currentFilter = name;
+        function showCategory(categoryId, element) {
+            currentFilter = null;
+            currentCategory = categoryId;
             setActiveNav(element);
-            const template = allTemplates.find(t => t.name === name);
-            if (template) {
-                updateHeader(template.name, template.os);
-                renderTemplates([template]);
-            }
+            const category = allCategories.find(c => c.id === categoryId);
+            const filtered = allTemplates.filter(t => t.category === categoryId);
+            updateHeader(category ? category.name : categoryId, `${filtered.length} templates`);
+            renderTemplates(filterBySearch(filtered));
             closeMobileSidebar();
         }
 
@@ -868,6 +1148,7 @@
             }
 
             currentFilter = null;
+            currentCategory = null;
             setActiveNav(null);
             const filtered = filterBySearch(allTemplates);
             updateHeader('Search Results', `${filtered.length} found`);
@@ -879,13 +1160,9 @@
             return templates.filter(t =>
                 t.name.toLowerCase().includes(searchQuery) ||
                 t.description.toLowerCase().includes(searchQuery) ||
-                t.os.toLowerCase().includes(searchQuery)
+                t.os.toLowerCase().includes(searchQuery) ||
+                (t.category && t.category.toLowerCase().includes(searchQuery))
             );
-        }
-
-        function closeMobileSidebar() {
-            document.querySelector('.sidebar').classList.remove('open');
-            document.querySelector('.sidebar-overlay').classList.remove('open');
         }
 
         function updateHeader(title, subtitle) {
@@ -944,66 +1221,196 @@
 
             content.innerHTML = `
                 <div class="template-grid">
-                    ${templates.map(t => createTemplateCard(t)).join('')}
+                    ${templates.map(t => createCompactCard(t)).join('')}
                 </div>
             `;
         }
 
-        function createTemplateCard(t) {
+        function getCategoryIcon(categoryId) {
+            return categoryMeta[categoryId]?.icon || '\uD83D\uDCE6';
+        }
+
+        function createCompactCard(t) {
             const cliCmd = `pvesh create /nodes/$(hostname)/storage/local/download-url --content vztmpl --filename ${t.filename} --url ${t.url} --checksum ${t.sha512} --checksum-algorithm sha512`;
             const res = t.resources || {};
-            const releaseDate = t.release_date ? new Date(t.release_date).toLocaleDateString() : '';
+            const ports = t.ports || [];
+            const paths = t.paths || [];
+            const categoryIcon = getCategoryIcon(t.category);
+
+            const portsDisplay = ports.slice(0, 2).map(p => `:${p.port} ${p.description}`).join(' | ');
+            const pathsDisplay = paths.slice(0, 1).map(p => p.path).join(', ');
 
             return `
                 <div class="template-card">
-                    <div class="template-header">
-                        <div class="template-name">${escapeHtml(t.name)}</div>
-                        <div class="template-badges">
-                            <span class="proxmox-badge">Proxmox VE</span>
-                            <span class="badge badge-version">v${escapeHtml(t.version)}</span>
-                            <span class="badge badge-os">${escapeHtml(t.os)}</span>
-                            <span class="badge badge-arch">${escapeHtml(t.arch)}</span>
+                    <div class="card-header">
+                        <div class="card-title-row">
+                            <span class="card-icon">${categoryIcon}</span>
+                            <span class="card-name">${escapeHtml(t.name)}</span>
                         </div>
-                    </div>
-                    <p class="template-description">${escapeHtml(t.description)}</p>
-
-                    <div class="template-links">
-                        ${t.changelog_url ? `<a href="${escapeHtml(t.changelog_url)}" class="template-link" target="_blank">&#128220; Changelog</a>` : ''}
-                        ${t.release_url ? `<a href="${escapeHtml(t.release_url)}" class="template-link" target="_blank">&#128230; Release</a>` : ''}
-                        ${releaseDate ? `<span class="template-link" style="cursor: default;">&#128197; ${releaseDate}</span>` : ''}
+                        <span class="card-version">v${escapeHtml(t.version)}</span>
                     </div>
 
-                    <div class="resources">
-                        <div class="resource-item">
-                            <div class="resource-label">Memory</div>
-                            <div class="resource-value">${res.memory_recommended || 512} MB</div>
-                            <div class="resource-sub">min ${res.memory_min || 256} MB</div>
+                    <p class="card-description">${escapeHtml(t.description)}</p>
+
+                    ${(ports.length > 0 || paths.length > 0) ? `
+                    <div class="card-info">
+                        ${ports.length > 0 ? `<div class="card-info-row"><span class="card-info-icon">&#128268;</span><span class="card-info-text">${escapeHtml(portsDisplay)}</span></div>` : ''}
+                        ${paths.length > 0 ? `<div class="card-info-row"><span class="card-info-icon">&#128193;</span><span class="card-info-text">${escapeHtml(pathsDisplay)}</span></div>` : ''}
+                    </div>
+                    ` : ''}
+
+                    <div class="card-resources">
+                        <div class="card-resource">
+                            <span class="card-resource-label">RAM</span>
+                            <span class="card-resource-value">${formatMemory(res.memory_recommended || 512)}</span>
                         </div>
-                        <div class="resource-item">
-                            <div class="resource-label">Disk</div>
-                            <div class="resource-value">${escapeHtml(res.disk_recommended || '5G')}</div>
-                            <div class="resource-sub">min ${escapeHtml(res.disk_min || '2G')}</div>
+                        <div class="card-resource">
+                            <span class="card-resource-label">Disk</span>
+                            <span class="card-resource-value">${escapeHtml(res.disk_recommended || '5G')}</span>
                         </div>
-                        <div class="resource-item">
-                            <div class="resource-label">CPU</div>
-                            <div class="resource-value">${res.cores || 1} Core${(res.cores || 1) > 1 ? 's' : ''}</div>
-                            <div class="resource-sub">recommended</div>
+                        <div class="card-resource">
+                            <span class="card-resource-label">CPU</span>
+                            <span class="card-resource-value">${res.cores || 1}C</span>
                         </div>
                     </div>
 
-                    <div class="copy-group">
-                        <div class="copy-label">Download URL</div>
-                        <div class="copy-row">
-                            <input type="text" class="copy-input" value="${escapeHtml(t.url)}" readonly>
-                            <button class="copy-btn" onclick="copyText(this, '${escapeHtml(t.url)}')">Copy</button>
+                    <div class="card-actions">
+                        <button class="card-btn card-btn-primary" onclick="copyInstallCommand('${escapeHtml(t.name)}', this)">
+                            &#128203; Copy Install
+                        </button>
+                        <button class="card-btn card-btn-secondary" onclick="showDetails('${escapeHtml(t.name)}')">
+                            Details
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function formatMemory(mb) {
+            if (mb >= 1024) {
+                return (mb / 1024).toFixed(mb % 1024 === 0 ? 0 : 1) + 'G';
+            }
+            return mb + 'M';
+        }
+
+        // Modal
+        function showDetails(name) {
+            const t = allTemplates.find(temp => temp.name === name);
+            if (!t) return;
+
+            const cliCmd = `pvesh create /nodes/$(hostname)/storage/local/download-url --content vztmpl --filename ${t.filename} --url ${t.url} --checksum ${t.sha512} --checksum-algorithm sha512`;
+            const res = t.resources || {};
+            const ports = t.ports || [];
+            const paths = t.paths || [];
+            const credentials = t.credentials;
+            const quickStart = t.quick_start || '';
+            const categoryIcon = getCategoryIcon(t.category);
+
+            const modal = document.getElementById('modal-content');
+            modal.innerHTML = `
+                <div class="modal-header">
+                    <div class="modal-title">
+                        <span>${categoryIcon}</span>
+                        <span>${escapeHtml(t.name)}</span>
+                    </div>
+                    <button class="modal-close" onclick="closeModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="modal-badges">
+                        <span class="badge badge-version">v${escapeHtml(t.version)}</span>
+                        <span class="badge badge-os">${escapeHtml(t.os)}</span>
+                        <span class="badge badge-arch">${escapeHtml(t.arch)}</span>
+                        ${t.category ? `<span class="badge badge-category badge-category-${t.category}">${escapeHtml(t.category)}</span>` : ''}
+                    </div>
+
+                    <p style="color: var(--text-secondary); margin-bottom: 24px;">${escapeHtml(t.description)}</p>
+
+                    ${quickStart ? `
+                    <div class="modal-section">
+                        <div class="modal-section-title">Quick Start</div>
+                        <div class="modal-quick-start">${escapeHtml(quickStart)}</div>
+                    </div>
+                    ` : ''}
+
+                    ${credentials ? `
+                    <div class="modal-section">
+                        <div class="modal-section-title">Default Credentials</div>
+                        <div class="modal-credentials">
+                            <div class="modal-credentials-warning">
+                                &#9888; Change password immediately!
+                            </div>
+                            <div class="modal-credentials-grid">
+                                <span class="modal-credentials-label">Username:</span>
+                                <span class="modal-credentials-value">${escapeHtml(credentials.username)}</span>
+                                <span class="modal-credentials-label">Password:</span>
+                                <span class="modal-credentials-value">${escapeHtml(credentials.password)}</span>
+                                ${credentials.note ? `<span class="modal-credentials-label">Note:</span><span>${escapeHtml(credentials.note)}</span>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                    ` : ''}
+
+                    ${ports.length > 0 ? `
+                    <div class="modal-section">
+                        <div class="modal-section-title">Ports</div>
+                        <div class="modal-list">
+                            ${ports.map(p => `
+                                <div class="modal-list-item">
+                                    <span class="modal-list-port">:${p.port}</span>
+                                    <span>${escapeHtml(p.description)}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                    ` : ''}
+
+                    ${paths.length > 0 ? `
+                    <div class="modal-section">
+                        <div class="modal-section-title">Important Paths</div>
+                        <div class="modal-list">
+                            ${paths.map(p => `
+                                <div class="modal-list-item">
+                                    <span class="modal-list-path">${escapeHtml(p.path)}</span>
+                                    <span style="color: var(--text-muted);">${escapeHtml(p.description)}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                    ` : ''}
+
+                    <div class="modal-section">
+                        <div class="modal-section-title">Resources</div>
+                        <div class="modal-list">
+                            <div class="modal-list-item">
+                                <span>&#128190;</span>
+                                <span>Memory: ${formatMemory(res.memory_recommended || 512)} (min ${formatMemory(res.memory_min || 256)})</span>
+                            </div>
+                            <div class="modal-list-item">
+                                <span>&#128191;</span>
+                                <span>Disk: ${escapeHtml(res.disk_recommended || '5G')} (min ${escapeHtml(res.disk_min || '2G')})</span>
+                            </div>
+                            <div class="modal-list-item">
+                                <span>&#9889;</span>
+                                <span>CPU: ${res.cores || 1} Core${(res.cores || 1) > 1 ? 's' : ''}</span>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="copy-group">
-                        <div class="copy-label">SHA-512 Checksum</div>
-                        <div class="copy-row">
-                            <input type="text" class="copy-input" value="${escapeHtml(t.sha512)}" readonly>
-                            <button class="copy-btn" onclick="copyText(this, '${escapeHtml(t.sha512)}')">Copy</button>
+                    <div class="modal-section">
+                        <div class="modal-section-title">Download</div>
+                        <div class="copy-group">
+                            <div class="copy-label">Download URL</div>
+                            <div class="copy-row">
+                                <input type="text" class="copy-input" value="${escapeHtml(t.url)}" readonly>
+                                <button class="copy-btn" onclick="copyText(this, '${escapeHtml(t.url)}')">Copy</button>
+                            </div>
+                        </div>
+                        <div class="copy-group">
+                            <div class="copy-label">SHA-512 Checksum</div>
+                            <div class="copy-row">
+                                <input type="text" class="copy-input" value="${escapeHtml(t.sha512)}" readonly>
+                                <button class="copy-btn" onclick="copyText(this, '${escapeHtml(t.sha512)}')">Copy</button>
+                            </div>
                         </div>
                     </div>
 
@@ -1017,36 +1424,85 @@
                             <p class="cli-note">Run on Proxmox node as root. Change <code>local</code> to your storage ID if needed.</p>
                         </div>
                     </div>
+
+                    <div class="modal-section" style="margin-top: 24px;">
+                        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                            ${t.changelog_url ? `<a href="${escapeHtml(t.changelog_url)}" target="_blank" class="card-btn card-btn-secondary" style="text-decoration: none;">&#128220; Changelog</a>` : ''}
+                            ${t.release_url ? `<a href="${escapeHtml(t.release_url)}" target="_blank" class="card-btn card-btn-secondary" style="text-decoration: none;">&#128230; Release</a>` : ''}
+                        </div>
+                    </div>
                 </div>
             `;
+
+            document.getElementById('modal').classList.add('open');
+            document.body.style.overflow = 'hidden';
         }
 
-        function escapeHtml(str) {
-            const div = document.createElement('div');
-            div.textContent = str;
-            return div.innerHTML;
+        function closeModal() {
+            document.getElementById('modal').classList.remove('open');
+            document.body.style.overflow = '';
+        }
+
+        function closeModalOnOverlay(event) {
+            if (event.target === document.getElementById('modal')) {
+                closeModal();
+            }
+        }
+
+        // Keyboard handler
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+
+        // Copy functions
+        function copyInstallCommand(name, btn) {
+            const t = allTemplates.find(temp => temp.name === name);
+            if (!t) return;
+
+            const cliCmd = `pvesh create /nodes/$(hostname)/storage/local/download-url --content vztmpl --filename ${t.filename} --url ${t.url} --checksum ${t.sha512} --checksum-algorithm sha512`;
+            copyText(btn, cliCmd);
         }
 
         function copyText(btn, text) {
             navigator.clipboard.writeText(text).then(() => {
-                const orig = btn.textContent;
-                btn.textContent = 'Copied!';
+                const orig = btn.innerHTML;
+                btn.innerHTML = '&#10003; Copied!';
                 btn.classList.add('copied');
                 setTimeout(() => {
-                    btn.textContent = orig;
+                    btn.innerHTML = orig;
                     btn.classList.remove('copied');
                 }, 2000);
             });
         }
 
-        function buildTemplateList() {
-            const container = document.getElementById('template-list');
-            container.innerHTML = allTemplates
-                .sort((a, b) => a.name.localeCompare(b.name))
-                .map(t => `
-                    <div class="nav-item" onclick="showTemplate('${escapeHtml(t.name)}', this)">
-                        <span>${escapeHtml(t.name)}</span>
-                        <span class="nav-item-count">${escapeHtml(t.version)}</span>
+        function escapeHtml(str) {
+            if (str === null || str === undefined) return '';
+            const div = document.createElement('div');
+            div.textContent = String(str);
+            return div.innerHTML;
+        }
+
+        // Build sidebar
+        function buildCategoryList() {
+            const container = document.getElementById('category-list');
+
+            // Count templates per category
+            const categoryCounts = {};
+            allTemplates.forEach(t => {
+                if (t.category) {
+                    categoryCounts[t.category] = (categoryCounts[t.category] || 0) + 1;
+                }
+            });
+
+            container.innerHTML = allCategories
+                .filter(c => categoryCounts[c.id] > 0)
+                .map(c => `
+                    <div class="nav-item" onclick="showCategory('${escapeHtml(c.id)}', this)">
+                        <span class="nav-item-icon">${getCategoryIcon(c.id)}</span>
+                        <span class="nav-item-label">${escapeHtml(c.name)}</span>
+                        <span class="nav-item-count">${categoryCounts[c.id] || 0}</span>
                     </div>
                 `).join('');
         }
@@ -1068,17 +1524,38 @@
             }
         }
 
+        // Load categories
+        async function loadCategories() {
+            try {
+                const response = await fetch('categories.json');
+                if (response.ok) {
+                    const data = await response.json();
+                    allCategories = data.categories || [];
+                }
+            } catch (e) {
+                // Use defaults if categories.json not available
+                allCategories = [
+                    { id: 'media', name: 'Media & Indexer' },
+                    { id: 'network', name: 'Network & Proxy' },
+                    { id: 'monitoring', name: 'Monitoring & Tools' },
+                    { id: 'development', name: 'Development' }
+                ];
+            }
+        }
+
         // Initialize
         async function init() {
             setTheme(getPreferredTheme());
 
             try {
+                await loadCategories();
+
                 const response = await fetch('templates.json');
                 if (!response.ok) throw new Error('Failed to load');
                 allTemplates = await response.json();
 
                 document.getElementById('total-count').textContent = allTemplates.length;
-                buildTemplateList();
+                buildCategoryList();
                 renderLanding();
                 loadMeta();
             } catch (e) {

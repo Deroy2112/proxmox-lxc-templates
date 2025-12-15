@@ -1,5 +1,6 @@
 name: nginx
 description: Nginx webserver on Debian 13 (Trixie)
+category: network
 version: 1.26.0
 build_version: 1
 base_os: debian-13
@@ -12,3 +13,23 @@ resources:
   disk_min: 2G
   disk_recommended: 5G
   cores: 1
+
+ports:
+  - port: 80
+    description: HTTP
+  - port: 443
+    description: HTTPS
+
+paths:
+  - path: /etc/nginx
+    description: Konfiguration
+  - path: /var/www/html
+    description: Web Root
+  - path: /var/log/nginx
+    description: Logs
+
+quick_start: |
+  Web Server: http://<IP>
+  Config: /etc/nginx/nginx.conf
+  Test: nginx -t
+  Reload: systemctl reload nginx
