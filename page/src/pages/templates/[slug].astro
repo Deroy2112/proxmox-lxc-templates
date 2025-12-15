@@ -48,8 +48,8 @@ const basePath = import.meta.env.BASE_URL;
     <MobileMenu />
 
     <!-- Main Content -->
-    <main class="flex-1 ml-0 md:ml-[var(--sidebar-width)] flex flex-col min-h-screen">
-      <div class="flex-1 p-6 pt-16 md:pt-6">
+    <main class="flex-1 ml-0 md:ml-[var(--sidebar-width)] flex flex-col min-h-screen overflow-x-hidden">
+      <div class="flex-1 p-6 pt-16 md:pt-6 overflow-x-hidden">
         <div class="max-w-[var(--content-max)] mx-auto">
           <!-- Back Button -->
           <div class="mb-6">
@@ -74,9 +74,9 @@ const basePath = import.meta.env.BASE_URL;
           />
 
           <!-- Two Column Layout -->
-          <div class="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6">
+          <div class="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_320px] gap-6">
             <!-- Main Column -->
-            <div class="space-y-6">
+            <div class="space-y-6 min-w-0">
               <!-- Installation -->
               <InstallCommand
                 name={data.name}
