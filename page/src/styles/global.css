@@ -11,16 +11,6 @@
   --color-accent-hover: #cc6400;
   --color-accent-light: rgba(229, 112, 0, 0.1);
 
-  /* Category Colors */
-  --color-cat-media: #e74c3c;
-  --color-cat-network: #3b82f6;
-  --color-cat-database: #f59e0b;
-  --color-cat-automation: #ec4899;
-  --color-cat-monitoring: #22c55e;
-  --color-cat-storage: #06b6d4;
-  --color-cat-security: #6366f1;
-  --color-cat-development: #8b5cf6;
-
   /* Status Colors */
   --color-success: #22c55e;
   --color-warning: #f59e0b;
@@ -51,6 +41,16 @@
    Light Theme (Default)
    ============================================ */
 :root {
+  /* Category Colors */
+  --color-cat-media: #e74c3c;
+  --color-cat-network: #3b82f6;
+  --color-cat-database: #f59e0b;
+  --color-cat-automation: #ec4899;
+  --color-cat-monitoring: #22c55e;
+  --color-cat-storage: #06b6d4;
+  --color-cat-security: #6366f1;
+  --color-cat-development: #8b5cf6;
+
   /* Text */
   --text-primary: rgba(0, 0, 0, 0.9);
   --text-secondary: rgba(0, 0, 0, 0.7);
