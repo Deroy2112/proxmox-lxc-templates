@@ -1,21 +1,15 @@
 @import "tailwindcss";
-@plugin "daisyui" {
-  themes: light --default, dark --prefersDark;
-}
+@plugin "daisyui";
 
 /* ============================================
-   Layout Variables (nicht in DaisyUI)
+   Custom Light Theme (Proxmox Orange)
    ============================================ */
-:root {
-  --sidebar-width: 260px;
-  --content-max: 1200px;
-}
+@plugin "daisyui/theme" {
+  name: "light";
+  default: true;
+  prefersdark: false;
+  color-scheme: light;
 
-/* ============================================
-   DaisyUI Theme Customization
-   Proxmox Orange (#E57000) als Primary
-   ============================================ */
-[data-theme="light"] {
   --color-base-100: oklch(100% 0 0);
   --color-base-200: oklch(97.8% 0.002 247.84);
   --color-base-300: oklch(95.5% 0.01 247.84);
@@ -44,9 +38,28 @@
 
   --color-error: oklch(60% 0.2 25);
   --color-error-content: oklch(100% 0 0);
+
+  --radius-selector: 0.5rem;
+  --radius-field: 0.5rem;
+  --radius-box: 1rem;
+
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+
+  --border: 1px;
+  --depth: 1;
+  --noise: 0;
 }
 
-[data-theme="dark"] {
+/* ============================================
+   Custom Dark Theme (Proxmox Orange)
+   ============================================ */
+@plugin "daisyui/theme" {
+  name: "dark";
+  default: false;
+  prefersdark: true;
+  color-scheme: dark;
+
   --color-base-100: oklch(15% 0.015 260);
   --color-base-200: oklch(18% 0.015 260);
   --color-base-300: oklch(22% 0.015 260);
@@ -75,6 +88,25 @@
 
   --color-error: oklch(60% 0.2 25);
   --color-error-content: oklch(100% 0 0);
+
+  --radius-selector: 0.5rem;
+  --radius-field: 0.5rem;
+  --radius-box: 1rem;
+
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+
+  --border: 1px;
+  --depth: 1;
+  --noise: 0;
+}
+
+/* ============================================
+   Layout Variables
+   ============================================ */
+:root {
+  --sidebar-width: 260px;
+  --content-max: 1200px;
 }
 
 /* ============================================
@@ -85,7 +117,7 @@ html {
 }
 
 /* ============================================
-   Animations (DaisyUI hat keine eingebauten)
+   Custom Animation
    ============================================ */
 @keyframes fadeIn {
   from {
