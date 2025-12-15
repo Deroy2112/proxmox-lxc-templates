@@ -1,6 +1,4 @@
 ---
-import Card from "@/components/ui/Card.astro";
-
 interface Path {
   path: string;
   description: string;
@@ -14,27 +12,26 @@ const { paths } = Astro.props;
 ---
 
 {paths && paths.length > 0 && (
-  <Card hover={false} class="p-0 overflow-hidden">
-    <div class="px-4 py-3 border-b border-[var(--border-color)] bg-[var(--bg-tertiary)]/50">
-      <h3 class="font-semibold text-[var(--text-primary)] flex items-center gap-2">
-        <svg class="w-4 h-4 text-[var(--color-accent)]" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/>
-        </svg>
-        Important Paths
-      </h3>
+  <div class="card bg-base-100">
+    <div class="card-body p-0">
+      <div class="px-4 py-3 border-b border-base-300 bg-base-200">
+        <h3 class="card-title text-base">
+          <svg class="w-4 h-4 text-primary" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/>
+          </svg>
+          Important Paths
+        </h3>
+      </div>
+      <div class="p-4 space-y-3">
+        {paths.map((p) => (
+          <div class="flex flex-col gap-1">
+            <kbd class="kbd kbd-sm w-full justify-start text-left truncate" title={p.path}>
+              {p.path}
+            </kbd>
+            <span class="text-sm opacity-60">{p.description}</span>
+          </div>
+        ))}
+      </div>
     </div>
-    <div class="p-4 space-y-3">
-      {paths.map((p) => (
-        <div class="flex flex-col gap-1">
-          <code
-            class="block px-2 py-1 rounded bg-[var(--bg-tertiary)] text-[var(--text-primary)] font-mono text-xs truncate"
-            title={p.path}
-          >
-            {p.path}
-          </code>
-          <span class="text-sm text-[var(--text-muted)]">{p.description}</span>
-        </div>
-      ))}
-    </div>
-  </Card>
+  </div>
 )}

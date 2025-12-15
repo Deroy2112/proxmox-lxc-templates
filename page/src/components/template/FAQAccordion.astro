@@ -1,6 +1,4 @@
 ---
-import Card from "@/components/ui/Card.astro";
-
 interface FAQItem {
   question: string;
   answer: string;
@@ -14,81 +12,29 @@ const { items } = Astro.props;
 ---
 
 {items && items.length > 0 && (
-  <Card hover={false} class="p-0 overflow-hidden">
-    <div class="px-4 py-3 border-b border-[var(--border-color)] bg-[var(--bg-tertiary)]/50">
-      <h2 class="font-semibold text-[var(--text-primary)] flex items-center gap-2">
-        <svg class="w-4 h-4 text-[var(--color-accent)]" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/>
-        </svg>
-        Frequently Asked Questions
-      </h2>
-    </div>
-    <div class="divide-y divide-[var(--border-color)]">
-      {items.map((item, index) => (
-        <div class="faq-item">
-          <button
-            type="button"
-            class="faq-question w-full px-4 py-3 flex items-center justify-between text-left hover:bg-[var(--bg-secondary)] transition-colors"
-            aria-expanded="false"
-            aria-controls={`faq-answer-${index}`}
-          >
-            <span class="font-medium text-[var(--text-primary)]">{item.question}</span>
-            <svg
-              class="faq-icon w-5 h-5 text-[var(--text-muted)] transition-transform duration-200 shrink-0 ml-4"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
-              <polyline points="6 9 12 15 18 9"></polyline>
-            </svg>
-          </button>
-          <div
-            id={`faq-answer-${index}`}
-            class="faq-answer hidden px-4 pb-4 text-[var(--text-secondary)]"
-          >
-            <div class="prose prose-sm max-w-none whitespace-pre-wrap">
-              {item.answer}
+  <div class="card bg-base-100">
+    <div class="card-body p-0">
+      <div class="px-4 py-3 border-b border-base-300 bg-base-200">
+        <h2 class="card-title text-base">
+          <svg class="w-4 h-4 text-primary" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/>
+          </svg>
+          Frequently Asked Questions
+        </h2>
+      </div>
+      <div class="divide-y divide-base-300">
+        {items.map((item, index) => (
+          <div class="collapse collapse-arrow">
+            <input type="radio" name="faq-accordion" />
+            <div class="collapse-title font-medium">
+              {item.question}
+            </div>
+            <div class="collapse-content">
+              <p class="whitespace-pre-wrap">{item.answer}</p>
             </div>
           </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
-  </Card>
+  </div>
 )}
-
-<style>
-  .faq-item.open .faq-icon {
-    transform: rotate(180deg);
-  }
-
-  .faq-item.open .faq-answer {
-    display: block;
-  }
-</style>
-
-<script>
-  function initFAQ() {
-    document.querySelectorAll(".faq-question").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        const item = btn.closest(".faq-item");
-        const isOpen = item?.classList.contains("open");
-
-        // Close all other items (accordion behavior)
-        document.querySelectorAll(".faq-item.open").forEach((openItem) => {
-          if (openItem !== item) {
-            openItem.classList.remove("open");
-            openItem.querySelector(".faq-question")?.setAttribute("aria-expanded", "false");
-          }
-        });
-
-        // Toggle current item
-        item?.classList.toggle("open", !isOpen);
-        btn.setAttribute("aria-expanded", String(!isOpen));
-      });
-    });
-  }
-
-  initFAQ();
-  document.addEventListener("astro:after-swap", initFAQ);
-</script>

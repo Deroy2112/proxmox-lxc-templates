@@ -37,6 +37,9 @@ CLAUDE.md
 # Logs
 *.log
 
+# Node.js
+node_modules/
+
 # Local development
 .env
 .env.local

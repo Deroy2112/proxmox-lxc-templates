@@ -6,16 +6,18 @@ const basePath = import.meta.env.BASE_URL;
 ---
 
 <BaseLayout title="Page Not Found" description="The page you're looking for doesn't exist.">
-  <main class="flex items-center justify-center min-h-screen p-6">
-    <div class="glass-card p-8 max-w-md text-center animate-fade-in">
-      <div class="icon-box icon-box-xl mx-auto mb-6" style="--icon-color: var(--color-error);">
-        <svg viewBox="0 0 24 24" fill="currentColor">
-          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
-        </svg>
+  <main class="flex items-center justify-center min-h-screen p-6 bg-base-100">
+    <div class="card glass p-8 max-w-md text-center">
+      <div class="avatar placeholder mx-auto mb-6">
+        <div class="bg-error text-error-content rounded-full w-16 h-16">
+          <svg class="w-8 h-8" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+          </svg>
+        </div>
       </div>
-      <h1 class="text-4xl font-bold text-[var(--text-primary)] mb-2">404</h1>
-      <p class="text-xl text-[var(--text-secondary)] mb-6">Page not found</p>
-      <p class="text-[var(--text-muted)] mb-8">
+      <h1 class="text-4xl font-bold mb-2">404</h1>
+      <p class="text-xl opacity-80 mb-6">Page not found</p>
+      <p class="opacity-60 mb-8">
         The page you're looking for doesn't exist or has been moved.
       </p>
       <Button href={basePath} variant="primary">

@@ -1,38 +1,26 @@
 ---
 interface Props {
+  zebra?: boolean;
   compact?: boolean;
   class?: string;
 }
 
-const { compact = false, class: className = "" } = Astro.props;
+const {
+  zebra = true,
+  compact = false,
+  class: className = "",
+} = Astro.props;
 
-const cellPadding = compact ? "px-3 py-2" : "px-4 py-3";
+const classes = `
+  table
+  ${zebra ? "table-zebra" : ""}
+  ${compact ? "table-xs" : ""}
+  ${className}
+`.trim();
 ---
 
-<div class={`overflow-x-auto rounded-lg border border-[var(--border-color)] ${className}`}>
-  <table class="w-full text-sm">
-    <slot name="head">
-      <thead class="bg-[var(--bg-tertiary)] text-[var(--text-secondary)] text-left">
-        <slot name="header" />
-      </thead>
-    </slot>
-    <tbody class="divide-y divide-[var(--border-color)]">
-      <slot />
-    </tbody>
+<div class="overflow-x-auto">
+  <table class={classes}>
+    <slot />
   </table>
 </div>
-
-<style define:vars={{ cellPadding }}>
-  table :global(th),
-  table :global(td) {
-    padding: var(--cellPadding);
-  }
-
-  table :global(th) {
-    font-weight: 500;
-  }
-
-  tbody :global(tr:hover) {
-    background-color: var(--bg-secondary);
-  }
-</style>

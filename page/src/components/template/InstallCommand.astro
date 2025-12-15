@@ -1,7 +1,5 @@
 ---
-import Card from "@/components/ui/Card.astro";
 import CodeBlock from "@/components/ui/CodeBlock.astro";
-import Alert from "@/components/ui/Alert.astro";
 
 interface Props {
   name: string;
@@ -28,46 +26,63 @@ const installCommand = download_url
   : "# Template not yet released";
 ---
 
-<Card hover={false} class="p-0 overflow-hidden">
-  <div class="px-4 py-3 border-b border-[var(--border-color)] bg-[var(--bg-tertiary)]/50">
-    <h2 class="font-semibold text-[var(--text-primary)] flex items-center gap-2">
-      <svg class="w-4 h-4 text-[var(--color-accent)]" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
-      </svg>
-      Installation
-    </h2>
-  </div>
-
-  <div class="p-4 space-y-4">
-    {download_url && (
-      <Alert type="info" size="sm">
-        In Proxmox UI: <strong>Datacenter → Storage → CT Templates → Download from URL</strong>
-      </Alert>
-    )}
-
-    {download_url && (
-      <div>
-        <label class="block text-sm font-medium text-[var(--text-muted)] mb-2">Download URL</label>
-        <CodeBlock code={download_url} showCopy={true} />
-      </div>
-    )}
-
-    {sha512 && (
-      <div>
-        <label class="block text-sm font-medium text-[var(--text-muted)] mb-2">SHA512 Checksum</label>
-        <CodeBlock code={sha512} showCopy={true} />
-      </div>
-    )}
-
-    <div>
-      <label class="block text-sm font-medium text-[var(--text-muted)] mb-2">Create Container</label>
-      <CodeBlock code={installCommand} language="bash" showCopy={true} />
+<div class="card bg-base-100">
+  <div class="card-body p-0">
+    <div class="px-4 py-3 border-b border-base-300 bg-base-200">
+      <h2 class="card-title text-base">
+        <svg class="w-4 h-4 text-primary" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+        </svg>
+        Installation
+      </h2>
     </div>
 
-    {quick_start && (
-      <Alert type="success" title="Quick Start">
-        <div class="whitespace-pre-wrap text-sm">{quick_start}</div>
-      </Alert>
-    )}
+    <div class="p-4 space-y-4">
+      {download_url && (
+        <div class="alert alert-info">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+          </svg>
+          <span>In Proxmox UI: <strong>Datacenter → Storage → CT Templates → Download from URL</strong></span>
+        </div>
+      )}
+
+      {download_url && (
+        <div>
+          <label class="label">
+            <span class="label-text">Download URL</span>
+          </label>
+          <CodeBlock code={download_url} showCopy={true} />
+        </div>
+      )}
+
+      {sha512 && (
+        <div>
+          <label class="label">
+            <span class="label-text">SHA512 Checksum</span>
+          </label>
+          <CodeBlock code={sha512} showCopy={true} />
+        </div>
+      )}
+
+      <div>
+        <label class="label">
+          <span class="label-text">Create Container</span>
+        </label>
+        <CodeBlock code={installCommand} showCopy={true} />
+      </div>
+
+      {quick_start && (
+        <div class="alert alert-success">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+          </svg>
+          <div>
+            <div class="font-bold">Quick Start</div>
+            <div class="text-sm whitespace-pre-wrap">{quick_start}</div>
+          </div>
+        </div>
+      )}
+    </div>
   </div>
-</Card>
+</div>

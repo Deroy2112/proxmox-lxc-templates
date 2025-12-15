@@ -1,69 +1,43 @@
 ---
-import Card from "@/components/ui/Card.astro";
-
 interface Props {
   content?: string;
 }
 
 const { content } = Astro.props;
 
-// Simple markdown-to-HTML conversion for changelog
+// Simple markdown-to-HTML conversion for changelog with DaisyUI classes
 function parseChangelog(md: string): string {
   if (!md) return "";
 
   return md
-    // Headers
-    .replace(/^### (.+)$/gm, '<h4 class="text-sm font-semibold text-[var(--text-muted)] mt-4 mb-2">$1</h4>')
-    .replace(/^## \[(.+?)\] - (.+)$/gm, '<h3 class="text-base font-semibold text-[var(--text-primary)] mt-6 mb-2 first:mt-0"><span class="text-[var(--color-accent)]">$1</span> <span class="text-[var(--text-muted)] font-normal">- $2</span></h3>')
-    .replace(/^## (.+)$/gm, '<h3 class="text-base font-semibold text-[var(--text-primary)] mt-6 mb-2 first:mt-0">$1</h3>')
-    // Lists
-    .replace(/^- (.+)$/gm, '<li class="text-[var(--text-secondary)] ml-4 list-disc">$1</li>')
-    // Inline code
-    .replace(/`([^`]+)`/g, '<code class="px-1 py-0.5 rounded bg-[var(--bg-tertiary)] text-sm">$1</code>')
-    // Bold
+    .replace(/^### (.+)$/gm, '<h4 class="text-sm font-semibold opacity-60 mt-4 mb-2">$1</h4>')
+    .replace(/^## \[(.+?)\] - (.+)$/gm, '<h3 class="text-base font-semibold mt-6 mb-2 first:mt-0"><span class="text-primary">$1</span> <span class="opacity-60 font-normal">- $2</span></h3>')
+    .replace(/^## (.+)$/gm, '<h3 class="text-base font-semibold mt-6 mb-2 first:mt-0">$1</h3>')
+    .replace(/^- (.+)$/gm, '<li class="opacity-80 ml-4 list-disc">$1</li>')
+    .replace(/`([^`]+)`/g, '<kbd class="kbd kbd-xs">$1</kbd>')
     .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-    // Links
-    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" class="text-[var(--color-accent)] hover:underline" target="_blank" rel="noopener">$1</a>')
-    // Wrap consecutive li elements in ul
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" class="link link-primary" target="_blank" rel="noopener">$1</a>')
     .replace(/(<li[^>]*>.*?<\/li>\n?)+/g, '<ul class="space-y-1 mb-3">$&</ul>')
-    // Paragraphs (lines that don't start with < and aren't empty)
-    .replace(/^(?!<)(?!\s*$)(.+)$/gm, '<p class="text-[var(--text-secondary)] mb-2">$1</p>');
+    .replace(/^(?!<)(?!\s*$)(.+)$/gm, '<p class="opacity-80 mb-2">$1</p>');
 }
 
-// Split changelog into versions
 function splitVersions(md: string): { latest: string; older: string[]; olderCount: number } {
   if (!md) return { latest: "", older: [], olderCount: 0 };
 
-  // Split by version headers (## [x.x.x] or ## [x.x.x-x])
   const versionRegex = /^## \[[\d.]+(?:-\d+)?\]/gm;
   const matches = [...md.matchAll(versionRegex)];
 
-  if (matches.length === 0) {
-    // No version headers found, return everything as latest
+  if (matches.length <= 1) {
     return { latest: md, older: [], olderCount: 0 };
   }
 
-  if (matches.length === 1) {
-    // Only one version
-    return { latest: md, older: [], olderCount: 0 };
-  }
-
-  // Get position of first and second version header
   const firstPos = matches[0].index!;
   const secondPos = matches[1].index!;
-
-  // Latest version is from start to second header
   const latest = md.slice(firstPos, secondPos).trim();
-
-  // Older versions are from second header to end
   const olderContent = md.slice(secondPos).trim();
   const older = olderContent ? [olderContent] : [];
 
-  return {
-    latest,
-    older,
-    olderCount: matches.length - 1,
-  };
+  return { latest, older, olderCount: matches.length - 1 };
 }
 
 const versions = content ? splitVersions(content) : { latest: "", older: [], olderCount: 0 };
@@ -72,86 +46,43 @@ const olderHtml = versions.older.length > 0 ? parseChangelog(versions.older[0]) 
 ---
 
 {content && (
-  <Card hover={false} class="p-0 overflow-hidden">
-    <div class="px-4 py-3 border-b border-[var(--border-color)] bg-[var(--bg-tertiary)]/50">
-      <h2 class="font-semibold text-[var(--text-primary)] flex items-center gap-2">
-        <svg class="w-4 h-4 text-[var(--color-accent)]" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/>
-        </svg>
-        Changelog
-      </h2>
-    </div>
-    <div class="p-4">
-      <!-- Latest Version (always visible) -->
-      <div class="changelog-content text-sm" set:html={latestHtml} />
+  <div class="card bg-base-100">
+    <div class="card-body p-0">
+      <div class="px-4 py-3 border-b border-base-300 bg-base-200">
+        <h2 class="card-title text-base">
+          <svg class="w-4 h-4 text-primary" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/>
+          </svg>
+          Changelog
+        </h2>
+      </div>
+      <div class="p-4">
+        <div class="changelog-content text-sm" set:html={latestHtml} />
 
-      <!-- Older Versions (collapsible) -->
-      {versions.olderCount > 0 && (
-        <>
-          <div id="older-changelog" class="changelog-content text-sm hidden border-t border-[var(--border-color)] pt-4 mt-4" set:html={olderHtml} />
-
-          <button
-            type="button"
-            id="toggle-changelog"
-            class="mt-4 w-full py-2 px-4 text-sm text-[var(--text-muted)] hover:text-[var(--text-primary)] border border-[var(--border-color)] rounded-lg hover:bg-[var(--bg-tertiary)] transition-colors flex items-center justify-center gap-2"
-          >
-            <span class="toggle-text">Show {versions.olderCount} older version{versions.olderCount > 1 ? 's' : ''}</span>
-            <svg class="toggle-icon w-4 h-4 transition-transform duration-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="6 9 12 15 18 9"></polyline>
-            </svg>
-          </button>
-        </>
-      )}
+        {versions.olderCount > 0 && (
+          <div class="collapse collapse-arrow border-t border-base-300 mt-4 pt-4">
+            <input type="checkbox" />
+            <div class="collapse-title font-medium p-0 min-h-0">
+              Show {versions.olderCount} older version{versions.olderCount > 1 ? 's' : ''}
+            </div>
+            <div class="collapse-content p-0">
+              <div class="changelog-content text-sm pt-4" set:html={olderHtml} />
+            </div>
+          </div>
+        )}
+      </div>
     </div>
-  </Card>
+  </div>
 )}
 
 <style>
   .changelog-content :global(h3:first-child) {
     margin-top: 0;
   }
-
   .changelog-content :global(ul) {
     padding-left: 0;
   }
-
   .changelog-content :global(li) {
     margin-left: 1.25rem;
   }
-
-  #toggle-changelog.expanded .toggle-icon {
-    transform: rotate(180deg);
-  }
 </style>
-
-<script>
-  function initChangelog() {
-    const btn = document.getElementById("toggle-changelog");
-    const older = document.getElementById("older-changelog");
-    const toggleText = btn?.querySelector(".toggle-text");
-
-    if (!btn || !older) return;
-
-    // Prevent duplicate listeners
-    if (btn.dataset.initialized) return;
-    btn.dataset.initialized = "true";
-
-    let isExpanded = false;
-
-    btn.addEventListener("click", () => {
-      isExpanded = !isExpanded;
-      older.classList.toggle("hidden", !isExpanded);
-      btn.classList.toggle("expanded", isExpanded);
-
-      if (toggleText) {
-        const count = toggleText.textContent?.match(/\d+/)?.[0] || "0";
-        toggleText.textContent = isExpanded
-          ? "Hide older versions"
-          : `Show ${count} older version${parseInt(count) > 1 ? "s" : ""}`;
-      }
-    });
-  }
-
-  document.addEventListener("astro:page-load", initChangelog);
-  document.addEventListener("astro:after-swap", initChangelog);
-</script>

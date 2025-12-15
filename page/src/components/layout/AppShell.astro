@@ -1,0 +1,63 @@
+---
+import Sidebar from "./Sidebar.astro";
+import Footer from "./Footer.astro";
+import ThemeToggle from "./ThemeToggle.astro";
+
+interface Category {
+  name: string;
+  label: string;
+  count?: number;
+}
+
+interface Props {
+  categories?: Category[];
+  activeCategory?: string;
+  totalCount?: number;
+}
+
+const { categories = [], activeCategory = "all", totalCount = 0 } = Astro.props;
+const basePath = import.meta.env.BASE_URL;
+---
+
+<div class="drawer lg:drawer-open">
+  <input id="app-drawer" type="checkbox" class="drawer-toggle" />
+
+  <!-- Main Content -->
+  <div class="drawer-content flex flex-col min-h-screen">
+    <!-- Mobile Navbar -->
+    <nav class="navbar bg-base-100 glass lg:hidden sticky top-0 z-30">
+      <div class="flex-none">
+        <label for="app-drawer" class="btn btn-square btn-ghost drawer-button">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M4 6h16M4 12h16M4 18h16"></path>
+          </svg>
+        </label>
+      </div>
+      <div class="flex-1">
+        <a href={basePath} class="btn btn-ghost text-lg font-bold">Proxmox Templates</a>
+      </div>
+      <div class="flex-none">
+        <ThemeToggle compact />
+      </div>
+    </nav>
+
+    <!-- Page Content -->
+    <main class="flex-1 p-4 lg:p-8">
+      <div class="max-w-[var(--content-max)] mx-auto">
+        <slot />
+      </div>
+    </main>
+
+    <Footer />
+  </div>
+
+  <!-- Sidebar Drawer -->
+  <div class="drawer-side z-40">
+    <label for="app-drawer" class="drawer-overlay" aria-label="close sidebar"></label>
+    <Sidebar
+      categories={categories}
+      activeCategory={activeCategory}
+      totalCount={totalCount}
+    />
+  </div>
+</div>
