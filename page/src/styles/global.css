@@ -1,11 +1,10 @@
 /* ============================================
-   KK-NETZ Design System - App Store
-   Durchgehend dunkles Design
+   Proxmox LXC Templates - Design System
    ============================================ */
 
 /* ========== CSS VARIABLES ========== */
 :root {
-  /* Primary (KK-NETZ Rot) */
+  /* Primary */
   --primary: #E25B5B;
   --primary-dark: #C94545;
   --primary-light: rgba(226, 91, 91, 0.1);
