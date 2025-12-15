@@ -390,14 +390,15 @@ const totalCount = templates.length;
     if (data.download_url) {
       downloadSection?.classList.remove("hidden");
       if (wgetEl) wgetEl.value = `wget ${data.download_url}`;
-      if (sha512El) {
+      const sha512Wrapper = document.getElementById("detail-sha512-wrapper");
+      if (sha512El && sha512Wrapper) {
         if (data.sha512) {
-          sha512El.textContent = `SHA512: ${data.sha512}`;
+          (sha512El as HTMLInputElement).value = `SHA512: ${data.sha512}`;
           sha512El.setAttribute("data-sha512", data.sha512 as string);
-          sha512El.parentElement?.classList.remove("hidden");
+          sha512Wrapper.classList.remove("hidden");
         } else {
-          sha512El.textContent = "";
-          sha512El.parentElement?.classList.add("hidden");
+          (sha512El as HTMLInputElement).value = "";
+          sha512Wrapper.classList.add("hidden");
         }
       }
     } else {
