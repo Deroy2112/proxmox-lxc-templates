@@ -14,7 +14,7 @@ const repoUrl = "https://github.com/Deroy2112/proxmox-lxc-templates";
           <Logo variant="gray" class="footer-logo-svg" />
         </div>
         <p class="footer-description">
-          Production-ready LXC templates for Proxmox VE with automatic updates and rollback support.
+          Production-ready LXC templates for Proxmox VE.
         </p>
         <!-- Build Status Badge -->
         <a href={`${repoUrl}/actions`} target="_blank" rel="noopener noreferrer" class="footer-badge">
@@ -31,7 +31,6 @@ const repoUrl = "https://github.com/Deroy2112/proxmox-lxc-templates";
         <h4>Resources</h4>
         <ul class="footer-links">
           <li><a href={`${repoUrl}#readme`} target="_blank" rel="noopener noreferrer">Documentation</a></li>
-          <li><a href={`${repoUrl}#installation`} target="_blank" rel="noopener noreferrer">Installation</a></li>
           <li><a href={`${repoUrl}/releases`} target="_blank" rel="noopener noreferrer">Releases</a></li>
         </ul>
       </div>
@@ -41,18 +40,8 @@ const repoUrl = "https://github.com/Deroy2112/proxmox-lxc-templates";
         <h4>Project</h4>
         <ul class="footer-links">
           <li><a href={repoUrl} target="_blank" rel="noopener noreferrer">GitHub</a></li>
-          <li><a href={`${repoUrl}/issues`} target="_blank" rel="noopener noreferrer">Issues & Support</a></li>
+          <li><a href={`${repoUrl}/issues`} target="_blank" rel="noopener noreferrer">Issues</a></li>
           <li><a href={`${repoUrl}/blob/main/LICENSE`} target="_blank" rel="noopener noreferrer">MIT License</a></li>
-        </ul>
-      </div>
-
-      <!-- Community -->
-      <div class="footer-column">
-        <h4>Community</h4>
-        <ul class="footer-links">
-          <li><a href={`${repoUrl}/discussions`} target="_blank" rel="noopener noreferrer">Discussions</a></li>
-          <li><a href={`${repoUrl}/pulls`} target="_blank" rel="noopener noreferrer">Contribute</a></li>
-          <li><a href={`${repoUrl}/stargazers`} target="_blank" rel="noopener noreferrer">Star on GitHub</a></li>
         </ul>
       </div>
     </div>
@@ -60,16 +49,13 @@ const repoUrl = "https://github.com/Deroy2112/proxmox-lxc-templates";
     <div class="footer-bottom">
       <p class="footer-copyright">
         <span class="footer-version">v3.0.0</span>
-        &copy; {currentYear} Deroy2112. MIT License.
+        &copy; {currentYear} Deroy2112
       </p>
-      <div class="footer-social">
-        <a href={repoUrl} target="_blank" rel="noopener noreferrer" title="GitHub Repository">
-          <!-- GitHub Icon -->
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor">
-            <path d="M208.31,75.68A59.78,59.78,0,0,0,202.93,28,8,8,0,0,0,196,24a59.75,59.75,0,0,0-48,24H124A59.75,59.75,0,0,0,76,24a8,8,0,0,0-6.93,4,59.78,59.78,0,0,0-5.38,47.68A58.14,58.14,0,0,0,56,104v8a56.06,56.06,0,0,0,48.44,55.47A39.8,39.8,0,0,0,96,192v8H72a24,24,0,0,1-24-24A40,40,0,0,0,8,136a8,8,0,0,0,0,16,24,24,0,0,1,24,24,40,40,0,0,0,40,40H96v16a8,8,0,0,0,16,0V192a24,24,0,0,1,48,0v40a8,8,0,0,0,16,0V192a39.8,39.8,0,0,0-8.44-24.53A56.06,56.06,0,0,0,216,112v-8A58.14,58.14,0,0,0,208.31,75.68ZM200,112a40,40,0,0,1-40,40H112a40,40,0,0,1-40-40v-8a41.74,41.74,0,0,1,6.9-22.48A8,8,0,0,0,80,73.55a43.81,43.81,0,0,1,.79-33.58,43.88,43.88,0,0,1,32.32,20.06A8,8,0,0,0,119.82,64h32.35a8,8,0,0,0,6.74-3.69,43.87,43.87,0,0,1,32.32-20.06A43.81,43.81,0,0,1,192,73.55a8.09,8.09,0,0,0,1,7.65A41.72,41.72,0,0,1,200,104Z"/>
-          </svg>
-        </a>
-      </div>
+      <a href={repoUrl} target="_blank" rel="noopener noreferrer" class="footer-github" title="GitHub">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor">
+          <path d="M208.31,75.68A59.78,59.78,0,0,0,202.93,28,8,8,0,0,0,196,24a59.75,59.75,0,0,0-48,24H124A59.75,59.75,0,0,0,76,24a8,8,0,0,0-6.93,4,59.78,59.78,0,0,0-5.38,47.68A58.14,58.14,0,0,0,56,104v8a56.06,56.06,0,0,0,48.44,55.47A39.8,39.8,0,0,0,96,192v8H72a24,24,0,0,1-24-24A40,40,0,0,0,8,136a8,8,0,0,0,0,16,24,24,0,0,1,24,24,40,40,0,0,0,40,40H96v16a8,8,0,0,0,16,0V192a24,24,0,0,1,48,0v40a8,8,0,0,0,16,0V192a39.8,39.8,0,0,0-8.44-24.53A56.06,56.06,0,0,0,216,112v-8A58.14,58.14,0,0,0,208.31,75.68ZM200,112a40,40,0,0,1-40,40H112a40,40,0,0,1-40-40v-8a41.74,41.74,0,0,1,6.9-22.48A8,8,0,0,0,80,73.55a43.81,43.81,0,0,1,.79-33.58,43.88,43.88,0,0,1,32.32,20.06A8,8,0,0,0,119.82,64h32.35a8,8,0,0,0,6.74-3.69,43.87,43.87,0,0,1,32.32-20.06A43.81,43.81,0,0,1,192,73.55a8.09,8.09,0,0,0,1,7.65A41.72,41.72,0,0,1,200,104Z"/>
+        </svg>
+      </a>
     </div>
   </div>
 </footer>
@@ -84,50 +70,50 @@ const repoUrl = "https://github.com/Deroy2112/proxmox-lxc-templates";
   .footer-inner {
     max-width: 1280px;
     margin: 0 auto;
-    padding: 48px 32px;
+    padding: 32px;
   }
 
   .footer-grid {
     display: grid;
-    grid-template-columns: 2fr 1fr 1fr 1fr;
-    gap: 48px;
-    margin-bottom: 48px;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 32px;
+    margin-bottom: 24px;
   }
 
   .footer-brand {
-    max-width: 280px;
+    max-width: 260px;
   }
 
   .footer-logo {
     display: flex;
     align-items: center;
     gap: 12px;
-    margin-bottom: 16px;
+    margin-bottom: 12px;
   }
 
   .footer-logo :global(.footer-logo-svg) {
-    height: 32px;
+    height: 28px;
     width: auto;
   }
 
   .footer-description {
-    font-size: 0.875rem;
+    font-size: 0.8125rem;
     color: var(--text-muted);
-    line-height: 1.6;
-    margin-bottom: 16px;
+    line-height: 1.5;
+    margin-bottom: 12px;
   }
 
   .footer-badge img {
-    height: 20px;
+    height: 18px;
     border-radius: var(--radius-sm);
   }
 
   .footer-column h4 {
     font-family: var(--font-mono);
-    font-size: 0.6875rem;
+    font-size: 0.625rem;
     font-weight: 600;
     color: var(--text-secondary);
-    margin-bottom: 16px;
+    margin-bottom: 12px;
     text-transform: uppercase;
     letter-spacing: 0.1em;
   }
@@ -136,11 +122,11 @@ const repoUrl = "https://github.com/Deroy2112/proxmox-lxc-templates";
     list-style: none;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 8px;
   }
 
   .footer-links a {
-    font-size: 0.875rem;
+    font-size: 0.8125rem;
     color: var(--text-muted);
     text-decoration: none;
     transition: color 0.15s ease;
@@ -154,51 +140,49 @@ const repoUrl = "https://github.com/Deroy2112/proxmox-lxc-templates";
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding-top: 24px;
+    padding-top: 16px;
     border-top: 1px solid var(--border);
-    flex-wrap: wrap;
-    gap: 16px;
   }
 
   .footer-copyright {
     font-family: var(--font-mono);
-    font-size: 0.75rem;
+    font-size: 0.6875rem;
     color: var(--text-muted);
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
   }
 
   .footer-version {
-    padding: 2px 6px;
+    padding: 2px 5px;
     background: var(--bg-elevated);
     border-radius: var(--radius-sm);
     color: var(--text-secondary);
   }
 
-  .footer-social {
-    display: flex;
-    gap: 16px;
-  }
-
-  .footer-social a {
+  .footer-github {
     color: var(--text-muted);
     transition: color 0.15s ease;
   }
 
-  .footer-social a:hover {
+  .footer-github:hover {
     color: var(--text-primary);
   }
 
-  .footer-social svg {
-    width: 20px;
-    height: 20px;
+  .footer-github svg {
+    width: 18px;
+    height: 18px;
   }
 
   /* Responsive */
-  @media (max-width: 900px) {
+  @media (max-width: 768px) {
+    .footer-inner {
+      padding: 24px 20px;
+    }
+
     .footer-grid {
       grid-template-columns: 1fr 1fr;
+      gap: 24px;
     }
 
     .footer-brand {
@@ -207,23 +191,14 @@ const repoUrl = "https://github.com/Deroy2112/proxmox-lxc-templates";
     }
   }
 
-  @media (max-width: 600px) {
-    .footer-inner {
-      padding: 32px 20px;
-    }
-
+  @media (max-width: 480px) {
     .footer-grid {
       grid-template-columns: 1fr;
-      gap: 32px;
+      gap: 20px;
     }
 
     .footer-brand {
       grid-column: span 1;
-    }
-
-    .footer-bottom {
-      flex-direction: column;
-      text-align: center;
     }
   }
 </style>
