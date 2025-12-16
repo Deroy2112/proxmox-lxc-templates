@@ -62,7 +62,7 @@
   ],
   "download_url": "https://github.com/Deroy2112/proxmox-lxc-templates/releases/download/v10.10.3-1-jellyfin/deroy2112-debian-13-jellyfin_10.10.3-1_amd64.tar.zst",
   "release_url": "https://github.com/Deroy2112/proxmox-lxc-templates/releases/tag/v10.10.3-1-jellyfin",
-  "sha512": "5b12046e53a63aae1308bf86e0880e56d72b1f1980e80f8ebb53577333f8b382dae2d660b1b3a156a82f201ad65628de486248ecae37482bfcfa867d1b2afa71",
+  "sha512": "6e91e1eadeb6dc788b93ea119065dbde6703e8072e55ddde19a30a763a6ed6aa45129cec58935322ea3416190e20669d4802083ae03d3da013042e14b119f27f",
   "release_date": "2025-12-15T12:58:50Z"
 }
 ,
@@ -144,7 +144,7 @@
   ],
   "download_url": "https://github.com/Deroy2112/proxmox-lxc-templates/releases/download/v2.13.5-1-nginx-proxy-manager/deroy2112-debian-13-nginx-proxy-manager_2.13.5-1_amd64.tar.zst",
   "release_url": "https://github.com/Deroy2112/proxmox-lxc-templates/releases/tag/v2.13.5-1-nginx-proxy-manager",
-  "sha512": "cc5a7a2749a3b231f48b2743ad885f2f0df7bc92b2a6c06eb617a3289a70d3508852bef163c6b593c6b7df16dce8d14bf78c6b42e32c0844c33a61b2f2493f54",
+  "sha512": "b3cca81ee3047e7f23ad5a535a789565405d3fe4270ae7211072f530ee1293c5867d6f986479de4506e187bc26fc45569e53ef21b09c3092e5bdf5d5489704d6",
   "release_date": "2025-12-15T12:58:59Z"
 }
 ,
@@ -210,7 +210,7 @@
   ],
   "download_url": "https://github.com/Deroy2112/proxmox-lxc-templates/releases/download/v1.26.0-1-nginx/deroy2112-debian-13-nginx_1.26.0-1_amd64.tar.zst",
   "release_url": "https://github.com/Deroy2112/proxmox-lxc-templates/releases/tag/v1.26.0-1-nginx",
-  "sha512": "ec9f26182a1480425c9c420831f6a702e2e777b685d1cd1bd9dfb7ce3425a45e439e21aacfa7323db83dd7b58a4ce083d0c459e5caac3e76a830cd816754f868",
+  "sha512": "30bd5f4f68665250d9c18733fc6832335ea0e0608c4f0794a2df2f37113f01a6398d0b1a75be32bbb2dfb31114ceeeceed45bfacb17b07c665117bdf9f5ab884",
   "release_date": "2025-12-15T12:59:03Z"
 }
 ,
@@ -269,7 +269,7 @@
   ],
   "download_url": "https://github.com/Deroy2112/proxmox-lxc-templates/releases/download/v5.1.0-1-shoko/deroy2112-debian-13-shoko_5.1.0-1_amd64.tar.zst",
   "release_url": "https://github.com/Deroy2112/proxmox-lxc-templates/releases/tag/v5.1.0-1-shoko",
-  "sha512": "9403f2419d9ae7f93f2173b9b0dd69d85b4902a670d4690fbc2378aa89bcec3bae46961d9dc00e77c331e8859c75b154cfdac6be6ab2b211cad9b757f3c90c6a",
+  "sha512": "a13507e42c184a56a3b47ef43445fc4f4cfdea9d56c715d7b0ea30c50ecf39e872ad8d55be58f74a49fca39cb1306d314c89c916b7e6f64015b469e62c3e8e38",
   "release_date": "2025-12-15T12:59:10Z"
 }
 ]
