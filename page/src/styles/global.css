@@ -1038,34 +1038,9 @@ input, textarea {
 }
 
 .mobile-header-inner {
-  display: grid;
-  grid-template-columns: 40px 1fr 40px;
-  align-items: center;
-  gap: 12px;
-}
-
-.mobile-header .logo {
-  justify-self: center;
-}
-
-.mobile-header .btn-icon {
-  justify-self: end;
   display: flex;
   align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  padding: 0;
-  background: transparent;
-  border: none;
-  color: var(--text-primary);
-  cursor: pointer;
-  border-radius: var(--radius);
-  transition: background 0.15s ease;
-}
-
-.mobile-header .btn-icon:hover {
-  background: var(--bg-elevated);
+  justify-content: space-between;
 }
 
 .menu-toggle {
@@ -1074,17 +1049,6 @@ input, textarea {
   border: none;
   color: var(--text-primary);
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  border-radius: var(--radius);
-  transition: background 0.15s ease;
-}
-
-.menu-toggle:hover {
-  background: var(--bg-elevated);
 }
 
 .menu-toggle svg {
