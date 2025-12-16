@@ -109,7 +109,7 @@ input, textarea {
 
 .sidebar-header {
   padding: 20px;
-  min-height: 73px; /* Sync with main header height */
+  height: 73px;
   box-sizing: border-box;
   border-bottom: 1px solid var(--border);
 }
@@ -276,7 +276,7 @@ input, textarea {
 
 .header-inner {
   padding: 20px 32px;
-  min-height: 73px; /* Match sidebar-header height (20px padding + 32px logo + 1px border) */
+  height: 72px; /* 73px sidebar-header - 1px border on .header */
   box-sizing: border-box;
   display: flex;
   align-items: center;
