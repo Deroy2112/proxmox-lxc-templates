@@ -11,9 +11,10 @@ readonly DOWNLOAD_DIR="/downloads"
 
 # === Install dependencies ===
 # Note: Full JRE required, NOT headless (official JDownloader requirement)
+# Debian 13 Trixie has OpenJDK 21 (not 17)
 apt-get update
 apt-get install -y --no-install-recommends \
-    openjdk-17-jre \
+    openjdk-21-jre \
     curl \
     ca-certificates
 

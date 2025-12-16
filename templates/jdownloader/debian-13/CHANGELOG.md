@@ -5,6 +5,6 @@
 ### Added
 - Initial JDownloader 2 template
 - Headless mode with MyJDownloader integration
-- OpenJDK 17 runtime
+- OpenJDK 21 runtime
 - Systemd service for automatic startup
 - Fixed UID/GID for shared volume support (media category)
