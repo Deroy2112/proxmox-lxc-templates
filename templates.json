@@ -54,7 +54,7 @@
   ],
   "download_url": "https://github.com/Deroy2112/proxmox-lxc-templates/releases/download/v2.0-1-jdownloader/deroy2112-debian-13-jdownloader_2.0-1_amd64.tar.zst",
   "release_url": "https://github.com/Deroy2112/proxmox-lxc-templates/releases/tag/v2.0-1-jdownloader",
-  "sha512": "f33f03e39f3e9bbfe111b09bfafc7eb4f6b57f4e947db514565f734bedfee7fad73330f6bf658a6bb0979bb510db081b54a7911a323853c31957c72a8d498e45",
+  "sha512": "6cfdfaa47173db172360ac2ec22e5fa31e51e298ef90b120bfe70d0e7ae3029a5d8dd0534c974dcf879bd1cbe0486f428047e3c16bfe1ccc65a87875c7ff4035",
   "release_date": "2025-12-16T01:51:45Z"
 }
 ,
