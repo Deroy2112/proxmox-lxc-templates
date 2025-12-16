@@ -1,5 +1,64 @@
 [
 {
+  "name": "jdownloader",
+  "description": "JDownloader 2 Download Manager (Headless)",
+  "category": "media",
+  "icon": "jdownloader",
+  "version": "2.0",
+  "build_version": 1,
+  "base_os": "debian-13",
+  "architecture": "amd64",
+  "maintainer": "Deroy2112 <81692934+Deroy2112@users.noreply.github.com>",
+  "project_url": "https://jdownloader.org",
+  "user": {
+    "uid": 1103,
+    "gid": 1100
+  },
+  "resources": {
+    "memory_min": 256,
+    "memory_recommended": 512,
+    "disk_min": "2G",
+    "disk_recommended": "10G",
+    "cores": 1
+  },
+  "ports": [
+    {
+      "port": 3129,
+      "description": "MyJDownloader Direct Connect (optional)"
+    }
+  ],
+  "paths": [
+    {
+      "path": "/opt/jdownloader",
+      "description": "JDownloader installation"
+    },
+    {
+      "path": "/downloads",
+      "description": "Download directory"
+    }
+  ],
+  "quick_start": "1. Create a free account at https://my.jdownloader.org\n2. Configure MyJDownloader credentials:\n   systemctl stop jdownloader\n   cat > /opt/jdownloader/cfg/org.jdownloader.api.myjdownloader.MyJDownloaderSettings.json << 'EOF'\n   {\n     \"email\": \"your-email@example.com\",\n     \"password\": \"your-password\",\n     \"devicename\": \"JDownloader-LXC\"\n   }\n   EOF\n   chown jdownloader:jdownloader /opt/jdownloader/cfg/org.jdownloader.api.myjdownloader.MyJDownloaderSettings.json\n   systemctl start jdownloader\n3. Access via https://my.jdownloader.org\n4. Mount your download folder as bind mount to /downloads\n",
+  "faq": [
+    {
+      "question": "How do I set up MyJDownloader?",
+      "answer": "1. Create a free account at https://my.jdownloader.org\n2. Stop the service: systemctl stop jdownloader\n3. Create the config file with your credentials:\n   cat > /opt/jdownloader/cfg/org.jdownloader.api.myjdownloader.MyJDownloaderSettings.json << 'EOF'\n   {\n     \"email\": \"your-email@example.com\",\n     \"password\": \"your-password\",\n     \"devicename\": \"JDownloader-LXC\"\n   }\n   EOF\n4. Fix ownership: chown jdownloader:jdownloader /opt/jdownloader/cfg/org.jdownloader.api.myjdownloader.MyJDownloaderSettings.json\n5. Start the service: systemctl start jdownloader\n6. Your device will appear at my.jdownloader.org\n"
+    },
+    {
+      "question": "How do I change MyJDownloader credentials?",
+      "answer": "Stop the service and remove the config:\nsystemctl stop jdownloader\nrm /opt/jdownloader/cfg/org.jdownloader.api.myjdownloader.MyJDownloaderSettings.json\nThen follow the setup steps again.\n"
+    },
+    {
+      "question": "Where are downloads stored?",
+      "answer": "Default: /downloads\nMount your storage as a bind mount to /downloads in Proxmox.\n"
+    }
+  ],
+  "download_url": "https://github.com/Deroy2112/proxmox-lxc-templates/releases/download/v2.0-1-jdownloader/deroy2112-debian-13-jdownloader_2.0-1_amd64.tar.zst",
+  "release_url": "https://github.com/Deroy2112/proxmox-lxc-templates/releases/tag/v2.0-1-jdownloader",
+  "sha512": "f33f03e39f3e9bbfe111b09bfafc7eb4f6b57f4e947db514565f734bedfee7fad73330f6bf658a6bb0979bb510db081b54a7911a323853c31957c72a8d498e45",
+  "release_date": "2025-12-16T01:51:45Z"
+}
+,
+{
   "name": "jellyfin",
   "description": "Jellyfin Media Server on Debian 13 (Trixie)",
   "category": "media",
@@ -62,7 +121,7 @@
   ],
   "download_url": "https://github.com/Deroy2112/proxmox-lxc-templates/releases/download/v10.10.3-1-jellyfin/deroy2112-debian-13-jellyfin_10.10.3-1_amd64.tar.zst",
   "release_url": "https://github.com/Deroy2112/proxmox-lxc-templates/releases/tag/v10.10.3-1-jellyfin",
-  "sha512": "6e91e1eadeb6dc788b93ea119065dbde6703e8072e55ddde19a30a763a6ed6aa45129cec58935322ea3416190e20669d4802083ae03d3da013042e14b119f27f",
+  "sha512": "3c0b2a510ace684d119e210eed54a7a9d90f6e549f14302daac500a02075d6a9e0b11eceb9b7448e1be322fcb60bc22a06357d7fc4edeca132257d6065d5ab63",
   "release_date": "2025-12-15T12:58:50Z"
 }
 ,
@@ -144,7 +203,7 @@
   ],
   "download_url": "https://github.com/Deroy2112/proxmox-lxc-templates/releases/download/v2.13.5-1-nginx-proxy-manager/deroy2112-debian-13-nginx-proxy-manager_2.13.5-1_amd64.tar.zst",
   "release_url": "https://github.com/Deroy2112/proxmox-lxc-templates/releases/tag/v2.13.5-1-nginx-proxy-manager",
-  "sha512": "b3cca81ee3047e7f23ad5a535a789565405d3fe4270ae7211072f530ee1293c5867d6f986479de4506e187bc26fc45569e53ef21b09c3092e5bdf5d5489704d6",
+  "sha512": "88f9fc859a050d0d6e6ad1858179db6b506ed694b4a281b6a032407a79eb2cfb3ee6ce3b73e1d89fc92651ab283d270909ea8a81de8e0ee5d81cc77019a67a02",
   "release_date": "2025-12-15T12:58:59Z"
 }
 ,
@@ -210,7 +269,7 @@
   ],
   "download_url": "https://github.com/Deroy2112/proxmox-lxc-templates/releases/download/v1.26.0-1-nginx/deroy2112-debian-13-nginx_1.26.0-1_amd64.tar.zst",
   "release_url": "https://github.com/Deroy2112/proxmox-lxc-templates/releases/tag/v1.26.0-1-nginx",
-  "sha512": "30bd5f4f68665250d9c18733fc6832335ea0e0608c4f0794a2df2f37113f01a6398d0b1a75be32bbb2dfb31114ceeeceed45bfacb17b07c665117bdf9f5ab884",
+  "sha512": "64d8ecfc552bdfb1605f0a4a7ecc8b936e1e226dda7a1360d59a55e4dbb2b54fa4581c6869334e2699d5f19ff40f4e8f70ab63be0c7468a422fd9c41c0cdc21b",
   "release_date": "2025-12-15T12:59:03Z"
 }
 ,
@@ -269,7 +328,7 @@
   ],
   "download_url": "https://github.com/Deroy2112/proxmox-lxc-templates/releases/download/v5.1.0-1-shoko/deroy2112-debian-13-shoko_5.1.0-1_amd64.tar.zst",
   "release_url": "https://github.com/Deroy2112/proxmox-lxc-templates/releases/tag/v5.1.0-1-shoko",
-  "sha512": "a13507e42c184a56a3b47ef43445fc4f4cfdea9d56c715d7b0ea30c50ecf39e872ad8d55be58f74a49fca39cb1306d314c89c916b7e6f64015b469e62c3e8e38",
+  "sha512": "25a8c9836c860f200b9292ed37a4f72d889891df4bc3ccf4e464c355b30e64db32ba338c236775d72fdde3939617df63afdb4e60b28bb37b18883e6855ba01ad",
   "release_date": "2025-12-15T12:59:10Z"
 }
 ]
