@@ -54,7 +54,7 @@
   ],
   "download_url": "https://github.com/Deroy2112/proxmox-lxc-templates/releases/download/v2.0-1-jdownloader/deroy2112-debian-13-jdownloader_2.0-1_amd64.tar.zst",
   "release_url": "https://github.com/Deroy2112/proxmox-lxc-templates/releases/tag/v2.0-1-jdownloader",
-  "sha512": "6cfdfaa47173db172360ac2ec22e5fa31e51e298ef90b120bfe70d0e7ae3029a5d8dd0534c974dcf879bd1cbe0486f428047e3c16bfe1ccc65a87875c7ff4035",
+  "sha512": "7fe043df779dfbb190054e6971221594199f4e119cfa697132d1aa242a7bde1ace4f469c8cfd2f0b6d53fbe6c4d044da5fae138b0172ecfd610c12e134c0b496",
   "release_date": "2025-12-16T01:51:45Z"
 }
 ,
@@ -328,7 +328,7 @@
   ],
   "download_url": "https://github.com/Deroy2112/proxmox-lxc-templates/releases/download/v5.1.0-1-shoko/deroy2112-debian-13-shoko_5.1.0-1_amd64.tar.zst",
   "release_url": "https://github.com/Deroy2112/proxmox-lxc-templates/releases/tag/v5.1.0-1-shoko",
-  "sha512": "25a8c9836c860f200b9292ed37a4f72d889891df4bc3ccf4e464c355b30e64db32ba338c236775d72fdde3939617df63afdb4e60b28bb37b18883e6855ba01ad",
+  "sha512": "7e2836b3f52f2ae20c49975e158de48a20061c238fe8e4fd4e7688e7281a2519e5b8e63e6f135d89693f94c639fcc1fd18cff6f1cd01be194ce45b64fcbb0c7e",
   "release_date": "2025-12-15T12:59:10Z"
 }
 ]
