@@ -1,7 +1,7 @@
 name: jdownloader
 description: JDownloader 2 Download Manager (Headless)
 category: media
-icon: jdownloader
+icon: jdownloader2
 version: "2.0"
 build_version: 1
 base_os: debian-13
@@ -34,13 +34,8 @@ quick_start: |
   1. Create a free account at https://my.jdownloader.org
   2. Configure MyJDownloader credentials:
      systemctl stop jdownloader
-     cat > /opt/jdownloader/cfg/org.jdownloader.api.myjdownloader.MyJDownloaderSettings.json << 'EOF'
-     {
-       "email": "your-email@example.com",
-       "password": "your-password",
-       "devicename": "JDownloader-LXC"
-     }
-     EOF
+     nano /opt/jdownloader/cfg/org.jdownloader.api.myjdownloader.MyJDownloaderSettings.json
+     Add: email, password, devicename fields
      chown jdownloader:jdownloader /opt/jdownloader/cfg/org.jdownloader.api.myjdownloader.MyJDownloaderSettings.json
      systemctl start jdownloader
   3. Access via https://my.jdownloader.org
@@ -51,17 +46,12 @@ faq:
     answer: |
       1. Create a free account at https://my.jdownloader.org
       2. Stop the service: systemctl stop jdownloader
-      3. Create the config file with your credentials:
-         cat > /opt/jdownloader/cfg/org.jdownloader.api.myjdownloader.MyJDownloaderSettings.json << 'EOF'
-         {
-           "email": "your-email@example.com",
-           "password": "your-password",
-           "devicename": "JDownloader-LXC"
-         }
-         EOF
-      4. Fix ownership: chown jdownloader:jdownloader /opt/jdownloader/cfg/org.jdownloader.api.myjdownloader.MyJDownloaderSettings.json
-      5. Start the service: systemctl start jdownloader
-      6. Your device will appear at my.jdownloader.org
+      3. Edit the config file:
+         nano /opt/jdownloader/cfg/org.jdownloader.api.myjdownloader.MyJDownloaderSettings.json
+      4. Add your credentials (email, password, devicename)
+      5. Fix ownership: chown jdownloader:jdownloader /opt/jdownloader/cfg/org.jdownloader.api.myjdownloader.MyJDownloaderSettings.json
+      6. Start the service: systemctl start jdownloader
+      7. Your device will appear at my.jdownloader.org
   - question: How do I change MyJDownloader credentials?
     answer: |
       Stop the service and remove the config:
