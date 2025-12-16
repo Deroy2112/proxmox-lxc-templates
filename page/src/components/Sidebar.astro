@@ -19,10 +19,11 @@ const basePath = import.meta.env.BASE_URL;
 ---
 
 <aside class="sidebar" id="sidebar">
-  <!-- Header with Logo -->
+  <!-- Header with Logo + Title -->
   <div class="sidebar-header">
     <a href={basePath} class="logo">
       <Logo variant="white" />
+      <span class="logo-text">Proxmox LXC Templates</span>
     </a>
   </div>
 
@@ -109,47 +110,24 @@ const basePath = import.meta.env.BASE_URL;
         </button>
       ))}
     </div>
-
-    <!-- Resources -->
-    <div class="nav-section">
-      <div class="nav-section-title">Resources</div>
-      <a href="https://github.com/Deroy2112/proxmox-lxc-templates" target="_blank" rel="noopener noreferrer" class="nav-item">
-        <!-- GitHub Icon -->
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor">
-          <path d="M208.31,75.68A59.78,59.78,0,0,0,202.93,28,8,8,0,0,0,196,24a59.75,59.75,0,0,0-48,24H124A59.75,59.75,0,0,0,76,24a8,8,0,0,0-6.93,4,59.78,59.78,0,0,0-5.38,47.68A58.14,58.14,0,0,0,56,104v8a56.06,56.06,0,0,0,48.44,55.47A39.8,39.8,0,0,0,96,192v8H72a24,24,0,0,1-24-24A40,40,0,0,0,8,136a8,8,0,0,0,0,16,24,24,0,0,1,24,24,40,40,0,0,0,40,40H96v16a8,8,0,0,0,16,0V192a24,24,0,0,1,48,0v40a8,8,0,0,0,16,0V192a39.8,39.8,0,0,0-8.44-24.53A56.06,56.06,0,0,0,216,112v-8A58.14,58.14,0,0,0,208.31,75.68ZM200,112a40,40,0,0,1-40,40H112a40,40,0,0,1-40-40v-8a41.74,41.74,0,0,1,6.9-22.48A8,8,0,0,0,80,73.55a43.81,43.81,0,0,1,.79-33.58,43.88,43.88,0,0,1,32.32,20.06A8,8,0,0,0,119.82,64h32.35a8,8,0,0,0,6.74-3.69,43.87,43.87,0,0,1,32.32-20.06A43.81,43.81,0,0,1,192,73.55a8.09,8.09,0,0,0,1,7.65A41.72,41.72,0,0,1,200,104Z" />
-        </svg>
-        GitHub
-        <!-- External Link Icon -->
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor" class="external-icon">
-          <path d="M224,104a8,8,0,0,1-16,0V59.32l-66.33,66.34a8,8,0,0,1-11.32-11.32L196.68,48H152a8,8,0,0,1,0-16h64a8,8,0,0,1,8,8Zm-40,24a8,8,0,0,0-8,8v72H48V80h72a8,8,0,0,0,0-16H48A16,16,0,0,0,32,80V208a16,16,0,0,0,16,16H176a16,16,0,0,0,16-16V136A8,8,0,0,0,184,128Z" />
-        </svg>
-      </a>
-      <a href="https://github.com/Deroy2112/proxmox-lxc-templates/releases" target="_blank" rel="noopener noreferrer" class="nav-item">
-        <!-- Tag Icon -->
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor">
-          <path d="M243.31,136,144,36.69A15.86,15.86,0,0,0,132.69,32H40a8,8,0,0,0-8,8v92.69A15.86,15.86,0,0,0,36.69,144L136,243.31a16,16,0,0,0,22.63,0l84.68-84.68a16,16,0,0,0,0-22.63Zm-96,96L48,132.69V48h84.69L232,147.31ZM96,84A12,12,0,1,1,84,72,12,12,0,0,1,96,84Z" />
-        </svg>
-        Releases
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor" class="external-icon">
-          <path d="M224,104a8,8,0,0,1-16,0V59.32l-66.33,66.34a8,8,0,0,1-11.32-11.32L196.68,48H152a8,8,0,0,1,0-16h64a8,8,0,0,1,8,8Zm-40,24a8,8,0,0,0-8,8v72H48V80h72a8,8,0,0,0,0-16H48A16,16,0,0,0,32,80V208a16,16,0,0,0,16,16H176a16,16,0,0,0,16-16V136A8,8,0,0,0,184,128Z" />
-        </svg>
-      </a>
-    </div>
   </nav>
 
-  <!-- Footer -->
-  <div class="sidebar-footer">
-    <div class="text-xs text-muted" style="text-align: center;">
-      Proxmox LXC Templates
-    </div>
-  </div>
+  <!-- Footer (empty, can be used for version info etc.) -->
+  <div class="sidebar-footer"></div>
 </aside>
 
 <style>
-  .external-icon {
-    width: 12px;
-    height: 12px;
-    opacity: 0.5;
-    margin-left: auto;
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    color: var(--text-primary);
+  }
+
+  .logo-text {
+    font-size: 0.875rem;
+    font-weight: 600;
+    white-space: nowrap;
   }
 </style>
