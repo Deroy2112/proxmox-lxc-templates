@@ -291,7 +291,7 @@ jobs:
           cd "$ROOTFS"
 
           sudo tar --numeric-owner --acls --xattrs \
-            -cf - . | zstd -T0 -19 -o "${{ runner.temp }}/${{ steps.config.outputs.template_file }}"
+            -cf - . | zstd -T0 -9 -o "${{ runner.temp }}/${{ steps.config.outputs.template_file }}"
 
           cd "${{ runner.temp }}"
           sha256sum "${{ steps.config.outputs.template_file }}" > "${{ steps.config.outputs.template_file }}.sha256"
