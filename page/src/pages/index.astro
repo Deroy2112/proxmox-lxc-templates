@@ -361,6 +361,30 @@ const totalCount = templates.length;
     return div.innerHTML;
   }
 
+  // Extract only the latest version from changelog
+  function extractLatestChangelog(changelog: string): string {
+    // Split by version headers (## [x.x.x-x] - date)
+    const versionRegex = /^## \[[\d.]+-?\d*\]/m;
+    const lines = changelog.split('\n');
+    const result: string[] = [];
+    let foundFirst = false;
+
+    for (const line of lines) {
+      if (versionRegex.test(line)) {
+        if (foundFirst) {
+          // Found second version header, stop
+          break;
+        }
+        foundFirst = true;
+      }
+      if (foundFirst) {
+        result.push(line);
+      }
+    }
+
+    return result.join('\n').trim() || changelog;
+  }
+
   // Populate detail with template data
   function populateDetail(data: Record<string, unknown>) {
     const iconUrl = `https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons@main/svg/${data.icon}.svg`;
@@ -513,19 +537,21 @@ const totalCount = templates.length;
       faqSection?.classList.add("hidden");
     }
 
-    // Changelog
+    // Changelog - Extract only the latest version
     const changelogSection = document.getElementById("detail-changelog-section");
     const changelogEl = document.getElementById("detail-changelog");
     const changelogItem = document.getElementById("changelog-item");
-    const changelogToggle = document.getElementById("changelog-toggle");
-    if (data.changelog && changelogSection && changelogEl) {
+    if (data.changelog && changelogSection && changelogEl && changelogItem) {
       changelogSection.classList.remove("hidden");
-      changelogEl.innerHTML = `<p>${escapeHtml(data.changelog as string).replace(/\n/g, '<br>')}</p>`;
 
-      // Toggle handler - use accordion-item.open class
-      changelogToggle?.addEventListener("click", () => {
-        changelogItem?.classList.toggle("open");
-      });
+      // Reset open state when loading new template
+      changelogItem.classList.remove("open");
+
+      // Parse changelog to get only the latest version
+      const fullChangelog = data.changelog as string;
+      const latestVersion = extractLatestChangelog(fullChangelog);
+
+      changelogEl.innerHTML = `<p>${escapeHtml(latestVersion).replace(/\n/g, '<br>')}</p>`;
     } else {
       changelogSection?.classList.add("hidden");
     }
@@ -587,6 +613,13 @@ const totalCount = templates.length;
           window.showToast?.("Failed to copy");
         }
       }
+    });
+
+    // Changelog toggle - bind once here instead of in populateDetail
+    const changelogToggle = document.getElementById("changelog-toggle");
+    const changelogItem = document.getElementById("changelog-item");
+    changelogToggle?.addEventListener("click", () => {
+      changelogItem?.classList.toggle("open");
     });
 
     // Card click handler
