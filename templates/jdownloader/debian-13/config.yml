@@ -2,7 +2,7 @@ name: jdownloader
 description: JDownloader 2 Download Manager (Headless)
 category: media
 icon: jdownloader
-version: 2.0
+version: "2.0"
 build_version: 1
 base_os: debian-13
 architecture: amd64
