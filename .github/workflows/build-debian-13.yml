@@ -212,7 +212,19 @@ jobs:
           sudo cp /etc/resolv.conf "$ROOTFS/etc/resolv.conf"
 
           # Mount /proc for packages that need it (e.g., OpenJDK)
-          sudo mount -t proc proc "$ROOTFS/proc"
+          # Only mount if not already mounted
+          if ! mountpoint -q "$ROOTFS/proc"; then
+            sudo mount -t proc proc "$ROOTFS/proc"
+            PROC_MOUNTED=1
+          fi
+
+          # Ensure /proc is unmounted on exit (even on error)
+          cleanup() {
+            if [[ "${PROC_MOUNTED:-}" == "1" ]] && mountpoint -q "$ROOTFS/proc"; then
+              sudo umount "$ROOTFS/proc" || true
+            fi
+          }
+          trap cleanup EXIT
 
           sudo cp "templates/${{ matrix.template }}/debian-13/build.sh" "$ROOTFS/tmp/build.sh"
           sudo chmod +x "$ROOTFS/tmp/build.sh"
@@ -238,9 +250,6 @@ jobs:
             cd /tmp
             ./build.sh
           "
-
-          # Unmount /proc
-          sudo umount "$ROOTFS/proc"
 
       - name: Save APT cache
         run: |
