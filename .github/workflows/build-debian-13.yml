@@ -211,6 +211,9 @@ jobs:
           # Copy host DNS for package installation
           sudo cp /etc/resolv.conf "$ROOTFS/etc/resolv.conf"
 
+          # Mount /proc for packages that need it (e.g., OpenJDK)
+          sudo mount -t proc proc "$ROOTFS/proc"
+
           sudo cp "templates/${{ matrix.template }}/debian-13/build.sh" "$ROOTFS/tmp/build.sh"
           sudo chmod +x "$ROOTFS/tmp/build.sh"
 
@@ -235,6 +238,9 @@ jobs:
             cd /tmp
             ./build.sh
           "
+
+          # Unmount /proc
+          sudo umount "$ROOTFS/proc"
 
       - name: Save APT cache
         run: |
