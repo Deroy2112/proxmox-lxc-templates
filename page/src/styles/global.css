@@ -934,7 +934,7 @@ input, textarea {
 
 .accordion-item.open .accordion-content {
   padding: 16px;
-  max-height: 500px;
+  max-height: 2000px;
 }
 
 /* ========== CODE BLOCKS ========== */
