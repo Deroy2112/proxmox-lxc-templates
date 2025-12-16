@@ -53,7 +53,7 @@
           </div>
 
           <!-- SHA512 with Copy Button -->
-          <div id="detail-sha512-wrapper" class="input-group mt-3">
+          <div id="detail-sha512-wrapper" class="input-group mt-4">
             <input id="detail-sha512" type="text" readonly />
             <button id="detail-sha512-copy" title="Copy SHA512">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor" style="width: 16px; height: 16px;">
@@ -129,6 +129,14 @@
           <div id="detail-changelog" class="accordion-content"></div>
         </div>
       </div>
+
+      <!-- Release Info (moved from sidebar) -->
+      <div id="detail-release-section" class="text-sm text-muted mt-6 hidden">
+        <p id="detail-release-date" class="mb-2"></p>
+        <a id="detail-github-link" href="#" target="_blank" rel="noopener noreferrer" style="color: var(--primary);">
+          View on GitHub &rarr;
+        </a>
+      </div>
     </div>
 
     <!-- Sidebar Column -->
@@ -165,14 +173,6 @@
           <div class="alert-title">Default Credentials</div>
           <div id="detail-credentials" class="alert-content"></div>
         </div>
-      </div>
-
-      <!-- Release Info -->
-      <div id="detail-release-section" class="text-sm text-muted hidden">
-        <p id="detail-release-date" class="mb-2"></p>
-        <a id="detail-github-link" href="#" target="_blank" rel="noopener noreferrer" style="color: var(--primary);">
-          View on GitHub &rarr;
-        </a>
       </div>
     </div>
   </div>

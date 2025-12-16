@@ -66,8 +66,6 @@ body {
   color: var(--text-primary);
   line-height: 1.6;
   min-height: 100vh;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
 a {
@@ -111,6 +109,8 @@ input, textarea {
 
 .sidebar-header {
   padding: 20px;
+  min-height: 73px; /* Sync with main header height */
+  box-sizing: border-box;
   border-bottom: 1px solid var(--border);
 }
 
@@ -139,7 +139,6 @@ input, textarea {
 
 .sidebar-footer {
   padding: 16px 20px;
-  border-top: 1px solid var(--border);
 }
 
 /* ========== NAVIGATION ========== */
@@ -239,7 +238,7 @@ input, textarea {
   flex: 1;
   border: none;
   outline: none;
-  font-size: 0.8125rem;
+  font-size: 16px; /* Prevents iOS zoom on focus */
   color: var(--text-primary);
   background: transparent;
 }
@@ -277,6 +276,8 @@ input, textarea {
 
 .header-inner {
   padding: 20px 32px;
+  min-height: 73px; /* Match sidebar-header height (20px padding + 32px logo + 1px border) */
+  box-sizing: border-box;
   display: flex;
   align-items: center;
   justify-content: space-between;
