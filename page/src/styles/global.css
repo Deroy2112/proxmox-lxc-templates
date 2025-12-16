@@ -1173,6 +1173,11 @@ input, textarea {
   .mobile-header {
     display: block;
   }
+
+  /* Hide desktop header on mobile */
+  .header {
+    display: none;
+  }
 }
 
 @media (max-width: 768px) {
