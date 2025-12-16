@@ -39,8 +39,16 @@ apt-get update
 apt-get install -y --no-install-recommends \
     dotnet-runtime-8.0
 
-# === Create shoko user ===
-useradd -r -s /usr/sbin/nologin -d "$SHOKO_DIR" "$SHOKO_USER"
+# === Create shoko user/group with fixed IDs (for shared volumes) ===
+if [[ -n "${TEMPLATE_GID:-}" ]]; then
+  groupadd -g "$TEMPLATE_GID" "$SHOKO_USER"
+fi
+if [[ -n "${TEMPLATE_UID:-}" ]]; then
+  useradd -r -u "$TEMPLATE_UID" -g "${TEMPLATE_GID:-$SHOKO_USER}" \
+    -s /usr/sbin/nologin -d "$SHOKO_DIR" "$SHOKO_USER"
+else
+  useradd -r -s /usr/sbin/nologin -d "$SHOKO_DIR" "$SHOKO_USER"
+fi
 
 # === Download and install Shoko Server ===
 mkdir -p "$SHOKO_DIR"

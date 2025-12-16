@@ -18,6 +18,15 @@ const templates = defineCollection({
     base_os: z.literal("debian-13"),
     architecture: z.string().default("amd64"),
     maintainer: z.string().optional(),
+    project_url: z.string().url().optional(),
+
+    // User/Group IDs (for shared volumes)
+    user: z
+      .object({
+        uid: z.number().optional(),
+        gid: z.number().optional(),
+      })
+      .optional(),
 
     // Resources
     resources: z.object({

@@ -12,6 +12,12 @@ apt-get install -y --no-install-recommends \
     curl \
     ca-certificates
 
+# === Create shared group for volumes (if configured) ===
+if [[ -n "${TEMPLATE_GID:-}" ]]; then
+  groupadd -g "$TEMPLATE_GID" shared
+  usermod -aG shared www-data
+fi
+
 # === Configure nginx ===
 cat > /etc/nginx/sites-available/default <<'EOF'
 server {

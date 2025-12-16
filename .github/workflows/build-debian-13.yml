@@ -63,16 +63,23 @@ jobs:
             zstd \
             qemu-user-static
 
+      - name: Install yq
+        uses: mikefarah/yq@v4
+
       - name: Read template config
         id: config
         run: |
           CONFIG="templates/${{ matrix.template }}/debian-13/config.yml"
 
-          NAME=$(grep '^name:' "$CONFIG" | cut -d: -f2 | xargs)
-          VERSION=$(grep '^version:' "$CONFIG" | cut -d: -f2 | xargs)
-          BUILD_VERSION=$(grep '^build_version:' "$CONFIG" | cut -d: -f2 | xargs)
-          BASE_OS=$(grep '^base_os:' "$CONFIG" | cut -d: -f2 | xargs)
-          ARCH=$(grep '^architecture:' "$CONFIG" | cut -d: -f2 | xargs || echo "amd64")
+          NAME=$(yq -r '.name' "$CONFIG")
+          VERSION=$(yq -r '.version' "$CONFIG")
+          BUILD_VERSION=$(yq -r '.build_version' "$CONFIG")
+          BASE_OS=$(yq -r '.base_os' "$CONFIG")
+          ARCH=$(yq -r '.architecture // "amd64"' "$CONFIG")
+
+          # User/Group IDs for shared volumes
+          USER_UID=$(yq -r '.user.uid // ""' "$CONFIG")
+          USER_GID=$(yq -r '.user.gid // ""' "$CONFIG")
 
           FULL_VERSION="${VERSION}-${BUILD_VERSION}"
           TEMPLATE_FILE="deroy2112-${BASE_OS}-${NAME}_${FULL_VERSION}_${ARCH}.tar.zst"
@@ -84,6 +91,8 @@ jobs:
           echo "base_os=$BASE_OS" >> "$GITHUB_OUTPUT"
           echo "arch=$ARCH" >> "$GITHUB_OUTPUT"
           echo "template_file=$TEMPLATE_FILE" >> "$GITHUB_OUTPUT"
+          echo "user_uid=$USER_UID" >> "$GITHUB_OUTPUT"
+          echo "user_gid=$USER_GID" >> "$GITHUB_OUTPUT"
 
       # Stufe 1: Debootstrap Base-Rootfs Cache (als tar-Archiv)
       - name: Cache debootstrap rootfs
@@ -212,6 +221,8 @@ jobs:
           TEMPLATE_VERSION="${{ steps.config.outputs.full_version }}"
           TEMPLATE_NAME="${{ steps.config.outputs.name }}"
           TEMPLATE_REPO="https://github.com/${{ github.repository }}"
+          TEMPLATE_UID="${{ steps.config.outputs.user_uid }}"
+          TEMPLATE_GID="${{ steps.config.outputs.user_gid }}"
 
           sudo -E chroot "$ROOTFS" /bin/bash -c "
             set -euo pipefail
@@ -219,6 +230,8 @@ jobs:
             export TEMPLATE_VERSION='${TEMPLATE_VERSION}'
             export TEMPLATE_NAME='${TEMPLATE_NAME}'
             export TEMPLATE_REPO='${TEMPLATE_REPO}'
+            export TEMPLATE_UID='${TEMPLATE_UID}'
+            export TEMPLATE_GID='${TEMPLATE_GID}'
             cd /tmp
             ./build.sh
           "

@@ -12,6 +12,15 @@ apt-get install -y --no-install-recommends \
     ca-certificates \
     gnupg
 
+# === Create jellyfin user/group with fixed IDs (for shared volumes) ===
+if [[ -n "${TEMPLATE_GID:-}" ]]; then
+  groupadd -g "$TEMPLATE_GID" jellyfin
+fi
+if [[ -n "${TEMPLATE_UID:-}" ]]; then
+  useradd -r -u "$TEMPLATE_UID" -g "${TEMPLATE_GID:-jellyfin}" \
+    -s /usr/sbin/nologin -d /var/lib/jellyfin jellyfin
+fi
+
 # === Add Jellyfin repository ===
 mkdir -p /etc/apt/keyrings
 curl -fsSL https://repo.jellyfin.org/jellyfin_team.gpg.key \

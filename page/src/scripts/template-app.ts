@@ -113,6 +113,17 @@ function populateDetail(data: Record<string, unknown>): void {
     replaceChildren(badgesEl, versionBadge, osTag, categoryBadge);
   }
 
+  // Project URL
+  const projectUrlEl = document.getElementById("detail-project-url") as HTMLAnchorElement | null;
+  if (projectUrlEl) {
+    if (data.project_url) {
+      projectUrlEl.href = data.project_url as string;
+      projectUrlEl.classList.remove("hidden");
+    } else {
+      projectUrlEl.classList.add("hidden");
+    }
+  }
+
   // Download
   const downloadSection = document.getElementById("detail-download-section");
   const wgetEl = document.getElementById("detail-wget") as HTMLInputElement | null;
@@ -205,6 +216,30 @@ function populateDetail(data: Record<string, unknown>): void {
     replaceChildren(pathsEl, ...rows);
   } else {
     pathsSection?.classList.add("hidden");
+  }
+
+  // User/Group IDs
+  const userSection = document.getElementById("detail-user-section");
+  const userEl = document.getElementById("detail-user");
+  const user = data.user as {uid?: number; gid?: number} | undefined;
+  if (user && (user.uid || user.gid) && userSection && userEl) {
+    userSection.classList.remove("hidden");
+    const rows: HTMLTableRowElement[] = [];
+    if (user.uid) {
+      const tr = createElement("tr");
+      tr.appendChild(createElement("td", { textContent: "UID" }));
+      tr.appendChild(createElement("td", { className: "font-mono", textContent: String(user.uid) }));
+      rows.push(tr);
+    }
+    if (user.gid) {
+      const tr = createElement("tr");
+      tr.appendChild(createElement("td", { textContent: "GID" }));
+      tr.appendChild(createElement("td", { className: "font-mono", textContent: String(user.gid) }));
+      rows.push(tr);
+    }
+    replaceChildren(userEl, ...rows);
+  } else {
+    userSection?.classList.add("hidden");
   }
 
   // Credentials

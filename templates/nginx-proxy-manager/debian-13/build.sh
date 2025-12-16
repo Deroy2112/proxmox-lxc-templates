@@ -164,6 +164,12 @@ openssl req -new -newkey rsa:2048 -days 3650 -nodes -x509 \
 sed -i 's/user npm/user root/g; s/^pid/#pid/g' /etc/nginx/nginx.conf
 sed -r -i 's/^([[:space:]]*)su npm npm/\1#su npm npm/g;' /etc/logrotate.d/nginx-proxy-manager
 
+# === Create shared group for volumes (if configured) ===
+if [[ -n "${TEMPLATE_GID:-}" ]]; then
+  groupadd -g "$TEMPLATE_GID" shared
+  usermod -aG shared root
+fi
+
 # === Create resolver config generator (runs at first boot) ===
 cat > /usr/local/bin/npm-resolvers-update <<'EOF'
 #!/bin/bash
