@@ -82,12 +82,19 @@ function hideTemplateDetail(): void {
 
 // Populate detail with template data
 function populateDetail(data: Record<string, unknown>): void {
-  const iconUrl = `https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons@main/svg/${data.icon}.svg`;
+  const iconUrlSvg = `https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons@main/svg/${data.icon}.svg`;
+  const iconUrlPng = `https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons@main/png/${data.icon}.png`;
   const displayName = (data.name as string).charAt(0).toUpperCase() + (data.name as string).slice(1);
 
-  // Icon & Name
+  // Icon & Name (with SVG -> PNG fallback)
   const iconEl = document.getElementById("detail-icon") as HTMLImageElement | null;
-  if (iconEl) iconEl.src = iconUrl;
+  if (iconEl) {
+    iconEl.src = iconUrlSvg;
+    iconEl.onerror = () => {
+      iconEl.onerror = null;
+      iconEl.src = iconUrlPng;
+    };
+  }
   const nameEl = document.getElementById("detail-name");
   if (nameEl) nameEl.textContent = displayName;
 
