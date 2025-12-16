@@ -94,30 +94,30 @@ jobs:
           echo "user_uid=$USER_UID" >> "$GITHUB_OUTPUT"
           echo "user_gid=$USER_GID" >> "$GITHUB_OUTPUT"
 
-      # Stufe 1: Debootstrap Base-Rootfs Cache (als tar-Archiv)
-      - name: Cache debootstrap rootfs
-        id: cache-rootfs
+      # Cache: Full base system (debootstrap + configured)
+      - name: Cache base system
+        id: cache-base
         uses: actions/cache@v4
         with:
-          path: debootstrap-cache.tar.zst
-          key: debootstrap-trixie-amd64-v2
+          path: base-system-cache.tar.zst
+          key: base-system-trixie-amd64-v3
           restore-keys: |
-            debootstrap-trixie-amd64-
+            base-system-trixie-amd64-
 
-      - name: Create rootfs with debootstrap
+      - name: Create or restore base system
         run: |
           ROOTFS="${{ runner.temp }}/rootfs"
-          CACHE_FILE="${{ github.workspace }}/debootstrap-cache.tar.zst"
+          CACHE_FILE="${{ github.workspace }}/base-system-cache.tar.zst"
 
           if [[ -f "$CACHE_FILE" ]]; then
-            echo "::notice::Restoring rootfs from cache..."
+            echo "::notice::Restoring fully configured base system from cache..."
             sudo mkdir -p "$ROOTFS"
             sudo tar --zstd -xf "$CACHE_FILE" -C "$ROOTFS"
           else
-            echo "::notice::Building fresh rootfs with debootstrap..."
+            echo "::notice::Building fresh base system (will be cached for future builds)..."
             sudo mkdir -p "$ROOTFS"
 
-            # Debian 13 Trixie only
+            # Debian 13 Trixie debootstrap
             sudo debootstrap \
               --arch=${{ steps.config.outputs.arch }} \
               --include=systemd,systemd-sysv,dbus,apt-utils,locales,iproute2,wget,curl,ca-certificates,less,logrotate,openssh-server \
@@ -125,37 +125,8 @@ jobs:
               "$ROOTFS" \
               http://deb.debian.org/debian
 
-            # Cache for next run (als tar-Archiv, um Berechtigungsprobleme zu vermeiden)
-            echo "::notice::Saving rootfs to cache..."
-            sudo tar --zstd -cf "$CACHE_FILE" -C "$ROOTFS" .
-            # Berechtigungen für Cache-Action setzen
-            sudo chown "$(id -u):$(id -g)" "$CACHE_FILE"
-          fi
-
-          echo "ROOTFS=$ROOTFS" >> "$GITHUB_ENV"
-
-      # Stufe 2: APT Package Cache
-      - name: Cache APT packages
-        uses: actions/cache@v4
-        with:
-          path: /tmp/apt-cache
-          key: apt-${{ matrix.template }}-${{ hashFiles(format('templates/{0}/debian-13/config.yml', matrix.template)) }}
-          restore-keys: |
-            apt-${{ matrix.template }}-
-            apt-
-
-      - name: Restore APT cache to rootfs
-        run: |
-          APT_CACHE="/tmp/apt-cache"
-          if [[ -d "$APT_CACHE" ]] && [[ -n "$(ls -A "$APT_CACHE" 2>/dev/null)" ]]; then
-            echo "::notice::Restoring APT cache..."
-            sudo mkdir -p "$ROOTFS/var/cache/apt/archives"
-            sudo cp -a "$APT_CACHE"/*.deb "$ROOTFS/var/cache/apt/archives/" 2>/dev/null || true
-          fi
-
-      - name: Configure base system
-        run: |
-          sudo chroot "$ROOTFS" /bin/bash <<'BASESCRIPT'
+            # Configure base system (only on fresh build)
+            sudo chroot "$ROOTFS" /bin/bash <<'BASESCRIPT'
           set -euo pipefail
           export DEBIAN_FRONTEND=noninteractive
 
@@ -179,7 +150,6 @@ jobs:
           apt-get install -y ifupdown2 isc-dhcp-client
 
           # Network interfaces - minimal config, Proxmox adds eth0 on container creation
-          # NOTE: Do NOT use interfaces.d - Proxmox writes directly to /etc/network/interfaces
           {
             echo "auto lo"
             echo "iface lo inet loopback"
@@ -203,8 +173,36 @@ jobs:
           mkdir -p /etc/systemd/system/multi-user.target.wants
           ln -sf /lib/systemd/system/networking.service /etc/systemd/system/multi-user.target.wants/networking.service
 
-          # Do NOT clean apt cache here - will be saved for caching
+          # Clean APT cache before caching base system
+          apt-get clean
+          rm -rf /var/lib/apt/lists/*
           BASESCRIPT
+
+            # Cache the fully configured base system
+            echo "::notice::Saving configured base system to cache..."
+            sudo tar --zstd -cf "$CACHE_FILE" -C "$ROOTFS" .
+            sudo chown "$(id -u):$(id -g)" "$CACHE_FILE"
+          fi
+
+          echo "ROOTFS=$ROOTFS" >> "$GITHUB_ENV"
+
+      # APT Package Cache for template-specific packages
+      - name: Cache APT packages
+        uses: actions/cache@v4
+        with:
+          path: /tmp/apt-cache
+          key: apt-${{ matrix.template }}-${{ hashFiles(format('templates/{0}/debian-13/config.yml', matrix.template)) }}
+          restore-keys: |
+            apt-${{ matrix.template }}-
+
+      - name: Restore APT cache to rootfs
+        run: |
+          APT_CACHE="/tmp/apt-cache"
+          if [[ -d "$APT_CACHE" ]] && [[ -n "$(ls -A "$APT_CACHE" 2>/dev/null)" ]]; then
+            echo "::notice::Restoring APT cache..."
+            sudo mkdir -p "$ROOTFS/var/cache/apt/archives"
+            sudo cp -a "$APT_CACHE"/*.deb "$ROOTFS/var/cache/apt/archives/" 2>/dev/null || true
+          fi
 
       - name: Run template build script
         run: |
@@ -294,9 +292,7 @@ jobs:
             -cf - . | zstd -T0 -9 -o "${{ runner.temp }}/${{ steps.config.outputs.template_file }}"
 
           cd "${{ runner.temp }}"
-          sha256sum "${{ steps.config.outputs.template_file }}" > "${{ steps.config.outputs.template_file }}.sha256"
           sha512sum "${{ steps.config.outputs.template_file }}" > "${{ steps.config.outputs.template_file }}.sha512"
-          md5sum "${{ steps.config.outputs.template_file }}" > "${{ steps.config.outputs.template_file }}.md5"
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
@@ -304,9 +300,7 @@ jobs:
           name: template-${{ matrix.template }}
           path: |
             ${{ runner.temp }}/${{ steps.config.outputs.template_file }}
-            ${{ runner.temp }}/${{ steps.config.outputs.template_file }}.sha256
             ${{ runner.temp }}/${{ steps.config.outputs.template_file }}.sha512
-            ${{ runner.temp }}/${{ steps.config.outputs.template_file }}.md5
 
   release:
     needs: [detect-changes, build]
@@ -359,10 +353,10 @@ jobs:
             gh release create "$TAG" \
               --title "$template $FULL_VERSION" \
               --notes "$RELEASE_NOTES" \
-              "$dir"/*.tar.zst "$dir"/*.sha256 "$dir"/*.sha512 "$dir"/*.md5 \
+              "$dir"/*.tar.zst "$dir"/*.sha512 \
               --latest=false \
               2>/dev/null || \
             gh release upload "$TAG" \
-              "$dir"/*.tar.zst "$dir"/*.sha256 "$dir"/*.sha512 "$dir"/*.md5 \
+              "$dir"/*.tar.zst "$dir"/*.sha512 \
               --clobber
           done
