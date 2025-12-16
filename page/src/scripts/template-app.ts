@@ -548,23 +548,6 @@ function initDetail(): void {
   }
 }
 
-// Mobile sidebar toggle
-function initMobileSidebar(): void {
-  const menuToggle = document.getElementById("menu-toggle");
-  const sidebar = document.querySelector(".sidebar");
-  const overlay = document.getElementById("sidebar-overlay");
-
-  menuToggle?.addEventListener("click", () => {
-    sidebar?.classList.toggle("open");
-    overlay?.classList.toggle("open");
-  });
-
-  overlay?.addEventListener("click", () => {
-    sidebar?.classList.remove("open");
-    overlay?.classList.remove("open");
-  });
-}
-
 // Keyboard shortcuts
 function initKeyboardShortcuts(): void {
   document.addEventListener("keydown", (e) => {
@@ -580,7 +563,6 @@ function initKeyboardShortcuts(): void {
 export function init(): void {
   initApp();
   initDetail();
-  initMobileSidebar();
   initKeyboardShortcuts();
 }
 
