@@ -34,8 +34,13 @@ quick_start: |
   1. Create a free account at https://my.jdownloader.org
   2. Configure MyJDownloader credentials:
      systemctl stop jdownloader
-     nano /opt/jdownloader/cfg/org.jdownloader.api.myjdownloader.MyJDownloaderSettings.json
-     Add: email, password, devicename fields
+     cat > /opt/jdownloader/cfg/org.jdownloader.api.myjdownloader.MyJDownloaderSettings.json << 'EOF'
+     {
+       "email": "your-email@example.com",
+       "password": "your-password",
+       "devicename": "JDownloader-LXC"
+     }
+     EOF
      chown jdownloader:jdownloader /opt/jdownloader/cfg/org.jdownloader.api.myjdownloader.MyJDownloaderSettings.json
      systemctl start jdownloader
   3. Access via https://my.jdownloader.org

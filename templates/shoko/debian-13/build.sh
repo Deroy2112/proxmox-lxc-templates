@@ -34,10 +34,10 @@ Architectures: amd64
 Signed-By: /etc/apt/keyrings/microsoft.gpg
 EOF
 
-# === Install .NET 8.0 Runtime ===
+# === Install ASP.NET Core 8.0 Runtime (includes Microsoft.AspNetCore.App framework) ===
 apt-get update
 apt-get install -y --no-install-recommends \
-    dotnet-runtime-8.0
+    aspnetcore-runtime-8.0
 
 # === Create shoko user/group with fixed IDs (for shared volumes) ===
 if [[ -n "${TEMPLATE_GID:-}" ]]; then
