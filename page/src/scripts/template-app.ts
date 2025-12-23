@@ -138,7 +138,10 @@ function populateDetail(data: Record<string, unknown>): void {
 
   if (data.download_url) {
     downloadSection?.classList.remove("hidden");
-    if (wgetEl) wgetEl.value = `wget ${data.download_url}`;
+    if (wgetEl) {
+      wgetEl.value = `URL: ${data.download_url}`;
+      wgetEl.setAttribute("data-url", data.download_url as string);
+    }
     const sha512Wrapper = document.getElementById("detail-sha512-wrapper");
     if (sha512El && sha512Wrapper) {
       if (data.sha512) {
@@ -500,14 +503,15 @@ function initDetail(): void {
   const wgetInput = document.getElementById("detail-wget") as HTMLInputElement | null;
   const sha512CopyBtn = document.getElementById("detail-sha512-copy");
 
-  // Copy wget command
+  // Copy URL
   wgetCopyBtn?.addEventListener("click", async () => {
-    if (wgetInput?.value) {
+    const url = wgetInput?.getAttribute("data-url");
+    if (url) {
       try {
-        await navigator.clipboard.writeText(wgetInput.value);
-        window.showToast?.("Copied to clipboard!");
+        await navigator.clipboard.writeText(url);
+        window.showToast?.("URL copied to clipboard!");
       } catch {
-        wgetInput.select();
+        wgetInput?.select();
         document.execCommand("copy");
         window.showToast?.("Copied!");
       }
