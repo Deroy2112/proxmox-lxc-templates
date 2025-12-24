@@ -1,86 +1,84 @@
-<p align="center">
-  <h1 align="center">Proxmox LXC Templates</h1>
-  <p align="center">
-    Ready-to-use LXC container templates with checksum verification
-  </p>
-</p>
+# Proxmox LXC Templates
 
-<p align="center">
-  <a href="https://github.com/Deroy2112/proxmox-lxc-templates/actions/workflows/build-template.yml">
-    <img src="https://github.com/Deroy2112/proxmox-lxc-templates/actions/workflows/build-template.yml/badge.svg" alt="Build Status">
-  </a>
-  <a href="https://github.com/Deroy2112/proxmox-lxc-templates/releases">
-    <img src="https://img.shields.io/github/v/release/Deroy2112/proxmox-lxc-templates?label=latest" alt="Latest Release">
-  </a>
-  <a href="https://github.com/Deroy2112/proxmox-lxc-templates/blob/main/LICENSE">
-    <img src="https://img.shields.io/github/license/Deroy2112/proxmox-lxc-templates" alt="License">
-  </a>
-</p>
+Custom LXC container templates for Proxmox VE. Pre-configured, optimized, and ready to deploy.
 
----
+[![Build](https://github.com/Deroy2112/proxmox-lxc-templates/actions/workflows/build-debian-13.yml/badge.svg)](https://github.com/Deroy2112/proxmox-lxc-templates/actions/workflows/build-debian-13.yml)
+[![License](https://img.shields.io/github/license/Deroy2112/proxmox-lxc-templates)](LICENSE)
+
+## Overview
+
+This project provides production-ready LXC container templates built with GitHub Actions using `debootstrap`. All templates are based on **Debian 13 (Trixie)** and include:
+
+- SHA-512 verified downloads
+- Built-in update mechanism with rollback support
+- Consistent UID/GID mapping for shared storage
+- Minimal footprint with only required packages
+
+**Website:** https://deroy2112.github.io/proxmox-lxc-templates/
+
+## Available Templates
+
+| Template | Description | Version |
+|----------|-------------|---------|
+| [Jellyfin](https://deroy2112.github.io/proxmox-lxc-templates/#jellyfin) | Media Server | 10.10.3 |
+| [Shoko](https://deroy2112.github.io/proxmox-lxc-templates/#shoko) | Anime Server | 5.1.0 |
+| [Nginx](https://deroy2112.github.io/proxmox-lxc-templates/#nginx) | Web Server | 1.26.0 |
+| [Nginx Proxy Manager](https://deroy2112.github.io/proxmox-lxc-templates/#nginx-proxy-manager) | Reverse Proxy | 2.13.5 |
+| [JDownloader](https://deroy2112.github.io/proxmox-lxc-templates/#jdownloader) | Download Manager | 2.0 |
 
 ## Installation
 
-### Option 1: Web UI
+### Web UI
 
-1. Go to **Storage** → **local** → **CT Templates**
+1. Navigate to **Datacenter** > **Storage** > **local** > **CT Templates**
 2. Click **Download from URL**
-3. Paste URL and SHA-512 checksum from our [website](https://deroy2112.github.io/proxmox-lxc-templates/)
+3. Copy the URL and SHA-512 checksum from the [website](https://deroy2112.github.io/proxmox-lxc-templates/)
+4. Paste both values and click **Query URL** then **Download**
 
-### Option 2: CLI
-
-Run on your Proxmox node as root:
+### CLI
 
 ```bash
 pvesh create /nodes/$(hostname)/storage/local/download-url \
   --content vztmpl \
-  --filename deroy2112-debian-13-nginx_1.26.0-1_amd64.tar.zst \
-  --url https://github.com/Deroy2112/proxmox-lxc-templates/releases/download/v1.26.0-1-nginx/deroy2112-debian-13-nginx_1.26.0-1_amd64.tar.zst \
+  --filename <FILENAME> \
+  --url <URL> \
   --checksum <SHA512> \
   --checksum-algorithm sha512
 ```
 
-Get the full command with checksum from our [website](https://deroy2112.github.io/proxmox-lxc-templates/).
+Get the complete command with all values from the [website](https://deroy2112.github.io/proxmox-lxc-templates/).
 
----
+## Update Containers
 
-## Available Templates
-
-| Template | Description | Base OS |
-|----------|-------------|---------|
-| **nginx** | Nginx Webserver | Debian 13 |
-
----
-
-## Features
-
-| | Feature |
-|---|---------|
-| **Verified** | All downloads are SHA-512 verified |
-| **Reproducible** | Built with GitHub Actions using debootstrap |
-| **Updateable** | Update running containers without rebuilding |
-| **Rollback** | Automatic backups before every update |
-
----
-
-## Update Running Containers
-
-Every template includes a built-in update tool:
+Every template includes `template-update` for in-place updates:
 
 ```bash
-template-update status      # Check for updates
-template-update update      # Apply update
-template-update rollback    # Restore previous version
+template-update status      # Check current version and available updates
+template-update update      # Download and apply update
+template-update rollback    # Restore previous version from backup
+template-update changelog   # View changelog
+template-update history     # Show update history
 ```
 
----
+## Shared Storage
 
-## Links
+Templates use consistent UID/GID mapping for shared storage access:
 
-- **Website:** https://deroy2112.github.io/proxmox-lxc-templates/
-- **Releases:** https://github.com/Deroy2112/proxmox-lxc-templates/releases
+| Category | GID | Description |
+|----------|-----|-------------|
+| media | 1100 | Jellyfin, Shoko, JDownloader |
+| network | 1200 | Nginx, Nginx Proxy Manager |
 
----
+Mount shared storage with matching group ownership to enable access across containers.
+
+## Contributing
+
+1. Fork the repository
+2. Create a template directory: `templates/<name>/debian-13/`
+3. Add required files: `config.yml`, `build.sh`, `update.sh`, `CHANGELOG.md`
+4. Submit a pull request
+
+See existing templates for reference.
 
 ## License
 
