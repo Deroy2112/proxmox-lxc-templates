@@ -68,7 +68,11 @@
       "question": "What are the default ports?",
       "answer": "- 8080: Web interface\n- 17001: Desktop client connections\n- 17002: PostgreSQL database (internal)\n"
     }
-  ]
+  ],
+  "download_url": "https://github.com/Deroy2112/proxmox-lxc-templates/releases/download/v25.02-1-ecodms/deroy2112-debian-13-ecodms_25.02-1_amd64.tar.zst",
+  "release_url": "https://github.com/Deroy2112/proxmox-lxc-templates/releases/tag/v25.02-1-ecodms",
+  "sha512": "e212668c0f63a7926aa4decb6a64f9998d0eab78b48829a742d05d2a29843a48285d245a23d39cfce398eb8859dff9102b98258bde7ef1e615f8a38be75f8e20",
+  "release_date": "2025-12-24T12:53:29Z"
 }
 ,
 {
