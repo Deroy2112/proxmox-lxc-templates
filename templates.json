@@ -407,4 +407,76 @@
   "sha512": "7e2836b3f52f2ae20c49975e158de48a20061c238fe8e4fd4e7688e7281a2519e5b8e63e6f135d89693f94c639fcc1fd18cff6f1cd01be194ce45b64fcbb0c7e",
   "release_date": "2025-12-15T12:59:10Z"
 }
+,
+{
+  "name": "vaultwarden",
+  "description": "Lightweight Bitwarden-compatible password manager written in Rust",
+  "category": "security",
+  "icon": "vaultwarden",
+  "version": "1.34.3",
+  "build_version": 1,
+  "base_os": "debian-13",
+  "architecture": "amd64",
+  "maintainer": "Deroy2112 <81692934+Deroy2112@users.noreply.github.com>",
+  "project_url": "https://github.com/dani-garcia/vaultwarden",
+  "user": {
+    "uid": 1701,
+    "gid": 1700
+  },
+  "resources": {
+    "memory_min": 128,
+    "memory_recommended": 256,
+    "disk_min": "1G",
+    "disk_recommended": "2G",
+    "cores": 1
+  },
+  "ports": [
+    {
+      "port": 8080,
+      "description": "Web Interface"
+    },
+    {
+      "port": 3012,
+      "description": "WebSocket (optional)"
+    }
+  ],
+  "paths": [
+    {
+      "path": "/var/lib/vaultwarden",
+      "description": "Data directory (database, attachments, keys)"
+    },
+    {
+      "path": "/etc/vaultwarden",
+      "description": "Configuration"
+    }
+  ],
+  "credentials": {
+    "username": "(first registered user becomes admin)",
+    "password": "(set during registration)",
+    "note": "Admin panel disabled by default. Enable via ADMIN_TOKEN in config."
+  },
+  "quick_start": "Web Interface: http://<IP>:8080\nConfig: /etc/vaultwarden/vaultwarden.env\nLogs: journalctl -u vaultwarden\n\nInitial Setup:\n1. Enable registration: Set SIGNUPS_ALLOWED=true in config\n2. Restart: systemctl restart vaultwarden\n3. Create your account at http://<IP>:8080\n4. Disable registration: Set SIGNUPS_ALLOWED=false\n5. Restart again to lock down registration\n",
+  "faq": [
+    {
+      "question": "How do I enable the admin panel?",
+      "answer": "Generate a token: openssl rand -base64 48\nAdd to /etc/vaultwarden/vaultwarden.env:\n  ADMIN_TOKEN=your-generated-token\nRestart: systemctl restart vaultwarden\nAccess: http://<IP>:8080/admin\n"
+    },
+    {
+      "question": "How do I configure SMTP for emails?",
+      "answer": "Edit /etc/vaultwarden/vaultwarden.env and set:\n  SMTP_HOST=smtp.example.com\n  SMTP_PORT=587\n  SMTP_SECURITY=starttls\n  SMTP_USERNAME=user@example.com\n  SMTP_PASSWORD=your-password\n  SMTP_FROM=vaultwarden@example.com\nRestart: systemctl restart vaultwarden\n"
+    },
+    {
+      "question": "How do I backup the data?",
+      "answer": "Stop the service: systemctl stop vaultwarden\nBackup /var/lib/vaultwarden (contains database and attachments)\nStart again: systemctl start vaultwarden\n"
+    },
+    {
+      "question": "How do I use a reverse proxy with HTTPS?",
+      "answer": "Vaultwarden works behind nginx/Traefik/Caddy.\nSet DOMAIN=https://vault.example.com in config.\nProxy to http://localhost:8080\nFor WebSocket support, also proxy /notifications/hub to port 3012\n"
+    },
+    {
+      "question": "How do I disable new user registration?",
+      "answer": "Add to /etc/vaultwarden/vaultwarden.env:\n  SIGNUPS_ALLOWED=false\nRestart: systemctl restart vaultwarden\n"
+    }
+  ]
+}
 ]
