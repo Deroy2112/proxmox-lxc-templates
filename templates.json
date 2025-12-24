@@ -71,7 +71,7 @@
   ],
   "download_url": "https://github.com/Deroy2112/proxmox-lxc-templates/releases/download/v25.02-1-ecodms/deroy2112-debian-13-ecodms_25.02-1_amd64.tar.zst",
   "release_url": "https://github.com/Deroy2112/proxmox-lxc-templates/releases/tag/v25.02-1-ecodms",
-  "sha512": "e212668c0f63a7926aa4decb6a64f9998d0eab78b48829a742d05d2a29843a48285d245a23d39cfce398eb8859dff9102b98258bde7ef1e615f8a38be75f8e20",
+  "sha512": "cacc6930cac893870b4c31bc55f8758b79a2c6e040bfb24d22d0ac5bd422d3e75d9ce9ba9ebcbf0a0cdb049ad16dd048dce69a73df6c118c78c186a4244dc76d",
   "release_date": "2025-12-24T12:53:29Z"
 }
 ,
