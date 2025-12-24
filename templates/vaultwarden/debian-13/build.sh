@@ -96,7 +96,7 @@ SIGNUPS_ALLOWED=false
 # DOMAIN=https://vault.example.com
 EOF
 
-chown root:vaultwarden /etc/vaultwarden/vaultwarden.env
+chown root:shared /etc/vaultwarden/vaultwarden.env
 chmod 640 /etc/vaultwarden/vaultwarden.env
 
 # === Create systemd service ===
