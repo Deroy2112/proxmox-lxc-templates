@@ -1,6 +1,6 @@
 #!/bin/bash
 # templates/ecodms/build.sh
-# Runs inside systemd-nspawn chroot during GitHub Actions build
+# Runs inside chroot during GitHub Actions build
 # Following official ecoDMS installation guide for Debian 13
 set -euo pipefail
 
@@ -11,23 +11,63 @@ apt-get update
 apt-get install -y --no-install-recommends \
 	curl \
 	ca-certificates \
-	gnupg
+	gnupg \
+	postgresql \
+	postgresql-client
 
-# === Create ecodms group with fixed GID (for shared volumes) ===
+# === Create ecodms user/group with fixed IDs (for shared volumes) ===
+# Must be created BEFORE installing ecodmsserver to use our fixed IDs
 if [[ -n "${TEMPLATE_GID:-}" ]]; then
 	groupadd -g "$TEMPLATE_GID" ecodms
 fi
+if [[ -n "${TEMPLATE_UID:-}" ]]; then
+	useradd -r -u "$TEMPLATE_UID" -g ecodms -s /usr/sbin/nologin -d /opt/ecodms ecodms
+fi
+
+# === Start PostgreSQL (required for ecoDMS installation) ===
+# In chroot environment, services don't start automatically
+# Find PostgreSQL data directory and start manually
+PG_DATA=$(find /var/lib/postgresql -name "main" -type d 2>/dev/null | head -1)
+if [[ -z "$PG_DATA" ]]; then
+	echo "ERROR: PostgreSQL data directory not found"
+	exit 1
+fi
+
+# Ensure socket directory exists
+mkdir -p /var/run/postgresql
+chown postgres:postgres /var/run/postgresql
+
+# Start PostgreSQL as postgres user
+echo "Starting PostgreSQL..."
+su - postgres -c "pg_ctl start -D '$PG_DATA' -l /var/log/postgresql/startup.log -w -t 60" || {
+	echo "pg_ctl start failed, trying pg_ctlcluster..."
+	pg_ctlcluster "$(pg_lsclusters -h | awk 'NR==1{print $1}')" main start || true
+}
+
+# Wait for PostgreSQL to be ready
+echo "Waiting for PostgreSQL..."
+for i in {1..30}; do
+	if su - postgres -c "pg_isready" &>/dev/null; then
+		echo "PostgreSQL is ready"
+		break
+	fi
+	echo "Waiting... ($i/30)"
+	sleep 1
+done
+
+# Verify PostgreSQL is running
+if ! su - postgres -c "pg_isready" &>/dev/null; then
+	echo "ERROR: PostgreSQL failed to start"
+	cat /var/log/postgresql/startup.log 2>/dev/null || true
+	exit 1
+fi
 
 # === Add ecoDMS repository (DEB822 format for Debian 13) ===
-# Official guide: https://www.ecodms.de/en/ecodms-archiv/systemvoraussetzungen
-# Note: ecoDMS only provides HTTP repository
 mkdir -p /etc/apt/keyrings
 
-# Download and convert GPG key (official: wget -qO /etc/apt/trusted.gpg.d/ecodms.asc)
 curl -fsSL http://www.ecodms.de/gpg/ecodms.key | gpg --dearmor -o /etc/apt/keyrings/ecodms.gpg
 chmod 644 /etc/apt/keyrings/ecodms.gpg
 
-# Official source: deb http://www.ecodms.de/ecodms_250264/trixie /
 cat >/etc/apt/sources.list.d/ecodms.sources <<'EOF'
 Types: deb
 URIs: http://www.ecodms.de/ecodms_250264/trixie
@@ -35,18 +75,19 @@ Suites: /
 Signed-By: /etc/apt/keyrings/ecodms.gpg
 EOF
 
-# === Update package lists ===
 apt-get update
 
 # === Pre-configure ecoDMS to avoid interactive prompts ===
-# Accept license and set language to English
 echo "ecodmsserver ecodmsserver/language select English" | debconf-set-selections
 echo "ecodmsserver ecodmsserver/license boolean true" | debconf-set-selections
 
 # === Install ecoDMS Server ===
-# Official guide: sudo apt-get install ecodmsserver
-# This installs PostgreSQL as dependency and creates the ecodms database
+echo "Installing ecoDMS Server..."
 apt-get install -y ecodmsserver
+
+# === Stop PostgreSQL (will start on container boot) ===
+echo "Stopping PostgreSQL..."
+su - postgres -c "pg_ctl stop -D '$PG_DATA' -m fast" || true
 
 # === Create data directory with correct permissions ===
 mkdir -p /srv/data
