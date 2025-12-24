@@ -1,0 +1,85 @@
+name: vaultwarden
+description: Lightweight Bitwarden-compatible password manager written in Rust
+category: security
+icon: vaultwarden
+version: 1.34.3
+build_version: 1
+base_os: debian-13
+architecture: amd64
+maintainer: Deroy2112 <81692934+Deroy2112@users.noreply.github.com>
+project_url: https://github.com/dani-garcia/vaultwarden
+
+user:
+  uid: 1701
+  gid: 1700
+
+resources:
+  memory_min: 128
+  memory_recommended: 256
+  disk_min: 1G
+  disk_recommended: 2G
+  cores: 1
+
+ports:
+  - port: 8080
+    description: Web Interface
+  - port: 3012
+    description: WebSocket (optional)
+
+paths:
+  - path: /var/lib/vaultwarden
+    description: Data directory (database, attachments, keys)
+  - path: /etc/vaultwarden
+    description: Configuration
+
+credentials:
+  username: (first registered user becomes admin)
+  password: (set during registration)
+  note: Admin panel disabled by default. Enable via ADMIN_TOKEN in config.
+
+quick_start: |
+  Web Interface: http://<IP>:8080
+  Config: /etc/vaultwarden/vaultwarden.env
+  Logs: journalctl -u vaultwarden
+
+  Initial Setup:
+  1. Enable registration: Set SIGNUPS_ALLOWED=true in config
+  2. Restart: systemctl restart vaultwarden
+  3. Create your account at http://<IP>:8080
+  4. Disable registration: Set SIGNUPS_ALLOWED=false
+  5. Restart again to lock down registration
+
+faq:
+  - question: How do I enable the admin panel?
+    answer: |
+      Generate a token: openssl rand -base64 48
+      Add to /etc/vaultwarden/vaultwarden.env:
+        ADMIN_TOKEN=your-generated-token
+      Restart: systemctl restart vaultwarden
+      Access: http://<IP>:8080/admin
+  - question: How do I configure SMTP for emails?
+    answer: |
+      Edit /etc/vaultwarden/vaultwarden.env and set:
+        SMTP_HOST=smtp.example.com
+        SMTP_PORT=587
+        SMTP_SECURITY=starttls
+        SMTP_USERNAME=user@example.com
+        SMTP_PASSWORD=your-password
+        SMTP_FROM=vaultwarden@example.com
+      Restart: systemctl restart vaultwarden
+  - question: How do I backup the data?
+    answer: |
+      Stop the service: systemctl stop vaultwarden
+      Backup /var/lib/vaultwarden (contains database and attachments)
+      Start again: systemctl start vaultwarden
+  - question: How do I use a reverse proxy with HTTPS?
+    answer: |
+      Vaultwarden works behind nginx/Traefik/Caddy.
+      Set DOMAIN=https://vault.example.com in config.
+      Proxy to http://localhost:8080
+      For WebSocket support, also proxy /notifications/hub to port 3012
+  - question: How do I disable new user registration?
+    answer: |
+      Add to /etc/vaultwarden/vaultwarden.env:
+        SIGNUPS_ALLOWED=false
+      Restart: systemctl restart vaultwarden
