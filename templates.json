@@ -477,6 +477,10 @@
       "question": "How do I disable new user registration?",
       "answer": "Add to /etc/vaultwarden/vaultwarden.env:\n  SIGNUPS_ALLOWED=false\nRestart: systemctl restart vaultwarden\n"
     }
-  ]
+  ],
+  "download_url": "https://github.com/Deroy2112/proxmox-lxc-templates/releases/download/v1.34.3-1-vaultwarden/deroy2112-debian-13-vaultwarden_1.34.3-1_amd64.tar.zst",
+  "release_url": "https://github.com/Deroy2112/proxmox-lxc-templates/releases/tag/v1.34.3-1-vaultwarden",
+  "sha512": "327a2ba83c19655150557aaddb4f21045cd1c911f11b28b9ddcd1ff4026057767bcd4803e8a3f14e855d9c4e1b773affefec44d9b467fa63bdc57db6caae423f",
+  "release_date": "2025-12-24T18:30:10Z"
 }
 ]
