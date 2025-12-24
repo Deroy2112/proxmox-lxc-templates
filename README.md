@@ -25,6 +25,7 @@ This project provides production-ready LXC container templates built with GitHub
 | [Nginx](https://deroy2112.github.io/proxmox-lxc-templates/#nginx) | Web Server | 1.26.0 |
 | [Nginx Proxy Manager](https://deroy2112.github.io/proxmox-lxc-templates/#nginx-proxy-manager) | Reverse Proxy | 2.13.5 |
 | [JDownloader](https://deroy2112.github.io/proxmox-lxc-templates/#jdownloader) | Download Manager | 2.0 |
+| [ecoDMS](https://deroy2112.github.io/proxmox-lxc-templates/#ecodms) | Document Management | 25.02 |
 
 ## Installation
 
@@ -68,6 +69,7 @@ Templates use consistent UID/GID mapping for shared storage access:
 |----------|-----|-------------|
 | media | 1100 | Jellyfin, Shoko, JDownloader |
 | network | 1200 | Nginx, Nginx Proxy Manager |
+| storage | 1600 | ecoDMS |
 
 Mount shared storage with matching group ownership to enable access across containers.
 
