@@ -8,18 +8,18 @@ export DEBIAN_FRONTEND=noninteractive
 # === Install packages ===
 apt-get update
 apt-get install -y --no-install-recommends \
-    nginx \
-    curl \
-    ca-certificates
+	nginx \
+	curl \
+	ca-certificates
 
 # === Create shared group for volumes (if configured) ===
 if [[ -n "${TEMPLATE_GID:-}" ]]; then
-  groupadd -g "$TEMPLATE_GID" shared
-  usermod -aG shared www-data
+	groupadd -g "$TEMPLATE_GID" shared
+	usermod -aG shared www-data
 fi
 
 # === Configure nginx ===
-cat > /etc/nginx/sites-available/default <<'EOF'
+cat >/etc/nginx/sites-available/default <<'EOF'
 server {
     listen 80 default_server;
     listen [::]:80 default_server;
@@ -36,7 +36,7 @@ server {
 EOF
 
 # === Welcome page ===
-cat > /var/www/html/index.html <<'EOF'
+cat >/var/www/html/index.html <<'EOF'
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -93,7 +93,7 @@ EOF
 sed -i "s/__VERSION__/${TEMPLATE_VERSION}/" /var/www/html/index.html
 
 # === Template info ===
-cat > /etc/template-info <<EOF
+cat >/etc/template-info <<EOF
 TEMPLATE_NAME="${TEMPLATE_NAME}"
 TEMPLATE_REPO="${TEMPLATE_REPO}"
 TEMPLATE_VERSION="${TEMPLATE_VERSION}"
@@ -103,7 +103,7 @@ EOF
 # === Install template-update tool ===
 repo_raw_url=$(echo "${TEMPLATE_REPO}" | sed 's|github.com|raw.githubusercontent.com|')/main
 curl -fsSL "${repo_raw_url}/scripts/template-update.sh" \
-    -o /usr/local/bin/template-update
+	-o /usr/local/bin/template-update
 chmod +x /usr/local/bin/template-update
 
 # === Enable services ===

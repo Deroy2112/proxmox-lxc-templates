@@ -14,19 +14,19 @@ readonly DATA_DIR="/data"
 # === Install base dependencies ===
 apt-get update
 apt-get install -y --no-install-recommends \
-    curl \
-    ca-certificates \
-    gnupg \
-    git \
-    build-essential \
-    python3 \
-    python3-dev \
-    python3-pip \
-    python3-venv \
-    python3-cffi \
-    openssl \
-    apache2-utils \
-    logrotate
+	curl \
+	ca-certificates \
+	gnupg \
+	git \
+	build-essential \
+	python3 \
+	python3-dev \
+	python3-pip \
+	python3-venv \
+	python3-cffi \
+	openssl \
+	apache2-utils \
+	logrotate
 
 # === Setup Certbot in virtualenv ===
 python3 -m venv /opt/certbot
@@ -36,11 +36,11 @@ ln -sf /opt/certbot/bin/certbot /usr/local/bin/certbot
 
 # === Add Node.js repository (Node.js 22 LTS) ===
 mkdir -p /etc/apt/keyrings
-curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key \
-    | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg
+curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key |
+	gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg
 chmod 644 /etc/apt/keyrings/nodesource.gpg
 
-cat > /etc/apt/sources.list.d/nodesource.sources <<'EOF'
+cat >/etc/apt/sources.list.d/nodesource.sources <<'EOF'
 Types: deb
 URIs: https://deb.nodesource.com/node_22.x
 Suites: nodistro
@@ -50,11 +50,11 @@ Signed-By: /etc/apt/keyrings/nodesource.gpg
 EOF
 
 # === Add OpenResty repository (using bookworm - compatible with trixie) ===
-curl -fsSL https://openresty.org/package/pubkey.gpg \
-    | gpg --dearmor -o /etc/apt/keyrings/openresty.gpg
+curl -fsSL https://openresty.org/package/pubkey.gpg |
+	gpg --dearmor -o /etc/apt/keyrings/openresty.gpg
 chmod 644 /etc/apt/keyrings/openresty.gpg
 
-cat > /etc/apt/sources.list.d/openresty.sources <<'EOF'
+cat >/etc/apt/sources.list.d/openresty.sources <<'EOF'
 Types: deb
 URIs: https://openresty.org/package/debian
 Suites: bookworm
@@ -66,13 +66,13 @@ EOF
 # === Install Node.js and OpenResty ===
 apt-get update
 apt-get install -y --no-install-recommends \
-    nodejs \
-    openresty
+	nodejs \
+	openresty
 
 # === Download NPM source ===
 mkdir -p "$NPM_DIR"
 curl -fsSL "https://github.com/NginxProxyManager/nginx-proxy-manager/archive/refs/tags/v${NPM_VERSION}.tar.gz" \
-    -o /tmp/npm.tar.gz
+	-o /tmp/npm.tar.gz
 tar -xzf /tmp/npm.tar.gz -C "$NPM_DIR" --strip-components=1
 
 # === Create symbolic links for binaries ===
@@ -91,7 +91,7 @@ sed -i 's+^daemon+#daemon+g' "$NPM_DIR/docker/rootfs/etc/nginx/nginx.conf"
 # Fix include paths to absolute
 NGINX_CONFS=$(find "$NPM_DIR" -type f -name "*.conf")
 for NGINX_CONF in $NGINX_CONFS; do
-    sed -i 's+include conf.d+include /etc/nginx/conf.d+g' "$NGINX_CONF"
+	sed -i 's+include conf.d+include /etc/nginx/conf.d+g' "$NGINX_CONF"
 done
 
 # === Create directory structure ===
@@ -138,7 +138,7 @@ cd "$APP_DIR"
 rm -rf "$APP_DIR/config/default.json"
 
 mkdir -p "$APP_DIR/config"
-cat > "$APP_DIR/config/production.json" <<'EOF'
+cat >"$APP_DIR/config/production.json" <<'EOF'
 {
   "database": {
     "engine": "knex-native",
@@ -156,9 +156,9 @@ npm install
 
 # === Generate dummy SSL certificates ===
 openssl req -new -newkey rsa:2048 -days 3650 -nodes -x509 \
-    -subj "/O=Nginx Proxy Manager/OU=Dummy Certificate/CN=localhost" \
-    -keyout "$DATA_DIR/nginx/dummykey.pem" \
-    -out "$DATA_DIR/nginx/dummycert.pem"
+	-subj "/O=Nginx Proxy Manager/OU=Dummy Certificate/CN=localhost" \
+	-keyout "$DATA_DIR/nginx/dummykey.pem" \
+	-out "$DATA_DIR/nginx/dummycert.pem"
 
 # === Patch nginx.conf for root user (no npm user in LXC) ===
 sed -i 's/user npm/user root/g; s/^pid/#pid/g' /etc/nginx/nginx.conf
@@ -166,12 +166,12 @@ sed -r -i 's/^([[:space:]]*)su npm npm/\1#su npm npm/g;' /etc/logrotate.d/nginx-
 
 # === Create shared group for volumes (if configured) ===
 if [[ -n "${TEMPLATE_GID:-}" ]]; then
-  groupadd -g "$TEMPLATE_GID" shared
-  usermod -aG shared root
+	groupadd -g "$TEMPLATE_GID" shared
+	usermod -aG shared root
 fi
 
 # === Create resolver config generator (runs at first boot) ===
-cat > /usr/local/bin/npm-resolvers-update <<'EOF'
+cat >/usr/local/bin/npm-resolvers-update <<'EOF'
 #!/bin/bash
 # Generate resolver config from current DNS settings
 echo resolver "$(awk 'BEGIN{ORS=" "} $1=="nameserver" {print ($2 ~ ":")? "["$2"]": $2}' /etc/resolv.conf);" > /etc/nginx/conf.d/include/resolvers.conf
@@ -179,7 +179,7 @@ EOF
 chmod +x /usr/local/bin/npm-resolvers-update
 
 # === Create systemd service ===
-cat > /lib/systemd/system/npm.service <<'EOF'
+cat >/lib/systemd/system/npm.service <<'EOF'
 [Unit]
 Description=Nginx Proxy Manager
 After=network.target
@@ -200,7 +200,7 @@ WantedBy=multi-user.target
 EOF
 
 # === Create logrotate config ===
-cat > /etc/logrotate.d/npm <<'EOF'
+cat >/etc/logrotate.d/npm <<'EOF'
 /data/logs/*.log {
     daily
     missingok
@@ -216,7 +216,7 @@ cat > /etc/logrotate.d/npm <<'EOF'
 EOF
 
 # === Template info ===
-cat > /etc/template-info <<EOF
+cat >/etc/template-info <<EOF
 TEMPLATE_NAME="${TEMPLATE_NAME}"
 TEMPLATE_REPO="${TEMPLATE_REPO}"
 TEMPLATE_VERSION="${TEMPLATE_VERSION}"
@@ -226,7 +226,7 @@ EOF
 # === Install template-update tool ===
 repo_raw_url="${TEMPLATE_REPO/github.com/raw.githubusercontent.com}/main"
 curl -fsSL "${repo_raw_url}/scripts/template-update.sh" \
-    -o /usr/local/bin/template-update
+	-o /usr/local/bin/template-update
 chmod +x /usr/local/bin/template-update
 
 # === Enable services ===
